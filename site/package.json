@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "start": "serve dist --listen tcp://0.0.0.0:${PORT:-4321} --no-clipboard",
+    "test:e2e": "playwright test",
     "astro": "astro"
   },
   "dependencies": {
@@ -15,5 +16,8 @@
     "@astrojs/sitemap": "^3.2.1",
     "astro": "^4.16.18",
     "serve": "^14.2.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
   }
 }
