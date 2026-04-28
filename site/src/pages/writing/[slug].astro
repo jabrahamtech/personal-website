@@ -1,0 +1,61 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import DocLayout from '../../layouts/DocLayout.astro';
+
+export async function getStaticPaths() {
+  const articles = (await getCollection('writing')).sort((a, b) => a.data.order - b.data.order);
+  return articles.map((article, i) => ({
+    params: { slug: article.slug },
+    props: {
+      article,
+      prev: i > 0 ? articles[i - 1] : null,
+      next: i < articles.length - 1 ? articles[i + 1] : null,
+    },
+  }));
+}
+
+interface Props {
+  article: CollectionEntry<'writing'>;
+  prev: CollectionEntry<'writing'> | null;
+  next: CollectionEntry<'writing'> | null;
+}
+const { article, prev, next } = Astro.props;
+const { data } = article;
+const { Content } = await article.render();
+
+const metaRow = [
+  { label: 'category', value: data.category },
+  { label: 'read',     value: data.readTime },
+  { label: 'posted',   value: data.posted },
+];
+---
+<DocLayout
+  title={`${data.title} — Jonathan Abraham`}
+  description={data.summary}
+  promptPath={`./writing/${article.slug}`}
+  crumbs={[
+    { href: '/', label: '~' },
+    { href: '/#writing', label: 'writing' },
+    { label: article.slug },
+  ]}
+  metaRow={metaRow}
+  narrow
+>
+  <Content />
+  {(prev || next) && (
+    <div class="pn" slot="footer">
+      {prev ? (
+        <a class="pcard" href={`/writing/${prev.slug}`}>
+          <small>← prev note</small>
+          <span>{prev.data.title}</span>
+        </a>
+      ) : <span></span>}
+      {next ? (
+        <a class="pcard next" href={`/writing/${next.slug}`}>
+          <small>next note →</small>
+          <span>{next.data.title}</span>
+        </a>
+      ) : <span></span>}
+    </div>
+  )}
+</DocLayout>

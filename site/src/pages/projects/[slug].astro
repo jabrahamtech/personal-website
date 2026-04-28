@@ -1,0 +1,58 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import DocLayout from '../../layouts/DocLayout.astro';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => {
+    const prev = projects[(i - 1 + projects.length) % projects.length];
+    const next = projects[(i + 1) % projects.length];
+    return {
+      params: { slug: project.slug },
+      props: { project, prev, next },
+    };
+  });
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  prev: CollectionEntry<'projects'>;
+  next: CollectionEntry<'projects'>;
+}
+const { project, prev, next } = Astro.props;
+const { data } = project;
+const { Content } = await project.render();
+
+const metaRow = [
+  { label: 'status', value: data.status },
+  { label: 'year',   value: String(data.year) },
+  { label: 'role',   value: data.role },
+  { label: 'stack',  value: data.stack },
+];
+---
+<DocLayout
+  title={`${data.title} — Jonathan Abraham`}
+  description={data.summary}
+  promptPath={`./projects/${project.slug}`}
+  crumbs={[
+    { href: '/', label: '~' },
+    { href: '/#proof-of-work', label: 'proof-of-work' },
+    { label: project.slug },
+  ]}
+  heroSummary={data.summary}
+  metaRow={metaRow}
+  tags={data.tags}
+  contentsToc={data.contentsToc}
+>
+  <Content />
+  <div class="pn" slot="footer">
+    <a class="pcard" href={`/projects/${prev.slug}`}>
+      <small>← prev project</small>
+      <span>{prev.data.title}</span>
+    </a>
+    <a class="pcard next" href={`/projects/${next.slug}`}>
+      <small>next project →</small>
+      <span>{next.data.title}</span>
+    </a>
+  </div>
+</DocLayout>

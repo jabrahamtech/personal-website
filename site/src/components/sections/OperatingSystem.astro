@@ -1,0 +1,61 @@
+---
+import OsCard from '../OsCard.astro';
+
+const G = 'var(--green)';
+const G2 = 'var(--green-2)';
+const C = 'var(--cyan)';
+const P = 'var(--purple)';
+const A = 'var(--amber)';
+
+const cards = [
+  {
+    index: '/01',
+    title: 'AI Workflow Automation',
+    description: 'Document extraction, email triage, CRM automation, quote intake, internal copilots, human-in-the-loop review, audit logs.',
+    tags: ['extraction', 'CRM', 'copilots'],
+    cells: 'a.a.a .bbb. ababa .bbb. a.a.a',
+    palette: { a: G, b: G2 },
+    cornerVariant: 'tl-br' as const,
+  },
+  {
+    index: '/02',
+    title: 'Voice AI Systems',
+    description: 'Twilio, Groq, streaming responses, interruptions, memory, call summarisation, structured output, insurance intake.',
+    tags: ['twilio', 'groq', 'streaming'],
+    cells: '.a.a. a.a.a .a.a. a.a.a .a.a.',
+    palette: { a: C },
+    cornerVariant: 'tr-bl' as const,
+  },
+  {
+    index: '/03',
+    title: 'Web3 / Blockchain Ops',
+    description: 'Treasury reporting, wallet monitoring, DAO tooling, governance summaries, token research agents, operational dashboards.',
+    tags: ['treasury', 'DAO', 'on-chain'],
+    cells: '..a.. .aaa. aabaa .aaa. ..a..',
+    palette: { a: P, b: G },
+    cornerVariant: 'tl-br' as const,
+  },
+  {
+    index: '/04',
+    title: 'Technical Deal-Making',
+    description: 'Scoping prototypes, pricing sprints, reducing implementation risk, translating technical work into commercial outcomes.',
+    tags: ['scoping', 'pricing', 'strategy'],
+    cells: 'aa.aa a...a ..a.. a...a aa.aa',
+    palette: { a: A },
+    cornerVariant: 'tr-bl' as const,
+  },
+];
+---
+<section id="operating-system" class="section reveal">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="prompt">&gt; ./operating-system</div>
+      <h2 class="h">Operating system</h2>
+      <p class="sub">The way I work: manual insight, AI-assisted production, human-edited execution. Four modules, one operator.</p>
+    </div>
+    <div class="grid-4">
+      {cards.map((c) => <OsCard {...c} />)}
+    </div>
+    <div class="ascii-div" aria-hidden="true">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+  </div>
+</section>

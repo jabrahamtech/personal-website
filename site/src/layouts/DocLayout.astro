@@ -1,0 +1,76 @@
+---
+import Base from './Base.astro';
+
+interface Crumb { href?: string; label: string }
+
+interface Props {
+  title: string;
+  description: string;
+  promptPath: string;            // e.g. './projects/voice-ai-intake'
+  crumbs: Crumb[];
+  heroSummary?: string;
+  metaRow?: { label: string; value: string }[];
+  tags?: string[];
+  contentsToc?: string[];
+  narrow?: boolean;
+}
+
+const {
+  title,
+  description,
+  promptPath,
+  crumbs,
+  heroSummary,
+  metaRow,
+  tags,
+  contentsToc,
+  narrow = false,
+} = Astro.props;
+---
+<Base title={title} description={description} showBoot={false}>
+  <main id="content" class="doc">
+    <div class={`wrap ${narrow ? 'narrow' : ''}`}>
+      <div class="crumbs">
+        {crumbs.map((c, i) => (
+          <>
+            {c.href ? <a href={c.href}>{c.label}</a> : <span>{c.label}</span>}
+            {i < crumbs.length - 1 && <span class="sep">/</span>}
+          </>
+        ))}
+      </div>
+      <div class="prompt">&gt; {promptPath}</div>
+      <h1 class="h doc">{title.replace(/ — Jonathan Abraham$/, '').replace(/Jonathan Abraham — /, '')}</h1>
+      {heroSummary && <p class="sub">{heroSummary}</p>}
+      {metaRow && (
+        <div class="meta-row">
+          {metaRow.map((m) => <span><b>{m.label}</b> {m.value}</span>)}
+        </div>
+      )}
+      {tags && tags.length > 0 && (
+        <div style="margin:0 0 28px">
+          {tags.map((t) => <span class="tag">{t}</span>)}
+        </div>
+      )}
+
+      {contentsToc ? (
+        <div class="doc-grid">
+          <article class="prose">
+            <slot />
+            <slot name="footer" />
+          </article>
+          <aside class="toc" aria-label="contents">
+            <h4>// contents</h4>
+            {contentsToc.map((t) => <a href="#content">{t}</a>)}
+          </aside>
+        </div>
+      ) : (
+        <article class="prose">
+          <slot />
+          <slot name="footer" />
+        </article>
+      )}
+
+      <div class="ascii-div" aria-hidden="true">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+    </div>
+  </main>
+</Base>

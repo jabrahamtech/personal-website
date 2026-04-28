@@ -1,0 +1,53 @@
+---
+title: 'Why production voice AI fails after the demo'
+summary: 'The hard part is not the voice. It is state, interruptions, memory, and handoff.'
+category: 'voice_ai_in_production'
+readTime: '~ 7 min'
+posted: '2026-04'
+order: 1
+---
+
+**Lorem ipsum dolor sit amet**, consectetur adipiscing elit. Every voice AI demo is impressive. The model speaks fluently, handles a couple of friendly turns, and the founder claims they've replaced a phone team. Two weeks into production, the same system is silently dropping calls, repeating itself, and confidently inventing customer details.
+
+The hard part is not the voice. The hard part is everything *around* the voice.
+
+## The four things demos hide
+
+### 1. State across turns
+
+Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. A demo is two or three turns. Production is twenty. State is not "what's in the context window" — it's the operational record that survives a hangup, a redial, and a handoff.
+
+### 2. Interruptions
+
+Real callers interrupt. They cough. They turn to talk to someone else. They hang up mid-sentence. Every node in your flow has to be cancellable — not "throw an exception", **cancellable**. Most demos can't even pause cleanly.
+
+### 3. Memory you can audit
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore. The moment you put a voice agent in front of a paying customer, "the model said something" stops being acceptable. You need a structured record: what was asked, what was understood, what was decided, what was acted on.
+
+### 4. Handoff
+
+The voice agent is rarely the system of record. It's a collector. The handoff to the CRM, the ticketing system, or the human queue has to be **idempotent, retryable, and provenance-tagged**. Most demos handwave this with a webhook.
+
+<div class="callout">
+  <b>// rule of thumb</b><br />
+  If your demo can't survive being interrupted, redialled, and handed off mid-call, it's not a system. It's a video.
+</div>
+
+## What I actually do
+
+Excepteur sint occaecat cupidatat non proident. I treat the LLM as one node in a graph, not the orchestrator. The graph runs in a real runtime — durable, observable, and boring. The LLM gets called only when it has to be, with a strict schema for what it can return, and a deterministic state machine vetoing anything that violates the call's required fields.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. The result is slower to build but vastly cheaper to operate, and the conversation with stakeholders shifts from *"is the AI good?"* to *"is the workflow correct?"* — which is the question we actually know how to answer.
+
+## If you're building one
+
+1. Write the call as a state machine on paper before you touch a model.
+2. Make every node cancellable. Test by hanging up at every step.
+3. Log everything the model said and why. Every field needs a source.
+4. Treat handoff as a separate, retryable system. Not a callback.
+5. Demo with hostile callers, not friendly ones.
+
+---
+
+**Building production voice AI?** [I'm available for scoped engagements](/#contact).

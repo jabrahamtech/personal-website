@@ -1,0 +1,26 @@
+---
+import PixelIcon from './PixelIcon.astro';
+interface Props {
+  index: string;
+  title: string;
+  description: string;
+  tags: string[];
+  cells: string;
+  palette: Record<string, string>;
+  cornerVariant?: 'tl-br' | 'tr-bl';
+}
+const { index, title, description, tags, cells, palette, cornerVariant = 'tl-br' } = Astro.props;
+const corners = cornerVariant === 'tl-br' ? ['tl', 'br'] : ['tr', 'bl'];
+---
+<div class="pcard os-card">
+  {corners.map((c) => <span class={`corner ${c}`}></span>)}
+  <div class="head">
+    <PixelIcon cells={cells} palette={palette} />
+    <span class="num">{index}</span>
+  </div>
+  <h3>{title}</h3>
+  <p>{description}</p>
+  <div class="tag-row">
+    {tags.map((t) => <span class="tag">{t}</span>)}
+  </div>
+</div>

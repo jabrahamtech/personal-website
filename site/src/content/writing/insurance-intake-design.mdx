@@ -1,0 +1,45 @@
+---
+title: 'How I would design an AI intake workflow for insurance brokers'
+summary: 'From messy emails and PDFs to structured quote data, missing-info checks, and human review.'
+category: 'ai_workflow_automation'
+readTime: '~ 9 min'
+posted: '2026-03'
+order: 2
+---
+
+**Lorem ipsum dolor sit amet**, consectetur adipiscing elit. Insurance intake is the textbook case for AI workflow automation: high-volume, low-margin, structurally repetitive, and yet stubbornly resistant to off-the-shelf tools. The reason is that the inputs are messy — forwarded email chains, PDF schedules, scanned forms, free-text broker notes — and the output has to be clean enough to enter into a regulated system of record.
+
+Here's how I'd actually design the workflow, end to end.
+
+## 1. Get a single source-of-truth for inputs
+
+Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Before any AI, every artifact lands in a content-addressed object store with a permanent URI. Every downstream extraction links back to that URI plus a byte range. No file lives anywhere else.
+
+## 2. Route by type, not by intent
+
+A small classifier decides "email body / PDF / scan / note" and routes to a type-specific extractor. Don't ask one giant prompt to handle all four — it'll be mediocre at all of them.
+
+## 3. Extract with confidence, not certainty
+
+Duis aute irure dolor in reprehenderit. Every extracted field carries (a) the value, (b) a confidence score, (c) the source span. Low confidence doesn't fail — it routes to review.
+
+<div class="callout">
+  <b>// rule</b><br />
+  If a broker can't see <strong>where</strong> a field came from, they'll re-read the source anyway. Provenance is the difference between automation and theatre.
+</div>
+
+## 4. Make missing-info a first-class step
+
+Excepteur sint occaecat cupidatat non proident. The schema knows what's required. Before anything goes to a human, a deterministic pass identifies missing fields and drafts a clarification email. The human approves; the system sends.
+
+## 5. Treat human review as the product
+
+Lorem ipsum dolor sit amet. The reviewer UI is the unlock. Source artifact on the left, extracted record on the right, every field clickable to its source span. Approve / edit / reject in one keystroke each.
+
+## 6. Handoff is its own system
+
+Idempotent writes to the CRM, retried on failure, with full provenance attached to every field. If the CRM ever asks "where did this come from?", the answer is one click away.
+
+---
+
+**Want help designing one?** [Get in touch](/#contact).

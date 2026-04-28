@@ -1,0 +1,16 @@
+---
+// 5x5 pixel-grid icon used by Operating System cards.
+// `cells` is a 25-char string of '.' (off) / 'a'..'z' (color slot).
+// `palette` maps a slot letter to a CSS color (CSS var or hex).
+interface Props {
+  cells: string;
+  palette: Record<string, string>;
+}
+const { cells, palette } = Astro.props;
+const grid = cells.replace(/\s+/g, '').padEnd(25, '.').slice(0, 25);
+---
+<div class="iconpix">
+  {grid.split('').map((c) => (
+    <i style={c === '.' ? '' : `background:${palette[c] ?? 'transparent'}`}></i>
+  ))}
+</div>

@@ -1,0 +1,14 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { article: CollectionEntry<'writing'> }
+const { article } = Astro.props;
+const { data } = article;
+---
+<article class="pcard article" data-cat={data.category}>
+  <span class="corner tl"></span><span class="corner br"></span>
+  <div class="meta"><span class="cat">[{data.category}]</span><span>{data.readTime}</span></div>
+  <h3>{data.title}</h3>
+  <p>{data.summary}</p>
+  <a class="read" href={`/writing/${article.slug}`}>read_note <span>→</span></a>
+</article>

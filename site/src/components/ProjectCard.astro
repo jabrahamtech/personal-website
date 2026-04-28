@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ProjectVis from './ProjectVis.astro';
+
+interface Props { project: CollectionEntry<'projects'> }
+const { project } = Astro.props;
+const { data } = project;
+
+const versionTagStyle =
+  data.versionTagColor === 'cyan'   ? 'color:var(--cyan)'   :
+  data.versionTagColor === 'purple' ? 'color:var(--purple)' :
+                                       '';
+---
+<article class="pcard proj">
+  <span class="corner tl"></span><span class="corner tr"></span>
+  <div class="proj-vis">
+    <div class="vis-grid"></div>
+    <ProjectVis slug={project.slug} />
+    <div class="vis-tag" style={versionTagStyle}>{data.versionTag}</div>
+  </div>
+  <div class="proj-body">
+    <h3>{data.title}</h3>
+    <div class="tags">{data.tags.map((t) => <span>{t}</span>)}</div>
+    <p>{data.cardDescription}</p>
+    <a class="pcta" href={`/projects/${project.slug}`}>{data.cardCta} <span>→</span></a>
+  </div>
+</article>
