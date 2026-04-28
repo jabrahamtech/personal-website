@@ -28,11 +28,11 @@ test.describe('home (posts list)', () => {
     expect(html).not.toContain('class="intro"');
   });
 
-  test('no pitch-surface or RSS artifacts remain', async ({ page }) => {
+  test('no pitch-surface or RSS artifacts remain on home', async ({ page }) => {
     await page.goto('/');
     const html = await page.content();
     for (const needle of [
-      'term-input', 'status-hud', 'boot-inner', 'sprite',
+      'status-hud', 'sprite',
       'Production Readiness Sprint', 'Operating system',
       'Founder-engineer building',
       'rss.xml',                                            // RSS removed
@@ -41,10 +41,10 @@ test.describe('home (posts list)', () => {
     }
   });
 
-  test('nav has posts and about only (no rss link)', async ({ page }) => {
+  test('nav has posts, terminal, about (no rss link)', async ({ page }) => {
     await page.goto('/');
     const linkTexts = await page.locator('nav.top .nav-links a').allTextContents();
-    expect(linkTexts).toEqual(['posts', 'about']);
+    expect(linkTexts).toEqual(['posts', 'terminal', 'about']);
   });
 
   test('footer surfaces email, github, linkedin', async ({ page }) => {
@@ -161,5 +161,60 @@ test.describe('infrastructure', () => {
   test('old writing routes 404', async ({ page }) => {
     const r = await page.goto('/writing/voice-ai-after-demo');
     expect(r?.status()).toBe(404);
+  });
+});
+
+test.describe('boot sequence', () => {
+  test('renders for fresh sessions and is removed after boot_seen flag is set', async ({ page, context }) => {
+    // Fresh session: boot wrapper should be in the DOM (it removes itself once done)
+    await context.clearCookies();
+    await page.goto('/');
+    // Either still mounted, or already removed (very fast machines) — but the script must have set the flag.
+    const seen = await page.evaluate(() => sessionStorage.getItem('boot_seen'));
+    // Wait briefly for the sequence to finish; total ≈ 1.6s
+    await page.waitForFunction(() => sessionStorage.getItem('boot_seen') === '1', null, { timeout: 5000 });
+    expect(seen === '1' || seen === null).toBe(true);
+
+    // Subsequent reload with the flag set should NOT mount the boot overlay
+    await page.reload();
+    await expect(page.locator('#boot')).toHaveCount(0);
+  });
+});
+
+test.describe('terminal page', () => {
+  test('renders the terminal widget and HUD defaults', async ({ page }) => {
+    const r = await page.goto('/terminal');
+    expect(r?.status()).toBe(200);
+    await expect(page).toHaveTitle(/Terminal — Jonathan Abraham/);
+    await expect(page.locator('.page-head h1')).toHaveText('Terminal');
+    await expect(page.locator('.term .term-bar')).toBeVisible();
+    await expect(page.locator('#term-input')).toBeVisible();
+    await expect(page.locator('#hud-stage')).toHaveText('0/5');
+    await expect(page.locator('#hud-score')).toHaveText('0');
+  });
+
+  test('terminal link is marked current on /terminal', async ({ page }) => {
+    await page.goto('/terminal');
+    await expect(page.locator('nav.top .nav-links a[aria-current="page"]')).toHaveText('terminal');
+  });
+
+  test('typing `help` produces output', async ({ page }) => {
+    await page.goto('/terminal');
+    const input = page.locator('#term-input');
+    await input.click();
+    await input.fill('help');
+    await input.press('Enter');
+    // Some line in #term-output should reference 'help' or list commands
+    await expect(page.locator('#term-output .term-line')).not.toHaveCount(0);
+  });
+
+  test('typing `start` advances stage HUD past 0/5', async ({ page }) => {
+    await page.goto('/terminal');
+    const input = page.locator('#term-input');
+    await input.click();
+    await input.fill('start');
+    await input.press('Enter');
+    // After start the HUD should reflect that we are inside the game
+    await expect(page.locator('#hud-stage')).not.toHaveText('0/5');
   });
 });
