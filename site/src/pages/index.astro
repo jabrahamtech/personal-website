@@ -6,7 +6,6 @@ type Post = CollectionEntry<'posts'>;
 
 const all = await getCollection('posts');
 
-// Sort: newest posted first; drafts (no posted date) at the bottom in title order.
 const sorted = all.sort((a, b) => {
   const ad = a.data.posted?.getTime() ?? 0;
   const bd = b.data.posted?.getTime() ?? 0;
@@ -15,18 +14,21 @@ const sorted = all.sort((a, b) => {
 });
 
 function fmt(p: Post) {
-  if (p.data.posted) {
-    return p.data.posted.toISOString().slice(0, 10);
-  }
+  if (p.data.posted) return p.data.posted.toISOString().slice(0, 10);
   return 'draft';
 }
 ---
 <Base>
   <main id="content" class="wrap">
     <header class="page-head">
-      <div class="prompt">&gt; ./posts</div>
-      <h1>Notes</h1>
-      <p class="intro">Working notes on production AI, voice AI, backend systems in Go, and the operational shape of running an insurtech (Brokerloop). Mostly things I had to learn the hard way.</p>
+      <h1 class="brandline">Jonathan Abraham</h1>
+      <p class="tagline">founder, <a href="#" rel="external">brokerloop</a> · senior engineer · melbourne, au</p>
+      <ul class="links-row">
+        <li><a href="mailto:jabrahamtech@gmail.com">email</a></li>
+        <li><a href="https://github.com/jabrahamtech" rel="me">github</a></li>
+        <li><a href="https://www.linkedin.com/in/jabrahamtech" rel="me">linkedin</a></li>
+        <li><a href="/about">about</a></li>
+      </ul>
     </header>
 
     <ul class="post-list">

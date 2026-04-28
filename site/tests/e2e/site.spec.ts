@@ -1,44 +1,61 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('home (posts list)', () => {
-  test('renders header, intro, and a list of posts', async ({ page }) => {
+  test('renders brand header, links row, and post list', async ({ page }) => {
     await page.goto('/');
 
     await expect(page).toHaveTitle('Jonathan Abraham');
-    await expect(page.locator('.page-head h1')).toHaveText('Notes');
-    await expect(page.locator('.page-head .intro')).toContainText('Brokerloop');
+    await expect(page.locator('.page-head h1.brandline')).toHaveText('Jonathan Abraham');
+    await expect(page.locator('.page-head .tagline')).toContainText('founder');
+    await expect(page.locator('.page-head .tagline')).toContainText('melbourne');
+
+    // links row contains the four expected links
+    const linkLabels = await page.locator('.links-row a').allTextContents();
+    expect(linkLabels).toEqual(['email', 'github', 'linkedin', 'about']);
 
     // posts list
     const rows = page.locator('.post-list .post-row');
     await expect(rows).toHaveCount(3);
-    // each row links to /posts/<slug>
     const hrefs = await rows.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')));
     for (const href of hrefs) expect(href).toMatch(/^\/posts\//);
 
     // every row currently shows the draft badge
-    const drafts = page.locator('.post-list .draft');
-    await expect(drafts).toHaveCount(3);
+    await expect(page.locator('.post-list .draft')).toHaveCount(3);
   });
 
-  test('no pitch-surface artifacts remain', async ({ page }) => {
+  test('the old "Notes / Working notes…" intro is gone', async ({ page }) => {
+    await page.goto('/');
+    const html = await page.content();
+    expect(html).not.toContain('>Notes<');
+    expect(html).not.toContain('Working notes on production AI');
+    expect(html).not.toContain('class="intro"');
+  });
+
+  test('no pitch-surface or RSS artifacts remain', async ({ page }) => {
     await page.goto('/');
     const html = await page.content();
     for (const needle of [
-      'term-input', 'status-hud', 'boot-inner', 'sprite',          // structural
-      'Production Readiness Sprint', 'Operating system', 'Backend AI Infrastructure', // section headings
-      'Founder-engineer building',                                  // hero
-      'work_with_me', 'view_proof_of_work', 'tell_me_what_youre_building', // CTAs
-      'available_for_contracts', 'selective_intake',                // status copy
-      'send_message',                                               // contact form
+      'term-input', 'status-hud', 'boot-inner', 'sprite',
+      'Production Readiness Sprint', 'Operating system',
+      'Founder-engineer building',
+      'rss.xml',                                            // RSS removed
     ]) {
       expect(html, `unexpected leftover: ${needle}`).not.toContain(needle);
     }
   });
 
-  test('nav has posts, about, rss only', async ({ page }) => {
+  test('nav has posts and about only (no rss link)', async ({ page }) => {
     await page.goto('/');
     const linkTexts = await page.locator('nav.top .nav-links a').allTextContents();
-    expect(linkTexts).toEqual(['posts', 'about', 'rss']);
+    expect(linkTexts).toEqual(['posts', 'about']);
+  });
+
+  test('footer surfaces email, github, linkedin', async ({ page }) => {
+    await page.goto('/');
+    const foot = page.locator('footer .links');
+    await expect(foot.locator('a[href^="mailto:"]')).toHaveText('email');
+    await expect(foot.locator('a[href*="github.com/jabrahamtech"]')).toHaveText('github');
+    await expect(foot.locator('a[href*="linkedin.com/in/jabrahamtech"]')).toHaveText('linkedin');
   });
 });
 
@@ -78,18 +95,27 @@ test.describe('post pages', () => {
     const hrefs = await pn.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')));
     for (const href of hrefs) expect(href).toMatch(/^\/posts\//);
   });
+
+  test('voice-ai post renders the seeded cover image', async ({ page }) => {
+    await page.goto('/posts/voice-ai-after-demo');
+    const cover = page.locator('figure.cover img');
+    await expect(cover).toBeVisible();
+    await expect(cover).toHaveAttribute('src', '/posts/voice-ai-cover.svg');
+    const r = await page.request.get('/posts/voice-ai-cover.svg');
+    expect(r.status()).toBe(200);
+    expect(r.headers()['content-type']).toContain('svg');
+  });
+
+  test('drafts without an image dont render a figure.cover', async ({ page }) => {
+    await page.goto('/posts/insurance-intake-design');
+    await expect(page.locator('figure.cover')).toHaveCount(0);
+  });
 });
 
 test.describe('infrastructure', () => {
-  test('rss.xml lists no drafts (currently empty channel)', async ({ page }) => {
+  test('rss.xml route is removed', async ({ page }) => {
     const r = await page.request.get('/rss.xml');
-    expect(r.status()).toBe(200);
-    expect(r.headers()['content-type']).toMatch(/xml/);
-    const body = await r.text();
-    expect(body).toContain('<rss');
-    expect(body).toContain('Jonathan Abraham');
-    // All current posts are drafts → no <item> elements
-    expect(body).not.toContain('<item>');
+    expect(r.status()).toBe(404);
   });
 
   test('sitemap-index.xml + sitemap-0.xml include posts and about', async ({ page }) => {

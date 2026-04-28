@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Voice AI call flow architecture">
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0 L0 0 0 24" fill="none" stroke="#1d2820" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="vignette" cx="50%" cy="50%" r="65%">
+      <stop offset="60%" stop-color="#070a08" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#070a08" stop-opacity="0.85"/>
+    </radialGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#7dff8a"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="630" fill="#0b0e0c"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#vignette)"/>
+
+  <!-- header strip -->
+  <g font-family="JetBrains Mono, monospace" font-size="14">
+    <text x="56" y="56" fill="#8b9286" letter-spacing="1.5">// architecture.svg</text>
+    <text x="1144" y="56" fill="#46c463" text-anchor="end">v0.4.2</text>
+  </g>
+
+  <!-- nodes (top row) -->
+  <g fill="#0a0e0b" stroke="#7dff8a" stroke-width="2">
+    <rect x="80"  y="220" width="160" height="80"/>
+    <rect x="320" y="220" width="200" height="80"/>
+    <rect x="600" y="220" width="200" height="80"/>
+    <rect x="880" y="220" width="160" height="80"/>
+  </g>
+  <!-- nodes (bottom row) -->
+  <g fill="#0a0e0b" stroke="#46c463" stroke-width="2">
+    <rect x="240" y="400" width="180" height="80"/>
+    <rect x="520" y="400" width="160" height="80"/>
+    <rect x="780" y="400" width="180" height="80"/>
+  </g>
+
+  <!-- arrows top row -->
+  <g stroke="#46c463" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M240 260 L320 260"/>
+    <path d="M520 260 L600 260"/>
+    <path d="M800 260 L880 260"/>
+    <!-- branches to memory + summary -->
+    <path d="M420 300 Q420 400 440 400"/>
+    <path d="M700 300 Q700 400 700 400"/>
+    <path d="M700 300 Q700 400 860 400"/>
+  </g>
+
+  <!-- node labels -->
+  <g font-family="JetBrains Mono, monospace" font-size="20" fill="#cfe9d3" text-anchor="middle">
+    <text x="160" y="265">CALLER</text>
+    <text x="420" y="265">TWILIO_RT</text>
+    <text x="700" y="265">ASR · LLM</text>
+    <text x="960" y="265">TTS</text>
+    <text x="330" y="445">MEMORY</text>
+    <text x="600" y="445">STATE</text>
+    <text x="870" y="445">SUMMARY</text>
+  </g>
+
+  <!-- caption -->
+  <g font-family="JetBrains Mono, monospace">
+    <text x="56" y="586" fill="#7dff8a" font-size="22" font-weight="700">production voice ai</text>
+    <text x="56" y="612" fill="#8b9286" font-size="14" letter-spacing="1.5">// state · interruptions · memory · handoff</text>
+  </g>
+
+  <!-- corner pixels (terminal aesthetic) -->
+  <g fill="#7dff8a">
+    <rect x="0"    y="0"    width="10" height="10"/>
+    <rect x="1190" y="0"    width="10" height="10"/>
+    <rect x="0"    y="620"  width="10" height="10"/>
+    <rect x="1190" y="620"  width="10" height="10"/>
+  </g>
+</svg>

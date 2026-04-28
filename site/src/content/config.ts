@@ -9,6 +9,12 @@ const posts = defineCollection({
     draft: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
     readTime: z.string().optional(),
+    image: z
+      .object({
+        src: z.string(),                // path under /public, e.g. /posts/voice-cover.svg
+        alt: z.string(),
+      })
+      .optional(),
   }),
 });
 

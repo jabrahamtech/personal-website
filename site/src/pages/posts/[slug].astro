@@ -45,6 +45,11 @@ if (data.readTime) metaRow.push({ label: 'read', value: data.readTime });
   metaRow={metaRow}
   tags={data.tags}
 >
+  {data.image && (
+    <figure class="cover">
+      <img src={data.image.src} alt={data.image.alt} loading="eager" />
+    </figure>
+  )}
   <Content />
   {(newer || older) && (
     <div class="pn" slot="footer">

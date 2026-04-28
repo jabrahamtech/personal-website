@@ -1,9 +1,8 @@
 ---
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const links = [
-  { href: '/',       label: 'posts',    match: (p: string) => p === '/' || p.startsWith('/posts') },
-  { href: '/about',  label: 'about',    match: (p: string) => p === '/about' },
-  { href: '/rss.xml',label: 'rss',      match: () => false },
+  { href: '/',      label: 'posts', match: (p: string) => p === '/' || p.startsWith('/posts') },
+  { href: '/about', label: 'about', match: (p: string) => p === '/about' },
 ];
 ---
 <nav class="top">

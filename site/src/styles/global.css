@@ -58,6 +58,15 @@ nav.top .row{display:flex;align-items:center;justify-content:space-between;heigh
 .page-head .prompt::before{content:"";width:6px;height:6px;background:var(--green);box-shadow:0 0 8px var(--green)}
 .page-head h1{font-family:var(--mono);font-size:clamp(28px,3.6vw,40px);line-height:1.1;letter-spacing:-0.01em;font-weight:700;margin:0 0 14px}
 .page-head p.intro{color:var(--ink-dim);font-size:16px;margin:0;max-width:620px}
+.page-head h1.brandline{font-size:clamp(24px,3.2vw,32px);margin:0 0 6px}
+.page-head .tagline{font-family:var(--mono);font-size:13px;color:var(--ink-mute);margin:0 0 14px}
+.page-head .tagline a{color:var(--ink-dim);border-bottom:1px dashed var(--line-2)}
+.page-head .tagline a:hover{color:var(--green);border-color:var(--green-2)}
+.links-row{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:13px}
+.links-row li{display:inline-flex;align-items:center}
+.links-row li:not(:last-child)::after{content:"·";color:var(--line-2);margin-left:14px}
+.links-row a{color:var(--ink-dim)}
+.links-row a:hover{color:var(--green)}
 
 /* posts list */
 .post-list{list-style:none;margin:0 0 64px;padding:0;display:flex;flex-direction:column;gap:0}
@@ -83,6 +92,9 @@ nav.top .row{display:flex;align-items:center;justify-content:space-between;heigh
 .doc .meta-row{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:12px;color:var(--ink-mute);margin:0 0 28px}
 .doc .meta-row span b{color:var(--ink-dim);font-weight:500;margin-right:6px}
 .doc .tag{font-family:var(--mono);font-size:11px;color:var(--ink-mute);padding:3px 7px;border:1px solid var(--line-2);margin-right:6px;display:inline-block}
+
+.cover{display:block;margin:0 0 28px;border:1px solid var(--line-2);background:#070a08;box-shadow:4px 4px 0 0 rgba(0,0,0,0.4), 4px 4px 0 1px var(--line)}
+.cover img,.cover svg{display:block;width:100%;height:auto}
 
 .prose{font-family:var(--sans);font-size:16px;line-height:1.7;color:var(--ink-dim)}
 .prose p{margin:0 0 18px}
@@ -113,8 +125,11 @@ nav.top .row{display:flex;align-items:center;justify-content:space-between;heigh
 /* footer */
 footer{padding:36px 0 60px;border-top:1px solid var(--line);margin-top:60px;position:relative;z-index:2}
 .foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--ink-mute)}
+.foot a{color:var(--ink-dim)}
 .foot a:hover{color:var(--green)}
 .foot .l{color:var(--ink-dim)}
+.foot .links{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.foot .links .sep{color:var(--line-2)}
 
 /* divider */
 .ascii-div{font-family:var(--mono);color:var(--line-2);font-size:13px;letter-spacing:0.4em;text-align:center;margin:48px 0 0;user-select:none}
