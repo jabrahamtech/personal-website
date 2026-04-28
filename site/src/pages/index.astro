@@ -17,8 +17,42 @@ function fmt(p: Post) {
   if (p.data.posted) return p.data.posted.toISOString().slice(0, 10);
   return 'draft';
 }
+
+const siteOrigin = (Astro.site ?? new URL('https://jonathanabraham.dev')).toString().replace(/\/$/, '');
+const personId = `${siteOrigin}/#jonathan`;
+const siteId = `${siteOrigin}/#site`;
+
+const blogJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  '@id': `${siteOrigin}/#blog`,
+  url: siteOrigin + '/',
+  name: 'Jonathan Abraham — posts',
+  description: 'Notes on production voice AI, AI workflow design, and backend AI infrastructure.',
+  inLanguage: 'en',
+  isPartOf: { '@id': siteId },
+  author: { '@id': personId },
+  publisher: { '@id': personId },
+  blogPost: sorted.map((p) => ({
+    '@type': 'BlogPosting',
+    '@id': `${siteOrigin}/posts/${p.slug}#post`,
+    url: `${siteOrigin}/posts/${p.slug}`,
+    headline: p.data.title,
+    description: p.data.summary,
+    datePublished: p.data.posted?.toISOString(),
+    keywords: p.data.tags.join(', '),
+    author: { '@id': personId },
+    ...(p.data.draft ? { creativeWorkStatus: 'Draft' } : {}),
+  })),
+};
+
+const description = 'Working notes from Jonathan Abraham on production voice AI, AI workflow design, and backend AI infrastructure for regulated industries (insurance, ops, voice).';
 ---
-<Base>
+<Base
+  title="Jonathan Abraham — production voice AI & AI infrastructure"
+  description={description}
+  jsonLd={blogJsonLd}
+>
   <main id="content" class="wrap">
     <header class="page-head">
       <div class="prompt">&gt; ./posts</div>

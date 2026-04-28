@@ -4,7 +4,7 @@ test.describe('home (posts list)', () => {
   test('renders only the ./posts prompt and the post list', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page).toHaveTitle('Jonathan Abraham');
+    await expect(page).toHaveTitle(/^Jonathan Abraham/);
     await expect(page.locator('.page-head .prompt')).toHaveText('> ./posts');
 
     // No brandline / tagline / links-row repeating what nav + footer already show
@@ -22,10 +22,12 @@ test.describe('home (posts list)', () => {
 
   test('the old "Notes / Working notes…" intro is gone', async ({ page }) => {
     await page.goto('/');
-    const html = await page.content();
-    expect(html).not.toContain('>Notes<');
-    expect(html).not.toContain('Working notes on production AI');
-    expect(html).not.toContain('class="intro"');
+    // Check visible text only — JSON-LD/meta may legitimately use these phrases.
+    const visible = (await page.locator('main').textContent()) || '';
+    expect(visible).not.toContain('Working notes on production AI');
+    expect(await page.locator('main .intro').count()).toBe(0);
+    // The page-head still has just the prompt, not an h1 + intro
+    await expect(page.locator('.page-head h1')).toHaveCount(0);
   });
 
   test('no pitch-surface or RSS artifacts remain on home', async ({ page }) => {
@@ -185,7 +187,7 @@ test.describe('terminal page', () => {
   test('renders the terminal widget and HUD defaults', async ({ page }) => {
     const r = await page.goto('/terminal');
     expect(r?.status()).toBe(200);
-    await expect(page).toHaveTitle(/Terminal — Jonathan Abraham/);
+    await expect(page).toHaveTitle(/^Terminal — /);
     await expect(page.locator('.page-head h1')).toHaveText('Terminal');
     await expect(page.locator('.term .term-bar')).toBeVisible();
     await expect(page.locator('#term-input')).toBeVisible();
@@ -247,5 +249,117 @@ test.describe('mobile layout (iPhone-class viewport, 390x844)', () => {
     await expect(page.locator('.term-foot')).toBeVisible();
     await expect(page.locator('#hud-stage')).toBeVisible();
     await expect(page.locator('#hud-score')).toBeVisible();
+  });
+});
+
+test.describe('SEO / AEO — head + structured data', () => {
+  for (const path of ['/', '/about', '/terminal', '/posts/voice-ai-after-demo']) {
+    test(`${path} has canonical, robots, og:*, twitter:* meta`, async ({ page }) => {
+      await page.goto(path);
+
+      const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+      expect(canonical).toMatch(/^https:\/\/jonathanabraham\.dev/);
+
+      // robots index,follow (not noindex)
+      const robots = await page.locator('meta[name="robots"]').getAttribute('content');
+      expect(robots).toMatch(/index/);
+      expect(robots).not.toMatch(/noindex/);
+
+      // OG essentials
+      for (const prop of ['og:title', 'og:description', 'og:url', 'og:image', 'og:site_name', 'og:type', 'og:locale']) {
+        const c = await page.locator(`meta[property="${prop}"]`).first().getAttribute('content');
+        expect(c, `missing ${prop} on ${path}`).toBeTruthy();
+      }
+
+      // Twitter card
+      const tw = await page.locator('meta[name="twitter:card"]').getAttribute('content');
+      expect(tw).toBe('summary_large_image');
+
+      // Description meta
+      const desc = await page.locator('meta[name="description"]').getAttribute('content');
+      expect(desc?.length || 0).toBeGreaterThan(60);
+    });
+
+    test(`${path} emits valid JSON-LD with Person + WebSite anchors`, async ({ page }) => {
+      await page.goto(path);
+      const blocks = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => e.textContent || ''));
+      expect(blocks.length).toBeGreaterThan(0);
+      const parsed = blocks.map((b) => JSON.parse(b));
+      // Site-wide Person and WebSite must always be present
+      const types = parsed.map((p) => p['@type']);
+      expect(types).toContain('Person');
+      expect(types).toContain('WebSite');
+    });
+  }
+
+  test('homepage embeds Blog schema with blogPost list', async ({ page }) => {
+    await page.goto('/');
+    const blocks = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent || 'null')));
+    const blog = blocks.find((b) => b && b['@type'] === 'Blog');
+    expect(blog).toBeTruthy();
+    expect(Array.isArray(blog.blogPost)).toBe(true);
+    expect(blog.blogPost.length).toBeGreaterThanOrEqual(3);
+  });
+
+  test('post page embeds BlogPosting + BreadcrumbList schemas', async ({ page }) => {
+    await page.goto('/posts/voice-ai-after-demo');
+    const blocks = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent || 'null')));
+    const types = blocks.map((b) => b?.['@type']);
+    expect(types).toContain('BlogPosting');
+    expect(types).toContain('BreadcrumbList');
+    const post = blocks.find((b) => b['@type'] === 'BlogPosting');
+    expect(post.headline).toBeTruthy();
+    expect(post.author?.['@id']).toMatch(/#jonathan$/);
+    expect(post.image?.url || post.image).toBeTruthy();
+  });
+
+  test('about page emits ProfilePage with sameAs links', async ({ page }) => {
+    await page.goto('/about');
+    const blocks = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent || 'null')));
+    expect(blocks.find((b) => b['@type'] === 'ProfilePage')).toBeTruthy();
+    const person = blocks.find((b) => b['@type'] === 'Person');
+    expect(person.sameAs).toEqual(expect.arrayContaining([
+      expect.stringMatching(/github\.com\/jabrahamtech/),
+      expect.stringMatching(/linkedin\.com\/in\/jabrahamtech/),
+    ]));
+  });
+
+  test('og:image returns 200 and is a real asset', async ({ page }) => {
+    await page.goto('/');
+    const ogImg = await page.locator('meta[property="og:image"]').first().getAttribute('content');
+    expect(ogImg).toBeTruthy();
+    // og:image is built absolute against Astro.site; resolve the path against the test server
+    const path = new URL(ogImg!).pathname;
+    const r = await page.request.get(path);
+    expect(r.status()).toBe(200);
+    expect(r.headers()['content-type']).toMatch(/svg|image/);
+  });
+});
+
+test.describe('AEO — llms.txt + AI crawler robots', () => {
+  test('llms.txt is served and follows the spec shape', async ({ page }) => {
+    const r = await page.request.get('/llms.txt');
+    expect(r.status()).toBe(200);
+    const body = await r.text();
+    // H1 + summary blockquote per llmstxt.org
+    expect(body).toMatch(/^#\s+Jonathan Abraham/);
+    expect(body).toMatch(/^>\s+/m);
+    // Sections we care about
+    expect(body).toMatch(/##\s+Posts/);
+    expect(body).toMatch(/##\s+Identity/);
+    // Each post should be linked
+    for (const slug of ['voice-ai-after-demo', 'insurance-intake-design', 'ai-automation-operationalise']) {
+      expect(body, `${slug} missing from llms.txt`).toContain(`/posts/${slug}`);
+    }
+  });
+
+  test('robots.txt explicitly allows the major AI / answer-engine bots', async ({ page }) => {
+    const r = await page.request.get('/robots.txt');
+    expect(r.status()).toBe(200);
+    const body = await r.text();
+    expect(body).toContain('Sitemap: https://jonathanabraham.dev/sitemap-index.xml');
+    for (const bot of ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended', 'Applebot-Extended', 'CCBot', 'Bingbot']) {
+      expect(body, `${bot} not allow-listed`).toMatch(new RegExp(`User-agent:\\s*${bot}`));
+    }
   });
 });

@@ -10,21 +10,53 @@ interface Props {
   crumbs: Crumb[];
   metaRow?: { label: string; value: string }[];
   tags?: string[];
+  /** OG image (post cover, if any). */
+  image?: string;
+  imageAlt?: string;
+  /** Article meta — passed through to <Base>. */
+  pageType?: 'article' | 'website' | 'profile';
+  publishedAt?: Date;
+  modifiedAt?: Date;
+  /** Optional pre-built JSON-LD (BlogPosting/BreadcrumbList) for posts. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { title, description, promptPath, crumbs, metaRow, tags } = Astro.props;
+const {
+  title,
+  description,
+  promptPath,
+  crumbs,
+  metaRow,
+  tags,
+  image,
+  imageAlt,
+  pageType = 'website',
+  publishedAt,
+  modifiedAt,
+  jsonLd,
+} = Astro.props;
 ---
-<Base title={title} description={description}>
+<Base
+  title={title}
+  description={description}
+  image={image}
+  imageAlt={imageAlt}
+  pageType={pageType}
+  publishedAt={publishedAt}
+  modifiedAt={modifiedAt}
+  tags={tags}
+  jsonLd={jsonLd}
+>
   <main id="content" class="doc">
     <div class="wrap">
-      <div class="crumbs">
+      <nav class="crumbs" aria-label="Breadcrumb">
         {crumbs.map((c, i) => (
           <>
-            {c.href ? <a href={c.href}>{c.label}</a> : <span>{c.label}</span>}
+            {c.href ? <a href={c.href}>{c.label}</a> : <span aria-current={i === crumbs.length - 1 ? 'page' : undefined}>{c.label}</span>}
             {i < crumbs.length - 1 && <span class="sep">/</span>}
           </>
         ))}
-      </div>
+      </nav>
       <div class="post-prompt">&gt; {promptPath}</div>
       <h1>{title.replace(/ — Jonathan Abraham$/, '')}</h1>
       {metaRow && (

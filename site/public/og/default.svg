@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="jonathan_abraham.os — operator notes on production AI">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#070a08"/>
+      <stop offset="100%" stop-color="#0b0e0c"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#152017" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.6"/>
+
+  <g transform="translate(80,90)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" fill="#cfe9d3">
+    <g fill="#7dff8a">
+      <rect x="0" y="0" width="14" height="14"/>
+      <rect x="22" y="0" width="14" height="14"/>
+      <rect x="44" y="0" width="14" height="14"/>
+    </g>
+    <text x="74" y="13" font-size="22" fill="#9aa39a" letter-spacing="2">OPERATOR://NOTES</text>
+
+    <text x="0" y="100" font-size="20" fill="#7dff8a" letter-spacing="1">&gt; ./jonathan_abraham</text>
+
+    <text x="0" y="200" font-size="76" font-weight="700" fill="#e8efe9">jonathan_abraham<tspan fill="#7dff8a">.os</tspan></text>
+
+    <text x="0" y="270" font-size="30" fill="#9aa39a">production voice AI · backend AI infrastructure</text>
+    <text x="0" y="312" font-size="30" fill="#9aa39a">working notes from a founder-engineer</text>
+
+    <g transform="translate(0,400)" font-size="22" fill="#cfe9d3">
+      <rect x="0" y="-22" width="6" height="6" fill="#7dff8a"/>
+      <text x="20" y="-6">brokerloop · australian insurtech</text>
+      <rect x="0" y="22" width="6" height="6" fill="#6ee7ff"/>
+      <text x="20" y="38">voice ai · long-form intake · go backend</text>
+      <rect x="0" y="66" width="6" height="6" fill="#f5b860"/>
+      <text x="20" y="82">contracts by referral</text>
+    </g>
+
+    <g transform="translate(0,470)" font-size="16" fill="#5a6d5d" letter-spacing="3">
+      <text>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</text>
+    </g>
+  </g>
+</svg>

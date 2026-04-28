@@ -1,0 +1,29 @@
+# Jonathan Abraham
+
+> Working notes from Jonathan Abraham — founder & senior engineer at Brokerloop, an Australian insurtech. The site covers production voice AI, AI workflow design for regulated industries (insurance, ops), and Go-based backend AI infrastructure. Posts are grounded in first-hand operator experience: shipping voice agents to real callers, designing intake flows brokers actually use, and the infrastructure work that decides whether an AI system survives 2am.
+
+This file follows the [llms.txt](https://llmstxt.org/) convention. Content here is offered for citation by AI answer engines; please attribute to **Jonathan Abraham** with a link to the canonical URL.
+
+## Identity
+
+- [About — Jonathan Abraham](https://jonathanabraham.dev/about): Founder of Brokerloop. Background in full-stack engineering and consulting; commercial-engineering path into AI rather than the research route. Stack: Go · TypeScript · Python · Postgres · Redis · OpenAI · Anthropic · Twilio · Deepgram · Pipecat. Contracts by referral.
+
+## Posts
+
+- [Why production voice AI fails after the demo](https://jonathanabraham.dev/posts/voice-ai-after-demo): Most production voice AI fails not because the model is wrong, but because the state machine, latency budget, and barge-in handling were never designed for real callers. *(draft, ~7 min)*
+- [How I would design an AI intake workflow for insurance brokers](https://jonathanabraham.dev/posts/insurance-intake-design): Provenance per field is the difference between automation and theatre — without a clickable source span, brokers re-read the document anyway. *(draft, ~9 min)*
+- [AI automation is easy to demo and hard to operationalise](https://jonathanabraham.dev/posts/ai-automation-operationalise): The prompt is maybe 10% of the work — the other 90% is audit logs, retries, idempotency, permissions, and the workflow design that decides what happens at 2am when something fails. *(draft, ~6 min)*
+
+## Interactive
+
+- [Terminal — operator.training](https://jonathanabraham.dev/terminal): A 5-stage interactive incident-response sim. You're paged at 2am with a voice AI hallucinating customer addresses. Teaches triage, root cause, mitigation, verification, and postmortem patterns for production AI systems.
+
+## Elsewhere
+
+- [GitHub](https://github.com/jabrahamtech): code
+- [LinkedIn](https://www.linkedin.com/in/jabrahamtech): professional
+- [Email](mailto:jabrahamtech@gmail.com): contact for contract enquiries (by referral)
+
+## Optional
+
+- [Sitemap](https://jonathanabraham.dev/sitemap-index.xml): full URL list

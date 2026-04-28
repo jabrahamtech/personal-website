@@ -4,39 +4,149 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import BootSequence from '../components/BootSequence.astro';
 
+type PageType = 'website' | 'article' | 'profile';
+
 interface Props {
   title?: string;
   description?: string;
+  /** Full URL or absolute path (will be made absolute against site). PNG/JPG preferred for OG. */
+  image?: string;
+  imageAlt?: string;
+  /** OG type. Posts use "article". */
+  pageType?: PageType;
+  /** Article meta — only used when pageType === 'article'. */
+  publishedAt?: Date;
+  modifiedAt?: Date;
+  tags?: string[];
+  /** Optional pre-built JSON-LD object(s) to inject into <head>. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** If true, advise crawlers not to index this page. */
+  noindex?: boolean;
 }
 
 const {
-  title = 'Jonathan Abraham',
-  description = 'Notes from Jonathan Abraham — founder-engineer building production AI for regulated industries.',
+  title = 'Jonathan Abraham — production voice AI & AI infrastructure',
+  description = 'Working notes from Jonathan Abraham — founder of Brokerloop, senior engineer building production voice AI and backend AI infrastructure for regulated industries (insurance, ops, voice).',
+  image = '/og/default.svg',
+  imageAlt = 'jonathan_abraham.os — operator notes on production AI',
+  pageType = 'website',
+  publishedAt,
+  modifiedAt,
+  tags = [],
+  jsonLd,
+  noindex = false,
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://jonathanabraham.dev').toString();
+const siteOrigin = (Astro.site ?? new URL('https://jonathanabraham.dev')).toString().replace(/\/$/, '');
+const canonical = new URL(Astro.url.pathname, siteOrigin + '/').toString();
+const ogImage = new URL(image, siteOrigin + '/').toString();
+
+/* Site-wide identity (Person + WebSite) — emitted on every page so AEO/LLM
+   crawlers always have an anchor entity to attach Article schemas to. */
+const personId = `${siteOrigin}/#jonathan`;
+const siteId = `${siteOrigin}/#site`;
+const siteWideJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': personId,
+    name: 'Jonathan Abraham',
+    givenName: 'Jonathan',
+    familyName: 'Abraham',
+    url: siteOrigin + '/',
+    image: new URL('/about/avatar.svg', siteOrigin + '/').toString(),
+    jobTitle: 'Founder & Senior Engineer',
+    worksFor: {
+      '@type': 'Organization',
+      name: 'Brokerloop',
+      description: 'Australian insurtech building automation infrastructure for insurance brokers.',
+    },
+    knowsAbout: [
+      'Voice AI',
+      'Production AI systems',
+      'Insurance technology',
+      'Backend infrastructure',
+      'Go programming',
+      'TypeScript',
+      'Voice agents',
+      'AI workflow design',
+    ],
+    sameAs: [
+      'https://github.com/jabrahamtech',
+      'https://www.linkedin.com/in/jabrahamtech',
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': siteId,
+    url: siteOrigin + '/',
+    name: 'Jonathan Abraham',
+    alternateName: 'jonathan_abraham.os',
+    description: 'Working notes on production AI, voice systems, and backend infrastructure.',
+    inLanguage: 'en',
+    publisher: { '@id': personId },
+    author: { '@id': personId },
+  },
+];
+
+const extraJsonLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
 ---
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
   <title>{title}</title>
   <meta name="description" content={description} />
   <meta name="theme-color" content="#0b0e0c" />
   <meta name="author" content="Jonathan Abraham" />
+  {noindex
+    ? <meta name="robots" content="noindex,nofollow" />
+    : <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />}
   <link rel="canonical" href={canonical} />
-  <meta property="og:type" content="website" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content={pageType} />
+  <meta property="og:site_name" content="Jonathan Abraham" />
+  <meta property="og:locale" content="en_AU" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:alt" content={imageAlt} />
+  {pageType === 'article' && publishedAt && (
+    <meta property="article:published_time" content={publishedAt.toISOString()} />
+  )}
+  {pageType === 'article' && modifiedAt && (
+    <meta property="article:modified_time" content={modifiedAt.toISOString()} />
+  )}
+  {pageType === 'article' && (
+    <meta property="article:author" content="Jonathan Abraham" />
+  )}
+  {pageType === 'article' && tags.map((t) => (
+    <meta property="article:tag" content={t} />
+  ))}
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+  <meta name="twitter:image:alt" content={imageAlt} />
+
   <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230b0e0c'/><g fill='%237dff8a'><rect x='3' y='3' width='2' height='2'/><rect x='7' y='3' width='2' height='2'/><rect x='11' y='3' width='2' height='2'/><rect x='3' y='7' width='10' height='2'/><rect x='3' y='11' width='2' height='2'/><rect x='11' y='11' width='2' height='2'/></g></svg>" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  {allJsonLd.map((node) => (
+    <script type="application/ld+json" set:html={JSON.stringify(node)}></script>
+  ))}
 </head>
 <body>
   <a class="skip-link" href="#content">skip to content</a>

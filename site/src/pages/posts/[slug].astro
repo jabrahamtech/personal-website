@@ -32,6 +32,41 @@ const metaRow: { label: string; value: string }[] = [];
 if (data.posted) metaRow.push({ label: 'posted', value: data.posted.toISOString().slice(0, 10) });
 else metaRow.push({ label: 'status', value: 'draft' });
 if (data.readTime) metaRow.push({ label: 'read', value: data.readTime });
+
+const siteOrigin = (Astro.site ?? new URL('https://jonathanabraham.dev')).toString().replace(/\/$/, '');
+const url = `${siteOrigin}/posts/${post.slug}`;
+const personId = `${siteOrigin}/#jonathan`;
+const siteId = `${siteOrigin}/#site`;
+
+const blogPosting: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  '@id': `${url}#post`,
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  headline: data.title,
+  description: data.summary,
+  url,
+  inLanguage: 'en',
+  isPartOf: { '@id': siteId },
+  author: { '@id': personId },
+  publisher: { '@id': personId },
+  keywords: data.tags.length ? data.tags.join(', ') : undefined,
+  datePublished: data.posted?.toISOString(),
+  dateModified: (data.posted ?? new Date()).toISOString(),
+  ...(data.image
+    ? { image: { '@type': 'ImageObject', url: new URL(data.image.src, siteOrigin + '/').toString(), caption: data.image.alt } }
+    : {}),
+  ...(data.draft ? { creativeWorkStatus: 'Draft' } : {}),
+};
+
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Posts', item: `${siteOrigin}/` },
+    { '@type': 'ListItem', position: 2, name: data.title, item: url },
+  ],
+};
 ---
 <DocLayout
   title={`${data.title} — Jonathan Abraham`}
@@ -44,6 +79,12 @@ if (data.readTime) metaRow.push({ label: 'read', value: data.readTime });
   ]}
   metaRow={metaRow}
   tags={data.tags}
+  image={data.image?.src}
+  imageAlt={data.image?.alt}
+  pageType="article"
+  publishedAt={data.posted}
+  modifiedAt={data.posted}
+  jsonLd={[blogPosting, breadcrumb]}
 >
   {data.image && (
     <figure class="cover">

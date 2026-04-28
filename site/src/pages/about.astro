@@ -1,7 +1,29 @@
 ---
 import Base from '../layouts/Base.astro';
+
+const siteOrigin = (Astro.site ?? new URL('https://jonathanabraham.dev')).toString().replace(/\/$/, '');
+const personId = `${siteOrigin}/#jonathan`;
+const url = `${siteOrigin}/about`;
+
+const profileJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  '@id': `${url}#profile`,
+  url,
+  name: 'About Jonathan Abraham',
+  inLanguage: 'en',
+  mainEntity: { '@id': personId },
+  about: { '@id': personId },
+};
+
+const description = 'About Jonathan Abraham — founder of Brokerloop, an Australian insurtech. Senior engineer building production voice AI, long-form intake flows, and Go-based backend AI infrastructure for regulated industries.';
 ---
-<Base title="About — Jonathan Abraham" description="About Jonathan Abraham — founder, Brokerloop. Senior engineer working on production voice AI and backend AI infrastructure.">
+<Base
+  title="About — Jonathan Abraham"
+  description={description}
+  pageType="profile"
+  jsonLd={profileJsonLd}
+>
   <main id="content" class="wrap">
     <header class="page-head">
       <div class="prompt">&gt; ./about</div>
