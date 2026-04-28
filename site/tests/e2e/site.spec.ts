@@ -218,3 +218,34 @@ test.describe('terminal page', () => {
     await expect(page.locator('#hud-stage')).not.toHaveText('0/5');
   });
 });
+
+test.describe('mobile layout (iPhone-class viewport, 390x844)', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  for (const path of ['/', '/about', '/terminal', '/posts/voice-ai-after-demo']) {
+    test(`${path} fits viewport without horizontal scroll`, async ({ page }) => {
+      await page.goto(path);
+      // page should not exceed the viewport horizontally
+      const overflow = await page.evaluate(() => ({
+        scroll: document.documentElement.scrollWidth,
+        client: document.documentElement.clientWidth,
+      }));
+      expect(overflow.scroll, `horizontal overflow on ${path}`).toBeLessThanOrEqual(overflow.client + 1);
+    });
+  }
+
+  test('about: avatar drops the float and renders above the bio', async ({ page }) => {
+    await page.goto('/about');
+    const figure = page.locator('figure.avatar');
+    await expect(figure).toBeVisible();
+    const float = await figure.evaluate((el) => getComputedStyle(el).float);
+    expect(float).toBe('none');
+  });
+
+  test('terminal: term-foot wraps and HUD remains visible', async ({ page }) => {
+    await page.goto('/terminal');
+    await expect(page.locator('.term-foot')).toBeVisible();
+    await expect(page.locator('#hud-stage')).toBeVisible();
+    await expect(page.locator('#hud-score')).toBeVisible();
+  });
+});
