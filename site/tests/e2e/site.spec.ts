@@ -71,6 +71,16 @@ test.describe('about page', () => {
     await page.goto('/about');
     await expect(page.locator('nav.top .nav-links a[aria-current="page"]')).toHaveText('about');
   });
+
+  test('about renders the avatar and the avatar file is served', async ({ page }) => {
+    await page.goto('/about');
+    const img = page.locator('figure.avatar img');
+    await expect(img).toBeVisible();
+    const src = await img.getAttribute('src');
+    expect(src).toBeTruthy();
+    const r = await page.request.get(src!);
+    expect(r.status()).toBe(200);
+  });
 });
 
 test.describe('post pages', () => {
