@@ -16,7 +16,7 @@
       <span class="term-line dim">  ↳ voice_ai_stack...............<span class="info">[ONLINE]</span></span>
       <span class="term-line dim">  ↳ web3_operations..............<span class="info">[ONLINE]</span></span>
       <span class="term-line dim">  ↳ technical_dealmaking.........<span class="info">[ONLINE]</span></span>
-      <span class="term-line"><span class="ok">  ▸ available_for_contracts</span></span>
+      <span class="term-line"><span class="ok">  ▸ selective_intake · Q2 onward</span></span>
     </div>
     <div class="term-input-row">
       <span class="pmt">$</span><input id="term-input" autocomplete="off" spellcheck="false" placeholder="try: help, projects, book, whoami" />
@@ -66,45 +66,43 @@
         { t: '  <b style="color:var(--green)">clear</b>         clear screen' }
       ]),
       whoami: () => writeBlock([
-        { t: '<span class="info">jonathan_abraham</span> · ai systems engineer' },
+        { t: '<span class="info">jonathan_abraham</span> · founder, brokerloop · senior engineer' },
         { t: '  ↳ melbourne · au · us-tz overlap' },
-        { t: '  ↳ full-stack + ai workflow + voice ai + web3 ops' },
+        { t: '  ↳ voice ai · backend ai infra · ai workflow automation' },
         { t: '  ↳ commercial judgement / shipping over demos' }
       ]),
       'ls /modules': () => writeBlock([
         { t: '  <span class="ok">[01]</span> ai_workflow_automation/' },
         { t: '  <span class="ok">[02]</span> voice_ai_systems/' },
-        { t: '  <span class="ok">[03]</span> web3_blockchain_ops/' },
+        { t: '  <span class="ok">[03]</span> backend_ai_infrastructure/' },
         { t: '  <span class="ok">[04]</span> technical_dealmaking/' }
       ]),
       projects: () => writeBlock([
-        { t: '  ▸ <a class="term-link" href="/projects/voice-ai-intake">voice_ai_intake</a>     · twilio · groq · streaming' },
-        { t: '  ▸ <a class="term-link" href="/projects/insurance-workflow">insurance_workflow</a>  · documents · crm · review' },
-        { t: '  ▸ <a class="term-link" href="/projects/web3-ops-agent">web3_ops_agent</a>      · treasury · governance · research' }
+        { t: '  ▸ <a class="term-link" href="/projects/voice-ai-intake">voice_ai_intake</a>     · twilio · deepgram · pipecat   <span class="dim">[wip]</span>' },
+        { t: '  ▸ <a class="term-link" href="/projects/insurance-workflow">insurance_workflow</a>  · documents · crm · review     <span class="dim">[wip]</span>' },
+        { t: '  ▸ <a class="term-link" href="/projects/backend-ai-infra">backend_ai_infra</a>    · go · queues · observability  <span class="dim">[wip]</span>' }
       ]),
       services: () => writeBlock([
-        { t: '  ▸ <a class="term-link" href="/#services">ai_prototype_sprint</a>   — 10 business days' },
-        { t: '  ▸ <a class="term-link" href="/#services">voice_ai_system_build</a> — scoped engagement' },
-        { t: '  ▸ <a class="term-link" href="/#services">technical_contracting</a> — monthly retainer' },
-        { t: '  ▸ <a class="term-link" href="/#services">founder_cto_support</a>   — advisory' }
+        { t: '  ▸ <a class="term-link" href="/#services">production_readiness_sprint</a> — 10 business days' },
+        { t: '  ▸ <a class="term-link" href="/#services">voice_ai_system_build</a>       — scoped engagement' },
+        { t: '  ▸ <a class="term-link" href="/#services">technical_contracting</a>       — monthly retainer' },
+        { t: '  ▸ <a class="term-link" href="/#services">founder_cto_support</a>         — advisory' }
       ]),
       writing: () => writeBlock([
-        { t: '  ▸ <a class="term-link" href="/writing/voice-ai-after-demo">why production voice ai fails after the demo</a>' },
-        { t: '  ▸ <a class="term-link" href="/writing/insurance-intake-design">designing an ai intake workflow for insurance</a>' },
-        { t: '  ▸ <a class="term-link" href="/writing/ai-automation-operationalise">ai automation: easy to demo, hard to operationalise</a>' }
+        { t: '  ▸ <a class="term-link" href="/writing/voice-ai-after-demo">why production voice ai fails after the demo</a>      <span class="dim">[wip]</span>' },
+        { t: '  ▸ <a class="term-link" href="/writing/insurance-intake-design">designing an ai intake workflow for insurance</a>     <span class="dim">[wip]</span>' },
+        { t: '  ▸ <a class="term-link" href="/writing/ai-automation-operationalise">ai automation: easy to demo, hard to operationalise</a> <span class="dim">[wip]</span>' }
       ]),
       stack: () => writeBlock([
-        { t: '<span class="dim">runtime:</span> node · python · typescript · postgres · redis' },
-        { t: '<span class="dim">ai:</span>      openai · anthropic · groq · langgraph · llama.cpp' },
-        { t: '<span class="dim">voice:</span>   twilio · livekit · deepgram · elevenlabs' },
-        { t: '<span class="dim">web3:</span>    viem · ethers · the_graph · safe · tenderly' },
-        { t: '<span class="dim">ops:</span>     railway · fly.io · cloudflare · supabase · sentry' }
+        { t: '<span class="dim">runtime:</span> go · typescript · python · postgres · redis' },
+        { t: '<span class="dim">ai:</span>      openai · anthropic · groq · langgraph' },
+        { t: '<span class="dim">voice:</span>   twilio · deepgram · pipecat · elevenlabs' },
+        { t: '<span class="dim">ops:</span>     fly.io · cloudflare · supabase · sentry' }
       ]),
       contact: () => writeBlock([
-        { t: '  ▸ email     <a class="term-link" href="mailto:hello@jonathanabraham.dev">hello@jonathanabraham.dev</a>' },
+        { t: '  ▸ email     <a class="term-link" href="mailto:jabrahamtech@gmail.com">jabrahamtech@gmail.com</a>' },
         { t: '  ▸ linkedin  /in/jonathan-abraham' },
-        { t: '  ▸ github    /jonathanabraham' },
-        { t: '  ▸ twitter   @jonabraham' }
+        { t: '  ▸ github    /jabrahamtech' }
       ]),
       book: () => {
         write('opening contact module...', 'info');
@@ -115,8 +113,8 @@
         }, 300);
       },
       status: () => writeBlock([
-        { t: '<span class="ok">▸ available_for_contracts</span> — Q2 onward' },
-        { t: '  current_focus: ai workflow · voice ai · web3 ops' },
+        { t: '<span class="ok">▸ selective_intake</span> — Q2 onward · contract work by referral' },
+        { t: '  current_focus: voice ai · backend ai infra · ai workflow' },
         { t: '  response_sla: &lt; 24h · async-first' }
       ]),
       clear: () => { out.innerHTML = ''; }

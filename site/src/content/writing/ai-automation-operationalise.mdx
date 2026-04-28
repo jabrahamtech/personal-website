@@ -1,41 +1,12 @@
 ---
 title: 'AI automation is easy to demo and hard to operationalise'
-summary: 'Why serious teams need audit logs, retries, permissions, and workflow design — not just prompts.'
+summary: 'Draft in progress.'
 category: 'engineering_to_business'
-readTime: '~ 6 min'
-posted: '2026-02'
+readTime: '— '
+posted: 'tbd'
 order: 3
 ---
 
-**Lorem ipsum dolor sit amet**, consectetur adipiscing elit. Most AI automation projects die in the gap between "it works on the happy path" and "it survives a Tuesday". The demo runs once and looks magical. Production runs ten thousand times and has to be auditable, recoverable, and boring.
-
-The unglamorous list of what serious teams actually need:
-
-## Audit logs that you'd show a regulator
-
-Sed do eiusmod tempor incididunt. Every model call, every tool invocation, every state transition. Searchable. Linked to the artifact that triggered it. Not "we have logs" — actually queryable when something goes wrong at 11pm.
-
-## Retries with exponential backoff and idempotency
-
-Duis aute irure dolor. Every external call fails sometimes. Every webhook gets delivered twice. Your workflow has to be designed for it, not surprised by it.
-
-## Permissions and approvals
-
-Excepteur sint occaecat cupidatat non proident. "The AI did it" is not a defensible audit trail. Every consequential action either has a human approver or a written, reviewable policy.
-
-<div class="callout">
-  <b>// rule</b><br />
-  If your AI can take an action that's expensive or irreversible, it should ask. Always. The model is fast. The user is the brake.
-</div>
-
-## Observability
-
-Lorem ipsum dolor sit amet. Token cost per workflow, latency per node, failure rate per integration. If you can't see it, you can't operate it. Most teams don't notice their costs are 4x what they think until the invoice arrives.
-
-## Workflow design — not just prompts
-
-Consectetur adipiscing elit. The prompt is maybe 10% of the work. The other 90% is: where does the data come from, what's the schema, who reviews, what happens on failure, how do humans recover, what gets persisted, what gets retried.
-
----
-
-**Operationalising an AI workflow?** [Let's talk](/#contact).
+> **▸ status: drafting**
+>
+> This piece is being written. The short version: the prompt is maybe 10% of the work — the other 90% is audit logs, retries, idempotency, permissions, and the workflow design that decides what happens at 2am when something fails.

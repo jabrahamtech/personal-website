@@ -6,17 +6,21 @@ interface Props { project: CollectionEntry<'projects'> }
 const { project } = Astro.props;
 const { data } = project;
 
+const isWip = data.versionTag === 'wip' || data.status.includes('coming soon');
 const versionTagStyle =
-  data.versionTagColor === 'cyan'   ? 'color:var(--cyan)'   :
-  data.versionTagColor === 'purple' ? 'color:var(--purple)' :
-                                       '';
+  isWip                              ? '' :
+  data.versionTagColor === 'cyan'    ? 'color:var(--cyan)'   :
+  data.versionTagColor === 'purple'  ? 'color:var(--purple)' :
+                                        '';
 ---
 <article class="pcard proj">
   <span class="corner tl"></span><span class="corner tr"></span>
   <div class="proj-vis">
     <div class="vis-grid"></div>
     <ProjectVis slug={project.slug} />
-    <div class="vis-tag" style={versionTagStyle}>{data.versionTag}</div>
+    <div class={`vis-tag ${isWip ? 'wip' : ''}`} style={versionTagStyle}>
+      {isWip ? 'drafting' : data.versionTag}
+    </div>
   </div>
   <div class="proj-body">
     <h3>{data.title}</h3>
