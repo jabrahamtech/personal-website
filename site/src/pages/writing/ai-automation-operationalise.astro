@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+const title = 'AI automation is easy to demo and hard to operationalise — Jonathan Abraham';
+const description = 'Why serious teams need audit logs, retries, permissions, and workflow design — not just prompts.';
+---
+<Base title={title} description={description} showBoot={false}>
+  <main id="content" class="doc">
+    <div class="wrap narrow">
+      <div class="crumbs">
+        <a href="/">~</a><span class="sep">/</span>
+        <a href="/#writing">writing</a><span class="sep">/</span>
+        <span>ai-automation-operationalise</span>
+      </div>
+      <div class="prompt">&gt; ./writing/ai-automation-operationalise</div>
+      <h1 class="h doc">AI automation is easy to demo and hard to operationalise</h1>
+      <div class="meta-row">
+        <span><b>category</b> <span style="color:var(--cyan)">engineering_to_business</span></span>
+        <span><b>read</b> ~ 6 min</span>
+        <span><b>posted</b> 2026-02</span>
+      </div>
+
+      <article class="prose">
+        <p><strong>Lorem ipsum dolor sit amet</strong>, consectetur adipiscing elit. Most AI automation projects die in the gap between "it works on the happy path" and "it survives a Tuesday". The demo runs once and looks magical. Production runs ten thousand times and has to be auditable, recoverable, and boring.</p>
+
+        <p>The unglamorous list of what serious teams actually need:</p>
+
+        <h2>Audit logs that you'd show a regulator</h2>
+        <p>Sed do eiusmod tempor incididunt. Every model call, every tool invocation, every state transition. Searchable. Linked to the artifact that triggered it. Not "we have logs" — actually queryable when something goes wrong at 11pm.</p>
+
+        <h2>Retries with exponential backoff and idempotency</h2>
+        <p>Duis aute irure dolor. Every external call fails sometimes. Every webhook gets delivered twice. Your workflow has to be designed for it, not surprised by it.</p>
+
+        <h2>Permissions and approvals</h2>
+        <p>Excepteur sint occaecat cupidatat non proident. "The AI did it" is not a defensible audit trail. Every consequential action either has a human approver or a written, reviewable policy.</p>
+
+        <div class="callout">
+          <b>// rule</b><br />
+          If your AI can take an action that's expensive or irreversible, it should ask. Always. The model is fast. The user is the brake.
+        </div>
+
+        <h2>Observability</h2>
+        <p>Lorem ipsum dolor sit amet. Token cost per workflow, latency per node, failure rate per integration. If you can't see it, you can't operate it. Most teams don't notice their costs are 4x what they think until the invoice arrives.</p>
+
+        <h2>Workflow design — not just prompts</h2>
+        <p>Consectetur adipiscing elit. The prompt is maybe 10% of the work. The other 90% is: where does the data come from, what's the schema, who reviews, what happens on failure, how do humans recover, what gets persisted, what gets retried.</p>
+
+        <hr />
+        <p><strong>Operationalising an AI workflow?</strong> <a href="/#contact">Let's talk</a>.</p>
+
+        <div class="pn">
+          <a class="pcard" href="/writing/insurance-intake-design"><small>← prev note</small><span>Designing an AI intake workflow for insurance brokers</span></a>
+          <a class="pcard next" href="/writing/voice-ai-after-demo"><small>next note →</small><span>Why production voice AI fails after the demo</span></a>
+        </div>
+      </article>
+      <div class="ascii-div" aria-hidden="true">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+    </div>
+  </main>
+</Base>

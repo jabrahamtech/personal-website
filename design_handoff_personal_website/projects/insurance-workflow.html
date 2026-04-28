@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Insurance Workflow Automation — Jonathan Abraham</title>
+<meta name="description" content="A practical workflow turning messy quote emails, PDFs, and intake notes into structured tasks, missing-info checks, and CRM-ready data." />
+<meta name="theme-color" content="#0b0e0c" />
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230b0e0c'/><g fill='%237dff8a'><rect x='3' y='3' width='2' height='2'/><rect x='7' y='3' width='2' height='2'/><rect x='11' y='3' width='2' height='2'/><rect x='3' y='7' width='10' height='2'/><rect x='3' y='11' width='2' height='2'/><rect x='11' y='11' width='2' height='2'/></g></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+<a class="skip-link" href="#content">skip to content</a>
+
+<nav class="top">
+  <div class="wrap row">
+    <a class="brand" href="../Personal Website.html">
+      <span class="pixel-logo" aria-hidden="true"><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i></span>
+      <span>jonathan_abraham<span style="color:var(--green)">.os</span></span>
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="../Personal Website.html#operating-system">work</a>
+      <a href="../Personal Website.html#proof-of-work">proof</a>
+      <a href="../Personal Website.html#services">services</a>
+      <a href="../Personal Website.html#writing">writing</a>
+      <a href="../Personal Website.html#contact">contact</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button class="nav-toggle" id="nav-toggle" aria-label="toggle menu" aria-expanded="false"><span class="bars"><i></i><i></i><i></i></span></button>
+      <a href="../Personal Website.html#contact" class="nav-cta">▸ start_a_project</a>
+    </div>
+  </div>
+</nav>
+
+<main id="content" class="doc">
+  <div class="wrap">
+    <div class="crumbs">
+      <a href="../Personal Website.html">~</a><span class="sep">/</span>
+      <a href="../Personal Website.html#proof-of-work">proof-of-work</a><span class="sep">/</span>
+      <span>insurance-workflow</span>
+    </div>
+    <div class="prompt">&gt; ./projects/insurance-workflow</div>
+    <h1 class="h">AI Insurance Workflow Automation</h1>
+    <p class="sub">A practical workflow turning messy quote emails, PDFs, and intake notes into structured tasks, missing-info checks, and CRM-ready data.</p>
+    <div class="meta-row">
+      <span><b>status</b> v1.2 · production</span>
+      <span><b>year</b> 2025</span>
+      <span><b>role</b> ai systems engineer</span>
+      <span><b>stack</b> python · langgraph · postgres · s3</span>
+    </div>
+    <div style="margin:0 0 28px">
+      <span class="tag">AI</span><span class="tag">Documents</span><span class="tag">CRM</span><span class="tag">Workflow</span><span class="tag">Human-in-loop</span>
+    </div>
+
+    <div class="doc-grid">
+      <article class="prose">
+        <div class="schem">
+          <div class="schem-head"><span>// workflow.dag</span><span>v1.2</span></div>
+          <svg viewBox="0 0 720 280" aria-hidden="true">
+            <defs><marker id="ai2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6ee7ff"/></marker></defs>
+            <g stroke="#6ee7ff" stroke-width="1.4" fill="none" marker-end="url(#ai2)">
+              <path d="M90 140 L210 70"/><path d="M90 140 L210 140"/><path d="M90 140 L210 210"/>
+              <path d="M310 70 L430 140"/><path d="M310 140 L430 140"/><path d="M310 210 L430 140"/>
+              <path d="M530 140 L630 70"/><path d="M530 140 L630 140"/><path d="M530 140 L630 210"/>
+            </g>
+            <g fill="#0a0e0b" stroke="#6ee7ff" stroke-width="1.4">
+              <rect x="20" y="120" width="80" height="40"/>
+              <rect x="210" y="50" width="100" height="40"/>
+              <rect x="210" y="120" width="100" height="40"/>
+              <rect x="210" y="190" width="100" height="40"/>
+              <rect x="430" y="120" width="100" height="40"/>
+              <rect x="630" y="50" width="80" height="40"/>
+              <rect x="630" y="120" width="80" height="40"/>
+              <rect x="630" y="190" width="80" height="40"/>
+            </g>
+            <g fill="#cfe9d3" font-family="JetBrains Mono" font-size="11">
+              <text x="38" y="144">INBOX</text>
+              <text x="232" y="74">EMAIL</text>
+              <text x="240" y="144">PDF</text>
+              <text x="232" y="214">NOTE</text>
+              <text x="446" y="144">EXTRACT</text>
+              <text x="652" y="74">CRM</text>
+              <text x="640" y="144">REVIEW</text>
+              <text x="650" y="214">FLAG</text>
+            </g>
+          </svg>
+        </div>
+
+        <p><strong>Lorem ipsum dolor sit amet</strong>, consectetur adipiscing elit. Insurance brokers receive quote requests as a chaotic mix of forwarded emails, PDF attachments, scanned forms, and free-text notes. The job of turning that mess into a clean record is high-volume, low-margin, and historically resistant to automation.</p>
+
+        <p>This is a representative breakdown of a workflow I designed for a broker-side intake team. <em>Specifics anonymised</em>; the architecture is the lesson.</p>
+
+        <h2>The problem</h2>
+        <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Each new quote required ~12 minutes of manual data entry across three systems, with a 7% rate of missing fields that triggered a back-and-forth email cycle averaging 36 hours.</p>
+
+        <h2>Architecture</h2>
+        <ul>
+          <li><strong>Inbox watcher</strong> — IMAP + S3 staging; every artifact gets a content hash and a permanent URI.</li>
+          <li><strong>Type router</strong> — small classifier decides email-body / PDF / scan / note; routes to the right extractor.</li>
+          <li><strong>Extraction</strong> — schema-bound LLM calls per type, with confidence per field.</li>
+          <li><strong>Missing-info checker</strong> — deterministic pass over the schema; auto-drafts a clarification email for review.</li>
+          <li><strong>Human review</strong> — broker UI shows the source artifact next to the extracted record; approve / edit / reject.</li>
+          <li><strong>CRM handoff</strong> — idempotent writer with retries; every field has provenance.</li>
+        </ul>
+
+        <div class="callout">
+          <b>// design note</b><br>
+          Excepteur sint occaecat cupidatat non proident. The win wasn't a smarter LLM — it was making <strong>every extracted field traceable to a source span</strong>. That's what made brokers trust the output enough to skip re-reading.
+        </div>
+
+        <h2>Spec sheet</h2>
+        <table class="spec">
+          <tr><td class="k">throughput</td><td class="v">~ 240 quotes/day · single tenant</td></tr>
+          <tr><td class="k">avg time saved</td><td class="v">9.5 min per quote</td></tr>
+          <tr><td class="k">missing-info loop</td><td class="v">36h → 4h median</td></tr>
+          <tr><td class="k">field provenance</td><td class="v">100% — source span linked</td></tr>
+          <tr><td class="k">runtime</td><td class="v">python 3.12 · langgraph · postgres</td></tr>
+          <tr><td class="k">deploy</td><td class="v">railway · single-region</td></tr>
+        </table>
+
+        <hr>
+        <p><strong>Building something similar?</strong> <a href="../Personal Website.html#contact">Get in touch</a>.</p>
+
+        <div class="pn">
+          <a class="pcard" href="voice-ai-intake.html"><small>← prev project</small><span>Voice AI Intake System</span></a>
+          <a class="pcard next" href="web3-ops-agent.html"><small>next project →</small><span>Web3 Operations Agent</span></a>
+        </div>
+      </article>
+
+      <aside class="toc" aria-label="contents">
+        <h4>// contents</h4>
+        <a href="#content">overview</a>
+        <a href="#content">the problem</a>
+        <a href="#content">architecture</a>
+        <a href="#content">spec sheet</a>
+      </aside>
+    </div>
+    <div class="ascii-div" aria-hidden="true">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div class="l">// built by jonathan abraham · ai_systems · voice_ai · web3_ops · software_contracting</div>
+    <div>© 2026 — session_ended_gracefully</div>
+  </div>
+</footer>
+
+<script>
+  (function(){const t=document.getElementById('nav-toggle');const l=document.getElementById('nav-links');if(!t||!l)return;t.addEventListener('click',()=>{const o=l.classList.toggle('open');t.setAttribute('aria-expanded',o?'true':'false');});})();
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+---
+import Base from '../../layouts/Base.astro';
+const title = 'Web3 Operations Agent — Jonathan Abraham';
+const description = 'An AI-assisted operations system for monitoring wallets, summarising governance activity, tracking treasury changes, and producing structured research updates.';
+---
+<Base title={title} description={description} showBoot={false}>
+  <main id="content" class="doc">
+    <div class="wrap">
+      <div class="crumbs">
+        <a href="/">~</a><span class="sep">/</span>
+        <a href="/#proof-of-work">proof-of-work</a><span class="sep">/</span>
+        <span>web3-ops-agent</span>
+      </div>
+      <div class="prompt">&gt; ./projects/web3-ops-agent</div>
+      <h1 class="h doc">Web3 Operations Agent</h1>
+      <p class="sub">An AI-assisted operations system for monitoring wallets, summarising governance activity, tracking treasury changes, and producing structured research updates.</p>
+      <div class="meta-row">
+        <span><b>status</b> v0.3 · alpha</span>
+        <span><b>year</b> 2025</span>
+        <span><b>role</b> systems engineer</span>
+        <span><b>stack</b> ts · viem · the_graph · postgres</span>
+      </div>
+      <div style="margin:0 0 28px">
+        <span class="tag">Web3</span><span class="tag">Wallets</span><span class="tag">Treasury</span><span class="tag">Governance</span><span class="tag">Research</span>
+      </div>
+
+      <div class="doc-grid">
+        <article class="prose">
+          <div class="schem">
+            <div class="schem-head"><span>// agent.runtime</span><span>v0.3 · alpha</span></div>
+            <svg viewBox="0 0 720 280" aria-hidden="true">
+              <defs><marker id="ai3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#c79bff"/></marker></defs>
+              <g stroke="#c79bff" stroke-width="1.4" fill="none" marker-end="url(#ai3)">
+                <path d="M90 70 L210 70"/><path d="M90 140 L210 140"/><path d="M90 210 L210 210"/>
+                <path d="M310 70 L430 140"/><path d="M310 140 L430 140"/><path d="M310 210 L430 140"/>
+                <path d="M530 140 L630 70"/><path d="M530 140 L630 140"/><path d="M530 140 L630 210"/>
+              </g>
+              <g fill="#0a0e0b" stroke="#c79bff" stroke-width="1.4">
+                <rect x="20" y="50" width="80" height="40"/>
+                <rect x="20" y="120" width="80" height="40"/>
+                <rect x="20" y="190" width="80" height="40"/>
+                <rect x="210" y="50" width="100" height="40"/>
+                <rect x="210" y="120" width="100" height="40"/>
+                <rect x="210" y="190" width="100" height="40"/>
+                <rect x="430" y="120" width="100" height="40"/>
+                <rect x="630" y="50" width="80" height="40"/>
+                <rect x="630" y="120" width="80" height="40"/>
+                <rect x="630" y="190" width="80" height="40"/>
+              </g>
+              <g fill="#cfe9d3" font-family="JetBrains Mono" font-size="11">
+                <text x="36" y="74">CHAIN</text>
+                <text x="32" y="144">SUBGRAPH</text>
+                <text x="36" y="214">FORUMS</text>
+                <text x="234" y="74">WALLET_W</text>
+                <text x="234" y="144">TREASURY</text>
+                <text x="234" y="214">GOV_FEED</text>
+                <text x="446" y="144">AGENT_LLM</text>
+                <text x="650" y="74">DIGEST</text>
+                <text x="640" y="144">DASHBOARD</text>
+                <text x="652" y="214">ALERTS</text>
+              </g>
+            </svg>
+          </div>
+
+          <p><strong>Lorem ipsum dolor sit amet</strong>, consectetur adipiscing elit. Web3 ops teams have to read everything: on-chain transfers, governance forums, multisig queues, snapshot proposals, and a dozen Discord channels. Most of it is signal-poor; the job is filtering and structuring it into something a human operator can act on in 10 minutes a day.</p>
+
+          <p>This is a representative concept for an AI-assisted operations agent. <em>Specifics anonymised</em>.</p>
+
+          <h2>The problem</h2>
+          <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. The treasury lead was spending the first 90 minutes of every day reconstructing what changed overnight across 4 chains and 11 watched addresses.</p>
+
+          <h2>Architecture</h2>
+          <ul>
+            <li><strong>Indexers</strong> — chain RPC + The Graph subgraphs, normalised into a single event log.</li>
+            <li><strong>Watchers</strong> — wallet, treasury, governance — each with its own deltas-only query.</li>
+            <li><strong>Agent core</strong> — LLM with tool access to the event log; produces a structured daily digest.</li>
+            <li><strong>Dashboard</strong> — read-only operator view; every claim links back to a tx hash or forum post.</li>
+            <li><strong>Alerts</strong> — deterministic rules layer for time-critical events; the LLM never gates these.</li>
+          </ul>
+
+          <div class="callout">
+            <b>// design note</b><br />
+            Excepteur sint occaecat cupidatat non proident. The hardest part wasn't the LLM — it was the <strong>delta-only event log</strong>. Without it, every digest restated yesterday's news.
+          </div>
+
+          <h2>Spec sheet</h2>
+          <table class="spec">
+            <tr><td class="k">chains watched</td><td class="v">eth · base · arbitrum · optimism</td></tr>
+            <tr><td class="k">digest cadence</td><td class="v">daily 07:00 + on-event</td></tr>
+            <tr><td class="k">alert rules</td><td class="v">deterministic · llm-bypassed</td></tr>
+            <tr><td class="k">runtime</td><td class="v">typescript · viem · postgres</td></tr>
+            <tr><td class="k">deploy</td><td class="v">cloudflare workers + supabase</td></tr>
+          </table>
+
+          <hr />
+          <p><strong>Running ops on-chain?</strong> <a href="/#contact">Let's talk</a>.</p>
+
+          <div class="pn">
+            <a class="pcard" href="/projects/insurance-workflow"><small>← prev project</small><span>AI Insurance Workflow Automation</span></a>
+            <a class="pcard next" href="/projects/voice-ai-intake"><small>next project →</small><span>Voice AI Intake System</span></a>
+          </div>
+        </article>
+
+        <aside class="toc" aria-label="contents">
+          <h4>// contents</h4>
+          <a href="#content">overview</a>
+          <a href="#content">the problem</a>
+          <a href="#content">architecture</a>
+          <a href="#content">spec sheet</a>
+        </aside>
+      </div>
+      <div class="ascii-div" aria-hidden="true">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+    </div>
+  </main>
+</Base>

@@ -1,0 +1,60 @@
+<div id="boot" aria-hidden="true">
+  <button class="skip" id="boot-skip">[esc] skip ▸</button>
+  <div class="boot-inner" id="boot-inner"></div>
+</div>
+
+<script is:inline>
+  (function () {
+    const boot = document.getElementById('boot');
+    const inner = document.getElementById('boot-inner');
+    const skipBtn = document.getElementById('boot-skip');
+    if (!boot || !inner || !skipBtn) return;
+    const seen = sessionStorage.getItem('boot_seen');
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (seen || reduce) { boot.remove(); return; }
+
+    const lines = [
+      { t: 'OPERATOR BIOS v2.6.04 — © j.abraham systems', d: 60 },
+      { t: '', d: 80 },
+      { t: 'POST..................................... <span style="color:#7dff8a">[OK]</span>', d: 120 },
+      { t: 'MEMORY 16384K  ........................... <span style="color:#7dff8a">[OK]</span>', d: 90 },
+      { t: 'CHECKING SIGNAL .......................... <span style="color:#7dff8a">[OK]</span>', d: 140 },
+      { t: 'MOUNTING /operator/profile ............... <span style="color:#7dff8a">[OK]</span>', d: 120 },
+      { t: 'LOADING ai_workflow_automation ........... <span style="color:#6ee7ff">[ONLINE]</span>', d: 160 },
+      { t: 'LOADING voice_ai_stack ................... <span style="color:#6ee7ff">[ONLINE]</span>', d: 160 },
+      { t: 'LOADING web3_operations .................. <span style="color:#6ee7ff">[ONLINE]</span>', d: 160 },
+      { t: 'LOADING technical_dealmaking ............. <span style="color:#6ee7ff">[ONLINE]</span>', d: 160 },
+      { t: '', d: 80 },
+      { t: '<span style="color:#f5b860">▸ session_id 0x42 · operator=jonathan · region=mel</span>', d: 200 },
+      { t: '<span style="color:#7dff8a">▸ status: available_for_contracts</span>', d: 240 },
+      { t: '', d: 60 },
+      { t: '<span style="color:#b9b8ae">launching command_centre...</span>', d: 300 }
+    ];
+    let i = 0, killed = false;
+    function step() {
+      if (killed) return;
+      if (i >= lines.length) { end(); return; }
+      const ln = document.createElement('span');
+      ln.className = 'boot-line show boot-flash';
+      ln.innerHTML = lines[i].t || '&nbsp;';
+      inner.appendChild(ln);
+      i++;
+      setTimeout(step, lines[i - 1].d);
+    }
+    function end() {
+      sessionStorage.setItem('boot_seen', '1');
+      boot.classList.add('gone');
+      setTimeout(() => boot.remove(), 400);
+    }
+    function skip() { killed = true; end(); }
+    skipBtn.addEventListener('click', skip);
+    function keyHandler(e) {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        skip();
+        document.removeEventListener('keydown', keyHandler);
+      }
+    }
+    document.addEventListener('keydown', keyHandler);
+    step();
+  })();
+</script>

@@ -1,0 +1,54 @@
+---
+import '../styles/global.css';
+const title = '404 — segmentation fault';
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{title}</title>
+  <meta name="theme-color" content="#0b0e0c" />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230b0e0c'/><g fill='%237dff8a'><rect x='3' y='3' width='2' height='2'/><rect x='7' y='3' width='2' height='2'/><rect x='11' y='3' width='2' height='2'/><rect x='3' y='7' width='10' height='2'/><rect x='3' y='11' width='2' height='2'/><rect x='11' y='11' width='2' height='2'/></g></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <a class="skip-link" href="#content">skip to content</a>
+  <main id="content" class="panic">
+    <div class="err">⚠ kernel: SIGNAL_NOT_FOUND · path resolves to /dev/null</div>
+    <h1>404</h1>
+    <p style="color:var(--ink-dim);max-width:560px;font-size:15px">
+      the route you requested doesn't exist on this operator. could be a stale link, a moved page, or a typo in the address bar.
+    </p>
+
+    <div class="stack">
+      <b>$ trace --route</b>
+      ↳ requested:   <span style="color:var(--amber)" id="req-path">/unknown</span>
+      ↳ resolver:    no_match
+      ↳ index_db:    cold
+      ↳ suggestion:  return_to_root
+      ↳ status:      <span style="color:var(--red)">404</span> &nbsp; <span class="blink">█</span>
+    </div>
+
+    <div class="ascii" aria-hidden="true">▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒</div>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="/">▸ return_to_root <span class="arrow">→</span></a>
+      <a class="btn btn-ghost" href="/#contact">report_broken_link <span class="arrow">→</span></a>
+    </div>
+
+    <div style="margin-top:36px;font-size:12px;color:var(--ink-mute)">
+      // session continues. nothing was lost. press <b style="color:var(--green)">[esc]</b> or use the buttons above.
+    </div>
+  </main>
+
+  <script is:inline>
+    const el = document.getElementById('req-path');
+    if (el) el.textContent = location.pathname || '/unknown';
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') location.href = '/'; });
+  </script>
+</body>
+</html>
