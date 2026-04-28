@@ -1,25 +1,22 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('home (posts list)', () => {
-  test('renders brand header, links row, and post list', async ({ page }) => {
+  test('renders only the ./posts prompt and the post list', async ({ page }) => {
     await page.goto('/');
 
     await expect(page).toHaveTitle('Jonathan Abraham');
-    await expect(page.locator('.page-head h1.brandline')).toHaveText('Jonathan Abraham');
-    await expect(page.locator('.page-head .tagline')).toContainText('founder');
-    await expect(page.locator('.page-head .tagline')).toContainText('melbourne');
+    await expect(page.locator('.page-head .prompt')).toHaveText('> ./posts');
 
-    // links row contains the four expected links
-    const linkLabels = await page.locator('.links-row a').allTextContents();
-    expect(linkLabels).toEqual(['email', 'github', 'linkedin', 'about']);
+    // No brandline / tagline / links-row repeating what nav + footer already show
+    await expect(page.locator('.page-head h1')).toHaveCount(0);
+    await expect(page.locator('.page-head .tagline')).toHaveCount(0);
+    await expect(page.locator('.links-row')).toHaveCount(0);
 
-    // posts list
     const rows = page.locator('.post-list .post-row');
     await expect(rows).toHaveCount(3);
     const hrefs = await rows.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')));
     for (const href of hrefs) expect(href).toMatch(/^\/posts\//);
 
-    // every row currently shows the draft badge
     await expect(page.locator('.post-list .draft')).toHaveCount(3);
   });
 
