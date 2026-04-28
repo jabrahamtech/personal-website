@@ -1,0 +1,65 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import DocLayout from '../../layouts/DocLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts')).sort((a, b) => {
+    const ad = a.data.posted?.getTime() ?? 0;
+    const bd = b.data.posted?.getTime() ?? 0;
+    return bd - ad;
+  });
+  return posts.map((post, i) => ({
+    params: { slug: post.slug },
+    props: {
+      post,
+      newer: i > 0 ? posts[i - 1] : null,
+      older: i < posts.length - 1 ? posts[i + 1] : null,
+    },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  newer: CollectionEntry<'posts'> | null;
+  older: CollectionEntry<'posts'> | null;
+}
+
+const { post, newer, older } = Astro.props;
+const { data } = post;
+const { Content } = await post.render();
+
+const metaRow: { label: string; value: string }[] = [];
+if (data.posted) metaRow.push({ label: 'posted', value: data.posted.toISOString().slice(0, 10) });
+else metaRow.push({ label: 'status', value: 'draft' });
+if (data.readTime) metaRow.push({ label: 'read', value: data.readTime });
+---
+<DocLayout
+  title={`${data.title} — Jonathan Abraham`}
+  description={data.summary}
+  promptPath={`./posts/${post.slug}`}
+  crumbs={[
+    { href: '/', label: '~' },
+    { href: '/', label: 'posts' },
+    { label: post.slug },
+  ]}
+  metaRow={metaRow}
+  tags={data.tags}
+>
+  <Content />
+  {(newer || older) && (
+    <div class="pn" slot="footer">
+      {newer ? (
+        <a href={`/posts/${newer.slug}`}>
+          <small>← newer</small>
+          <span>{newer.data.title}</span>
+        </a>
+      ) : <span></span>}
+      {older ? (
+        <a class="next" href={`/posts/${older.slug}`}>
+          <small>older →</small>
+          <span>{older.data.title}</span>
+        </a>
+      ) : <span></span>}
+    </div>
+  )}
+</DocLayout>

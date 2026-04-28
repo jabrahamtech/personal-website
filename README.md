@@ -1,46 +1,40 @@
-# jonathan_abraham.os
+# jonathan_abraham.dev
 
-Personal website for **Jonathan Abraham** — AI systems engineer based in Melbourne, AU.
+Personal site / blog for **Jonathan Abraham** — founder, [Brokerloop](https://brokerloop.com.au) (insurtech, Melbourne AU); senior engineer working on production voice AI and backend AI infrastructure.
 
-A retro terminal "operator command centre" with an interactive command line, boot sequence, live status HUD, and case-study sub-pages.
+This is a writing-first site, in the spirit of [smcleod.net](https://smcleod.net/). Notes on production AI, voice AI, backend systems in Go, and the operational shape of running an insurtech.
 
 ## Stack
 
-- **Astro 4** (static, zero-JS-by-default with progressive enhancement)
-- **Astro Content Collections** (MDX) for projects + writing
-- **@astrojs/sitemap** for `sitemap-index.xml` / `sitemap-0.xml`
-- Vanilla CSS with design tokens (`src/styles/global.css`)
-- Google Fonts CDN (JetBrains Mono · Inter · VT323)
+- **Astro 4** (static, zero-JS-by-default)
+- **Astro Content Collections** (MDX) for posts
+- **@astrojs/rss** for `/rss.xml`
+- **@astrojs/sitemap** for `/sitemap-index.xml`
+- Vanilla CSS with operator-terminal design tokens (`src/styles/global.css`)
 
 ## Repo layout
 
 ```
-design_handoff_personal_website/      # original HTML reference designs (kept for posterity)
-site/                                 # Astro implementation (source of truth)
+design_handoff_personal_website/  # original handoff (kept for posterity)
+site/                             # Astro implementation
   src/
     layouts/
-      Base.astro                      # head, nav, footer, sprite, HUD, boot
-      DocLayout.astro                 # shared shell for project + article detail pages
+      Base.astro                  # head + nav + footer
+      DocLayout.astro             # post detail shell
     components/
-      Nav · Footer · BootSequence · StatusHUD · Terminal
-      PixelIcon · OsCard · Schematic
-      ProjectVis · ProjectCard · ArticleCard
-      sections/
-        Hero · OperatingSystem · ProofOfWork
-        Services · WritingSection · About · Contact
+      Nav · Footer
     content/
-      config.ts                       # Zod schemas for projects + writing collections
-      projects/*.mdx                  # one MDX file per case study
-      writing/*.mdx                   # one MDX file per article
+      config.ts                   # posts collection schema (Zod)
+      posts/*.mdx                 # one MDX file per post
     pages/
-      index.astro                     # composes the section components
-      404.astro                       # kernel-panic page
-      projects/[slug].astro           # dynamic route, getStaticPaths from collection
-      writing/[slug].astro            # dynamic route, getStaticPaths from collection
-    styles/global.css                 # design tokens + components
-  public/
-    robots.txt
-  dist/                               # build output (gitignored)
+      index.astro                 # posts list
+      about.astro                 # bio
+      404.astro                   # kernel-panic 404
+      posts/[slug].astro          # dynamic route, getStaticPaths from collection
+      rss.xml.ts                  # RSS feed (drafts excluded)
+    styles/global.css
+  tests/e2e/site.spec.ts          # Playwright suite
+  public/robots.txt
 ```
 
 ## Develop
@@ -48,29 +42,41 @@ site/                                 # Astro implementation (source of truth)
 ```bash
 cd site
 npm install
-npm run dev      # http://localhost:4321
-npm run build    # static output -> site/dist
-npm run preview  # serve dist locally
+npm run dev          # http://localhost:4321
+npm run build        # static output -> site/dist
+npm run start        # serve dist on $PORT (Railway entrypoint)
+npm run test:e2e     # Playwright (auto-builds + serves)
 ```
 
-## Add a project
+## Add a post
 
-Drop a new MDX file in `site/src/content/projects/<slug>.mdx` with the schema-required frontmatter (see `src/content/config.ts`). The card on the home page and the `/projects/<slug>` route both render automatically.
+Drop a new MDX file in `site/src/content/posts/<slug>.mdx`:
 
-## Add a writing note
+```mdx
+---
+title: 'My new post'
+summary: 'Short one-line description.'
+posted: 2026-05-01           # omit to keep it as a draft
+draft: false                  # set true to exclude from list + RSS
+tags: ['voice-ai']
+readTime: '~ 5 min'
+---
 
-Drop a new MDX file in `site/src/content/writing/<slug>.mdx`. Same idea.
+Body in markdown / MDX.
+```
+
+The post appears in the home list and the RSS feed automatically; the dynamic route `/posts/<slug>` renders it via the shared DocLayout.
+
+## Deploy (Railway)
+
+- Service Root Directory = `site`
+- Service Public Networking → port `4321`
+- `npm start` runs `serve dist --listen tcp://0.0.0.0:${PORT:-4321}`
+- Custom domain: jonathanabraham.dev
 
 ## Production TODO
 
-- [ ] Replace lorem ipsum with real bios + case-study bodies + article bodies
+- [ ] Write the three drafts (currently stubbed with one-sentence theses)
 - [ ] OG image at 1200×630 (`public/og.png`)
-- [ ] Wire contact form to a real backend (currently posts to formsubmit.co)
-- [ ] Add `apple-touch-icon` + `manifest.webmanifest`
-- [ ] Self-host fonts via `@fontsource/jetbrains-mono` + `@fontsource/inter`
-- [ ] Spam protection on the contact form (Cloudflare Turnstile)
+- [ ] Self-host fonts (`@fontsource/jetbrains-mono` + `@fontsource/inter`)
 - [ ] Analytics (Plausible / Umami)
-
-## Design reference
-
-See `design_handoff_personal_website/README.md` for the full design spec — tokens, components, motion, accessibility notes.

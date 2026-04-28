@@ -6,30 +6,17 @@ interface Crumb { href?: string; label: string }
 interface Props {
   title: string;
   description: string;
-  promptPath: string;            // e.g. './projects/voice-ai-intake'
+  promptPath: string;
   crumbs: Crumb[];
-  heroSummary?: string;
   metaRow?: { label: string; value: string }[];
   tags?: string[];
-  contentsToc?: string[];
-  narrow?: boolean;
 }
 
-const {
-  title,
-  description,
-  promptPath,
-  crumbs,
-  heroSummary,
-  metaRow,
-  tags,
-  contentsToc,
-  narrow = false,
-} = Astro.props;
+const { title, description, promptPath, crumbs, metaRow, tags } = Astro.props;
 ---
-<Base title={title} description={description} showBoot={false}>
+<Base title={title} description={description}>
   <main id="content" class="doc">
-    <div class={`wrap ${narrow ? 'narrow' : ''}`}>
+    <div class="wrap">
       <div class="crumbs">
         {crumbs.map((c, i) => (
           <>
@@ -38,39 +25,23 @@ const {
           </>
         ))}
       </div>
-      <div class="prompt">&gt; {promptPath}</div>
-      <h1 class="h doc">{title.replace(/ — Jonathan Abraham$/, '').replace(/Jonathan Abraham — /, '')}</h1>
-      {heroSummary && <p class="sub">{heroSummary}</p>}
+      <div class="post-prompt">&gt; {promptPath}</div>
+      <h1>{title.replace(/ — Jonathan Abraham$/, '')}</h1>
       {metaRow && (
         <div class="meta-row">
           {metaRow.map((m) => <span><b>{m.label}</b> {m.value}</span>)}
         </div>
       )}
       {tags && tags.length > 0 && (
-        <div style="margin:0 0 28px">
+        <div style="margin:0 0 24px">
           {tags.map((t) => <span class="tag">{t}</span>)}
         </div>
       )}
 
-      {contentsToc ? (
-        <div class="doc-grid">
-          <article class="prose">
-            <slot />
-            <slot name="footer" />
-          </article>
-          <aside class="toc" aria-label="contents">
-            <h4>// contents</h4>
-            {contentsToc.map((t) => <a href="#content">{t}</a>)}
-          </aside>
-        </div>
-      ) : (
-        <article class="prose">
-          <slot />
-          <slot name="footer" />
-        </article>
-      )}
-
-      <div class="ascii-div" aria-hidden="true">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+      <article class="prose">
+        <slot />
+        <slot name="footer" />
+      </article>
     </div>
   </main>
 </Base>

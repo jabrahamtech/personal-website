@@ -1,37 +1,49 @@
 ---
 import Base from '../layouts/Base.astro';
-import Hero from '../components/sections/Hero.astro';
-import OperatingSystem from '../components/sections/OperatingSystem.astro';
-import ProofOfWork from '../components/sections/ProofOfWork.astro';
-import Services from '../components/sections/Services.astro';
-import WritingSection from '../components/sections/WritingSection.astro';
-import About from '../components/sections/About.astro';
-import Contact from '../components/sections/Contact.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+type Post = CollectionEntry<'posts'>;
+
+const all = await getCollection('posts');
+
+// Sort: newest posted first; drafts (no posted date) at the bottom in title order.
+const sorted = all.sort((a, b) => {
+  const ad = a.data.posted?.getTime() ?? 0;
+  const bd = b.data.posted?.getTime() ?? 0;
+  if (ad !== bd) return bd - ad;
+  return a.data.title.localeCompare(b.data.title);
+});
+
+function fmt(p: Post) {
+  if (p.data.posted) {
+    return p.data.posted.toISOString().slice(0, 10);
+  }
+  return 'draft';
+}
 ---
 <Base>
-  <main id="content">
-    <Hero />
-    <OperatingSystem />
-    <ProofOfWork />
-    <Services />
-    <WritingSection />
-    <About />
-    <Contact />
+  <main id="content" class="wrap">
+    <header class="page-head">
+      <div class="prompt">&gt; ./posts</div>
+      <h1>Notes</h1>
+      <p class="intro">Working notes on production AI, voice AI, backend systems in Go, and the operational shape of running an insurtech (Brokerloop). Mostly things I had to learn the hard way.</p>
+    </header>
+
+    <ul class="post-list">
+      {sorted.map((post) => (
+        <li>
+          <a class="post-row" href={`/posts/${post.slug}`}>
+            <div class="meta">
+              <span>{fmt(post)}</span>
+              {post.data.draft && <span class="draft">draft</span>}
+              {post.data.readTime && <><span class="sep">·</span><span>{post.data.readTime}</span></>}
+              {post.data.tags.length > 0 && <><span class="sep">·</span><span class="tag">{post.data.tags.join(' · ')}</span></>}
+            </div>
+            <h2>{post.data.title}</h2>
+            <p>{post.data.summary}</p>
+          </a>
+        </li>
+      ))}
+    </ul>
   </main>
 </Base>
-
-<script is:inline>
-  // reveal-on-scroll
-  (function () {
-    if (!('IntersectionObserver' in window)) {
-      document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
-      return;
-    }
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-      });
-    }, { threshold: 0.08 });
-    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
-  })();
-</script>

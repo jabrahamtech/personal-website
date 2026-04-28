@@ -1,49 +1,18 @@
 ---
-type Link = { href: string; label: string };
-const links: Link[] = [
-  { href: '/#operating-system', label: 'work' },
-  { href: '/#proof-of-work', label: 'proof' },
-  { href: '/#services', label: 'services' },
-  { href: '/#writing', label: 'writing' },
-  { href: '/#contact', label: 'contact' },
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const links = [
+  { href: '/',       label: 'posts',    match: (p: string) => p === '/' || p.startsWith('/posts') },
+  { href: '/about',  label: 'about',    match: (p: string) => p === '/about' },
+  { href: '/rss.xml',label: 'rss',      match: () => false },
 ];
 ---
 <nav class="top">
   <div class="wrap row">
-    <a class="brand" href="/">
-      <span class="pixel-logo" aria-hidden="true">
-        <i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i>
-        <i></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i></i>
-        <i></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i>
-      </span>
-      <span>jonathan_abraham<span style="color:var(--green)">.os</span></span>
-    </a>
-    <div class="nav-links" id="nav-links">
-      {links.map((l) => <a href={l.href}>{l.label}</a>)}
-    </div>
-    <div style="display:flex;align-items:center;gap:6px">
-      <button class="nav-toggle" id="nav-toggle" aria-label="toggle menu" aria-expanded="false">
-        <span class="bars"><i></i><i></i><i></i></span>
-      </button>
-      <a href="/#contact" class="nav-cta">▸ start_a_project</a>
+    <a class="brand" href="/">jonathan_abraham<span class="accent">.os</span></a>
+    <div class="nav-links">
+      {links.map((l) => (
+        <a href={l.href} aria-current={l.match(path) ? 'page' : undefined}>{l.label}</a>
+      ))}
     </div>
   </div>
 </nav>
-
-<script is:inline>
-  (function () {
-    const t = document.getElementById('nav-toggle');
-    const l = document.getElementById('nav-links');
-    if (!t || !l) return;
-    t.addEventListener('click', () => {
-      const open = l.classList.toggle('open');
-      t.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
-    l.addEventListener('click', (e) => {
-      if (e.target && e.target.tagName === 'A') {
-        l.classList.remove('open');
-        t.setAttribute('aria-expanded', 'false');
-      }
-    });
-  })();
-</script>
