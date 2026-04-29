@@ -22,13 +22,27 @@ const siteOrigin = (Astro.site ?? new URL('https://jonathanabraham.dev')).toStri
 const personId = `${siteOrigin}/#jonathan`;
 const siteId = `${siteOrigin}/#site`;
 
+const defaultOg = {
+  src: '/og/default.svg',
+  alt: 'jonathan_abraham.os — shipping production AI for over 2 years',
+};
+
+function imageFor(p: Post) {
+  const img = p.data.image ?? defaultOg;
+  return {
+    '@type': 'ImageObject',
+    url: new URL(img.src, siteOrigin + '/').toString(),
+    caption: img.alt,
+  };
+}
+
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Blog',
   '@id': `${siteOrigin}/#blog`,
   url: siteOrigin + '/',
   name: 'Jonathan Abraham — posts',
-  description: 'Notes on production voice AI, AI workflow design, and backend AI infrastructure.',
+  description: 'Working notes on building production AI — voice agents, intake automation, and the backend infrastructure that keeps AI systems reliable in production.',
   inLanguage: 'en',
   isPartOf: { '@id': siteId },
   author: { '@id': personId },
@@ -39,6 +53,7 @@ const blogJsonLd = {
     url: `${siteOrigin}/posts/${p.slug}`,
     headline: p.data.title,
     description: p.data.summary,
+    image: imageFor(p),
     datePublished: p.data.posted?.toISOString(),
     keywords: p.data.tags.join(', '),
     author: { '@id': personId },
@@ -46,10 +61,10 @@ const blogJsonLd = {
   })),
 };
 
-const description = 'Working notes from Jonathan Abraham on production voice AI, AI workflow design, and backend AI infrastructure for regulated industries (insurance, ops, voice).';
+const description = 'Working notes from Jonathan Abraham on building production AI — voice agents, intake automation, and backend infrastructure for environments where reliability, compliance, and real users matter. Founder of Brokerloop (Melbourne).';
 ---
 <Base
-  title="Jonathan Abraham — production voice AI & AI infrastructure"
+  title="Jonathan Abraham — building production AI"
   description={description}
   jsonLd={blogJsonLd}
 >

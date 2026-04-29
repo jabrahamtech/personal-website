@@ -64,7 +64,7 @@ test.describe('about page', () => {
     await expect(page).toHaveTitle(/About — Jonathan Abraham/);
     await expect(page.locator('.page-head h1')).toHaveText('About');
     await expect(page.locator('.prose')).toContainText('Brokerloop');
-    await expect(page.locator('.prose')).toContainText('Contract work is by referral');
+    await expect(page.locator('.prose')).toContainText('New work is by referral');
     await expect(page.locator('.prose a[href^="mailto:jabrahamtech@gmail.com"]').first()).toBeVisible();
     await expect(page.locator('.prose a[href*="github.com/jabrahamtech"]')).toBeVisible();
   });
@@ -311,6 +311,27 @@ test.describe('SEO / AEO — head + structured data', () => {
     expect(post.headline).toBeTruthy();
     expect(post.author?.['@id']).toMatch(/#jonathan$/);
     expect(post.image?.url || post.image).toBeTruthy();
+  });
+
+  test('every BlogPosting carries an image — including drafts without a cover (Rich Results requirement)', async ({ page }) => {
+    // Page-level BlogPosting on a post that has NO cover image in frontmatter.
+    await page.goto('/posts/insurance-intake-design');
+    const blocks = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent || 'null')));
+    const post = blocks.find((b) => b['@type'] === 'BlogPosting');
+    expect(post).toBeTruthy();
+    const img = typeof post.image === 'string' ? post.image : post.image?.url;
+    expect(img, 'BlogPosting.image is missing on a draft without a cover').toBeTruthy();
+    expect(img).toMatch(/^https?:\/\//);
+
+    // Homepage Blog graph: every blogPost[] entry must carry image too.
+    await page.goto('/');
+    const homeBlocks = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent || 'null')));
+    const blog = homeBlocks.find((b) => b['@type'] === 'Blog');
+    expect(blog?.blogPost?.length).toBeGreaterThanOrEqual(3);
+    for (const bp of blog.blogPost) {
+      const v = typeof bp.image === 'string' ? bp.image : bp.image?.url;
+      expect(v, `Blog.blogPost[].image missing for ${bp.url}`).toBeTruthy();
+    }
   });
 
   test('about page emits ProfilePage with sameAs links', async ({ page }) => {

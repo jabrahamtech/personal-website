@@ -53,9 +53,11 @@ const blogPosting: Record<string, unknown> = {
   keywords: data.tags.length ? data.tags.join(', ') : undefined,
   datePublished: data.posted?.toISOString(),
   dateModified: (data.posted ?? new Date()).toISOString(),
-  ...(data.image
-    ? { image: { '@type': 'ImageObject', url: new URL(data.image.src, siteOrigin + '/').toString(), caption: data.image.alt } }
-    : {}),
+  image: {
+    '@type': 'ImageObject',
+    url: new URL(data.image?.src ?? '/og/default.svg', siteOrigin + '/').toString(),
+    caption: data.image?.alt ?? 'jonathan_abraham.os — shipping production AI for over 2 years',
+  },
   ...(data.draft ? { creativeWorkStatus: 'Draft' } : {}),
 };
 
