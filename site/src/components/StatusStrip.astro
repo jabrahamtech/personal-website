@@ -1,0 +1,41 @@
+---
+// Bloomberg-style status strip rendered just below the nav on every page.
+// Static-but-believable values; the local time updates client-side.
+const buildSlug = 'a3f8c'; // bumped manually on substantive deploys
+---
+<div class="status-strip" role="status" aria-label="system status">
+  <div class="wrap row">
+    <div class="left">
+      <span class="dot"></span>
+      <span><b>MEL</b> · <span id="ss-time">--:--</span> <span class="dim">AEST</span></span>
+      <span class="sep">·</span>
+      <span><b>STATUS</b> open_to_select_work</span>
+    </div>
+    <div class="right">
+      <span class="hide-sm"><b>FOCUS</b> voice agents · low-latency systems</span>
+      <span class="sep hide-sm">·</span>
+      <span><b>BUILD</b> {buildSlug}</span>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    const el = document.getElementById('ss-time');
+    if (!el) return;
+    function tick() {
+      // AEST/AEDT — Australia/Melbourne; falls back to local if Intl is unavailable.
+      try {
+        const t = new Intl.DateTimeFormat('en-AU', {
+          hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Australia/Melbourne'
+        }).format(new Date());
+        el.textContent = t;
+      } catch {
+        const d = new Date();
+        el.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      }
+    }
+    tick();
+    setInterval(tick, 30 * 1000);
+  })();
+</script>

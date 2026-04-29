@@ -252,6 +252,33 @@ test.describe('mobile layout (iPhone-class viewport, 390x844)', () => {
   });
 });
 
+test.describe('status strip (Bloomberg-style)', () => {
+  test('renders on every page with status, time placeholder, and build', async ({ page }) => {
+    for (const path of ['/', '/about', '/terminal', '/posts/voice-ai-after-demo']) {
+      await page.goto(path);
+      await expect(page.locator('.status-strip')).toBeVisible();
+      await expect(page.locator('.status-strip')).toContainText('STATUS');
+      await expect(page.locator('.status-strip')).toContainText('open_to_select_work');
+      await expect(page.locator('.status-strip')).toContainText('BUILD');
+      // Local time hydrates client-side; just assert the slot exists with HH:MM shape eventually
+      await expect(page.locator('#ss-time')).toHaveText(/^\d{2}:\d{2}$/);
+    }
+  });
+});
+
+test.describe('selected work on /about', () => {
+  test('lists fraud-detection bank line, Brokerloop, low-latency arch, OSS interests', async ({ page }) => {
+    await page.goto('/about');
+    const work = page.locator('.work-list');
+    await expect(work).toBeVisible();
+    await expect(work).toContainText('tier-one Australian bank');
+    await expect(work).toContainText('Fraud detection AI');
+    await expect(work).toContainText('Brokerloop');
+    await expect(work).toContainText('Low-latency event-driven architecture');
+    await expect(work).toContainText('nautilus_trader');
+  });
+});
+
 test.describe('SEO / AEO — head + structured data', () => {
   for (const path of ['/', '/about', '/terminal', '/posts/voice-ai-after-demo']) {
     test(`${path} has canonical, robots, og:*, twitter:* meta`, async ({ page }) => {

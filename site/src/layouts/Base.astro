@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
+import StatusStrip from '../components/StatusStrip.astro';
 import Footer from '../components/Footer.astro';
 import BootSequence from '../components/BootSequence.astro';
 
@@ -174,6 +175,7 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
   <a class="skip-link" href="#content">skip to content</a>
   <BootSequence />
   <Nav />
+  <StatusStrip />
   <slot />
   <Footer />
 </body>

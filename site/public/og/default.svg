@@ -36,8 +36,10 @@
       <text x="22" y="95">writing on production-grade AI systems</text>
     </g>
 
-    <g transform="translate(0,486)" font-size="14" fill="#5a6d5d" letter-spacing="6">
-      <text>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</text>
+    <line x1="0" y1="510" x2="1040" y2="510" stroke="#1a2b1d" stroke-width="1" stroke-dasharray="2,6"/>
+    <g transform="translate(0,510)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="14" fill="#5a6d5d">
+      <text x="0" y="32" letter-spacing="2">MEL · AEST · status: open_to_select_work · build a3f8c</text>
+      <text x="1040" y="32" text-anchor="end" letter-spacing="2" fill="#7dff8a">▸ jonathanabraham.dev</text>
     </g>
   </g>
 </svg>

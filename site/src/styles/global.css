@@ -155,11 +155,11 @@ footer{padding:36px 0 60px;border-top:1px solid var(--line);margin-top:60px;posi
 .ascii-div{font-family:var(--mono);color:var(--line-2);font-size:13px;letter-spacing:0.4em;text-align:center;margin:48px 0 0;user-select:none;overflow:hidden;white-space:nowrap}
 
 /* boot sequence (first visit) */
-#boot{position:fixed;inset:0;z-index:200;background:#070a08;display:flex;align-items:flex-start;justify-content:flex-start;padding:48px 56px;font-family:var(--mono);font-size:14px;color:#cfe9d3;line-height:1.65}
+#boot{position:fixed;inset:0;z-index:200;background:#070a08;display:flex;align-items:center;justify-content:center;padding:48px 56px;font-family:var(--mono);font-size:14px;color:#cfe9d3;line-height:1.65}
 #boot.gone{opacity:0;pointer-events:none;transition:opacity .35s ease}
 #boot::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom, rgba(125,255,138,0.04) 0 1px, transparent 1px 3px)}
 #boot::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%)}
-#boot .boot-inner{position:relative;z-index:2;max-width:760px;width:100%}
+#boot .boot-inner{position:relative;z-index:2;max-width:640px;width:100%;margin:0 auto}
 #boot .boot-line{display:block;white-space:pre-wrap;opacity:0}
 #boot .boot-line.show{opacity:1}
 #boot .skip{position:absolute;bottom:24px;right:32px;z-index:3;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);border:1px solid var(--line-2);background:transparent;padding:6px 10px;cursor:pointer}
@@ -202,6 +202,28 @@ footer{padding:36px 0 60px;border-top:1px solid var(--line);margin-top:60px;posi
 .term-foot .meter{display:inline-flex;gap:2px;margin-left:6px}
 .term-foot .meter i{width:6px;height:8px;background:var(--line-2);display:block}
 .term-foot .meter i.on{background:var(--green);box-shadow:0 0 4px var(--green)}
+
+/* status strip (Bloomberg-style system bar under nav) */
+.status-strip{border-bottom:1px solid var(--line);background:#070a08;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em;position:relative;z-index:40}
+.status-strip .row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:6px 0}
+.status-strip .left,.status-strip .right{display:inline-flex;align-items:center;gap:10px;min-width:0}
+.status-strip b{color:var(--ink-dim);font-weight:500;letter-spacing:.06em;margin-right:4px}
+.status-strip .dim{color:var(--line-2);margin-left:2px}
+.status-strip .sep{color:var(--line-2)}
+.status-strip .dot{width:6px;height:6px;background:var(--green);box-shadow:0 0 6px var(--green);display:inline-block;animation:ssblink 2.4s ease-in-out infinite}
+@keyframes ssblink{0%,100%{opacity:1}50%{opacity:.45}}
+.status-strip .hide-sm{display:inline}
+@media (max-width:720px){
+  .status-strip{font-size:10.5px}
+  .status-strip .row{flex-wrap:wrap;row-gap:2px}
+  .status-strip .hide-sm{display:none}
+}
+
+/* selected work list */
+.work-list{list-style:none;padding:0;margin:0 0 24px}
+.work-list li{padding:14px 0;border-top:1px dashed var(--line);font-size:15.5px;line-height:1.6}
+.work-list li:last-child{border-bottom:1px dashed var(--line)}
+.work-list strong{color:var(--ink);display:block;margin-bottom:4px;font-family:var(--mono);font-size:14.5px;letter-spacing:.01em}
 
 /* mobile — phones / narrow screens
    Tighten spacing, shrink terminal box, soften ascii divider, allow the
