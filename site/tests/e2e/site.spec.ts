@@ -383,7 +383,7 @@ test.describe('SEO / AEO — head + structured data', () => {
       await page.goto(path);
 
       const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-      expect(canonical).toMatch(/^https:\/\/jonathanabraham\.dev/);
+      expect(canonical).toMatch(/^https:\/\/jabrahamtech\.com/);
 
       // robots index,follow (not noindex)
       const robots = await page.locator('meta[name="robots"]').getAttribute('content');
@@ -503,7 +503,7 @@ test.describe('AEO — llms.txt + AI crawler robots', () => {
     const r = await page.request.get('/robots.txt');
     expect(r.status()).toBe(200);
     const body = await r.text();
-    expect(body).toContain('Sitemap: https://jonathanabraham.dev/sitemap-index.xml');
+    expect(body).toContain('Sitemap: https://jabrahamtech.com/sitemap-index.xml');
     for (const bot of ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended', 'Applebot-Extended', 'CCBot', 'Bingbot']) {
       expect(body, `${bot} not allow-listed`).toMatch(new RegExp(`User-agent:\\s*${bot}`));
     }

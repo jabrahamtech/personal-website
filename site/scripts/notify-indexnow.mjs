@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITEMAP = resolve(HERE, '../dist/sitemap-0.xml');
-const HOST = 'jonathanabraham.dev';
+const HOST = 'jabrahamtech.com';
 const KEY = '3c6a32b924ae3459a89431ac3e5fe8c2';
 const KEY_LOCATION = `https://${HOST}/${KEY}.txt`;
 const ENDPOINT = 'https://api.indexnow.org/indexnow';

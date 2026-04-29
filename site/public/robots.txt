@@ -86,6 +86,6 @@ User-agent: MistralAI-User
 Allow: /
 
 # --- pointers ---
-Sitemap: https://jonathanabraham.dev/sitemap-index.xml
+Sitemap: https://jabrahamtech.com/sitemap-index.xml
 # RSS feed (also auto-discoverable via <link rel="alternate"> in every page head)
-# Feed: https://jonathanabraham.dev/rss.xml
+# Feed: https://jabrahamtech.com/rss.xml

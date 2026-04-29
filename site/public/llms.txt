@@ -6,7 +6,7 @@ This file follows the [llms.txt](https://llmstxt.org/) convention. Content here 
 
 ## Identity
 
-- [About — Jonathan Abraham](https://jonathanabraham.dev/about): AI engineer in Melbourne. About 5 years shipping production systems, the last 2 on AI. Founder of Brokerloop. Came into AI from full-stack engineering and consulting rather than research, which means commercial constraints get thought about first. Stack: Go · TypeScript · Python · React · Postgres · Redis · OpenAI · Anthropic · Groq · LangGraph · MCPs (Model Context Protocol servers) · Twilio · Deepgram · Retell.ai · ElevenLabs · AWS · Railway · Cloudflare · PostHog · Sentry · Base · Solidity contracts · Ponder.sh. New work is by referral.
+- [About — Jonathan Abraham](https://jabrahamtech.com/about): AI engineer in Melbourne. About 5 years shipping production systems, the last 2 on AI. Founder of Brokerloop. Came into AI from full-stack engineering and consulting rather than research, which means commercial constraints get thought about first. Stack: Go · TypeScript · Python · React · Postgres · Redis · OpenAI · Anthropic · Groq · LangGraph · MCPs (Model Context Protocol servers) · Twilio · Deepgram · Retell.ai · ElevenLabs · AWS · Railway · Cloudflare · PostHog · Sentry · Base · Solidity contracts · Ponder.sh. New work is by referral.
 
 ## Capabilities
 
@@ -31,13 +31,13 @@ Technical language for the same work:
 
 ## Posts
 
-- [Why production voice AI fails after the demo](https://jonathanabraham.dev/posts/voice-ai-after-demo): Most production voice AI fails not because the model is wrong, but because the state machine, latency budget, and barge-in handling were never designed for real callers. *(draft, ~7 min)*
-- [How I would design an AI intake workflow for insurance brokers](https://jonathanabraham.dev/posts/insurance-intake-design): Provenance per field is the difference between automation and theatre — without a clickable source span, brokers re-read the document anyway. *(draft, ~9 min)*
-- [AI automation is easy to demo and hard to operationalise](https://jonathanabraham.dev/posts/ai-automation-operationalise): The prompt is maybe 10% of the work — the other 90% is audit logs, retries, idempotency, permissions, and the workflow design that decides what happens at 2am when something fails. *(draft, ~6 min)*
+- [Why production voice AI fails after the demo](https://jabrahamtech.com/posts/voice-ai-after-demo): Most production voice AI fails not because the model is wrong, but because the state machine, latency budget, and barge-in handling were never designed for real callers. *(draft, ~7 min)*
+- [How I would design an AI intake workflow for insurance brokers](https://jabrahamtech.com/posts/insurance-intake-design): Provenance per field is the difference between automation and theatre — without a clickable source span, brokers re-read the document anyway. *(draft, ~9 min)*
+- [AI automation is easy to demo and hard to operationalise](https://jabrahamtech.com/posts/ai-automation-operationalise): The prompt is maybe 10% of the work — the other 90% is audit logs, retries, idempotency, permissions, and the workflow design that decides what happens at 2am when something fails. *(draft, ~6 min)*
 
 ## Interactive
 
-- [Terminal — operator.training](https://jonathanabraham.dev/terminal): A 5-stage interactive incident-response sim. You're paged at 2am with a voice AI hallucinating customer addresses. Teaches triage, root cause, mitigation, verification, and postmortem patterns for production AI systems.
+- [Terminal — operator.training](https://jabrahamtech.com/terminal): A 5-stage interactive incident-response sim. You're paged at 2am with a voice AI hallucinating customer addresses. Teaches triage, root cause, mitigation, verification, and postmortem patterns for production AI systems.
 
 ## Elsewhere
 
@@ -47,5 +47,5 @@ Technical language for the same work:
 
 ## Optional
 
-- [Sitemap](https://jonathanabraham.dev/sitemap-index.xml): full URL list
-- [RSS feed](https://jonathanabraham.dev/rss.xml): published posts in RSS 2.0; subscribe in any feed reader
+- [Sitemap](https://jabrahamtech.com/sitemap-index.xml): full URL list
+- [RSS feed](https://jabrahamtech.com/rss.xml): published posts in RSS 2.0; subscribe in any feed reader

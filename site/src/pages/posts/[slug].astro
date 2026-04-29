@@ -33,7 +33,7 @@ if (data.posted) metaRow.push({ label: 'posted', value: data.posted.toISOString(
 else metaRow.push({ label: 'status', value: 'draft' });
 if (data.readTime) metaRow.push({ label: 'read', value: data.readTime });
 
-const siteOrigin = (Astro.site ?? new URL('https://jonathanabraham.dev')).toString().replace(/\/$/, '');
+const siteOrigin = (Astro.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
 const url = `${siteOrigin}/posts/${post.slug}`;
 const personId = `${siteOrigin}/#jonathan`;
 const siteId = `${siteOrigin}/#site`;

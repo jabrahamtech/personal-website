@@ -35,7 +35,7 @@ function fmtWords(n: number) {
   return `${(n / 1000).toFixed(1)}k words`;
 }
 
-const siteOrigin = (Astro.site ?? new URL('https://jonathanabraham.dev')).toString().replace(/\/$/, '');
+const siteOrigin = (Astro.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
 const personId = `${siteOrigin}/#jonathan`;
 const siteId = `${siteOrigin}/#site`;
 

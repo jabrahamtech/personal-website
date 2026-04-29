@@ -56,7 +56,7 @@
     <!-- bottom status row + url CTA -->
     <g transform="translate(0,524)" font-size="14" fill="#5a6d5d">
       <text x="0" y="0" letter-spacing="2">REGIONS AU + US · STATUS open_to_select_work · BUILD a3f8c</text>
-      <text x="1040" y="0" text-anchor="end" letter-spacing="2" fill="#7dff8a">jonathanabraham.dev →</text>
+      <text x="1040" y="0" text-anchor="end" letter-spacing="2" fill="#7dff8a">jabrahamtech.com →</text>
     </g>
   </g>
 </svg>

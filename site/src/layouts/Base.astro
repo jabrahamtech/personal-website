@@ -38,7 +38,7 @@ const {
   noindex = false,
 } = Astro.props;
 
-const siteOrigin = (Astro.site ?? new URL('https://jonathanabraham.dev')).toString().replace(/\/$/, '');
+const siteOrigin = (Astro.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
 const canonical = new URL(Astro.url.pathname, siteOrigin + '/').toString();
 const ogImage = new URL(image, siteOrigin + '/').toString();
 

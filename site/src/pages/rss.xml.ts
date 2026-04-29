@@ -12,7 +12,7 @@ export async function GET(context: APIContext) {
     .filter((p) => !p.data.draft && p.data.posted)
     .sort((a, b) => (b.data.posted!.getTime() - a.data.posted!.getTime()));
 
-  const site = (context.site ?? new URL('https://jonathanabraham.dev')).toString().replace(/\/$/, '');
+  const site = (context.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
   const feedUrl = `${site}/rss.xml`;
 
   return rss({
