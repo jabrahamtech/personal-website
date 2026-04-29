@@ -204,8 +204,8 @@ test.describe('terminal page', () => {
   test('renders the terminal widget and HUD defaults', async ({ page }) => {
     const r = await page.goto('/terminal');
     expect(r?.status()).toBe(200);
-    await expect(page).toHaveTitle(/^Terminal — /);
-    await expect(page.locator('.page-head h1')).toHaveText('Terminal');
+    await expect(page).toHaveTitle(/^operator\.training/);
+    await expect(page.locator('.page-head h1')).toHaveText('operator.training');
     await expect(page.locator('.term .term-bar')).toBeVisible();
     await expect(page.locator('#term-input')).toBeVisible();
     await expect(page.locator('#hud-stage')).toHaveText('0/5');

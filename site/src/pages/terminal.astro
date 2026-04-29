@@ -3,18 +3,15 @@ import Base from '../layouts/Base.astro';
 import Terminal from '../components/Terminal.astro';
 ---
 <Base
-  title="Terminal — operator.training, an incident-response sim for production AI"
-  description="operator.training v0.1 — a 5-stage interactive incident-response sim by Jonathan Abraham. You're paged at 2am with a voice AI hallucinating customer addresses. Learn triage, root cause, mitigation, verification, and postmortem patterns for production AI systems."
+  title="operator.training — production AI incident sim · Jonathan Abraham"
+  description="operator.training — a short interactive sim. Two scenarios (voice AI intake, prop trading signal). Five stages each. Teaches production-AI patterns: triage, root cause, mitigation, verification, postmortem."
 >
   <main id="content" class="wrap term-page">
     <header class="page-head">
       <div class="prompt">&gt; ./terminal</div>
-      <h1>Terminal</h1>
+      <h1>operator.training</h1>
+      <p class="preamble">interactive incident sim — type <b>start</b> for the menu.</p>
     </header>
-
-    <p class="preamble">
-      <b>operator.training v0.1</b> — a short interactive sim with two scenarios. <b>voice</b>: a voice ai is putting wrong addresses in call summaries. <b>trading</b>: a live signal is printing the wrong sign with $4M deployed. same five-stage shape (triage → root cause → mitigate → verify → postmortem). type <b>start</b> for the menu, or jump in with <b>start voice</b> · <b>start trading</b>.
-    </p>
 
     <Terminal />
 
