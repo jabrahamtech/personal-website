@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "postbuild": "node scripts/notify-indexnow.mjs",
     "preview": "astro preview",
     "start": "serve dist --listen tcp://0.0.0.0:${PORT:-4321} --no-clipboard",
     "test:e2e": "playwright test",
