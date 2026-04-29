@@ -61,5 +61,31 @@ const links = [
     sheet.addEventListener('click', (e) => { if (e.target === sheet) shut(); });
     // Any link tap closes the sheet so navigation feels instant.
     sheet.querySelectorAll('a').forEach((a) => a.addEventListener('click', shut));
+
+    // F1 / F2 / F3 → navigate to the corresponding nav target. Browsers
+    // reserve F1 (help), so we preventDefault aggressively. F-key labels
+    // already exist in the UI; this just makes the labels real.
+    const fkeyMap = { F1: '/', F2: '/terminal', F3: '/about' };
+    document.addEventListener('keydown', (e) => {
+      const href = fkeyMap[e.key];
+      if (!href) return;
+      // Skip when typing in an input / textarea / contenteditable so the
+      // terminal page's command input isn't broken by F-keys.
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      // Skip when modifier keys are held — leaves system shortcuts alone.
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      e.preventDefault();
+      // No-op if we're already on the target page (avoids a wasted loader).
+      const cur = (location.pathname.replace(/\/$/, '') || '/');
+      const target = (href.replace(/\/$/, '') || '/');
+      if (cur === target) return;
+      // Delegate to the matching <a> so the page-loader click handler in
+      // Base.astro picks it up and shows the terminal-frame loader before
+      // navigating. Falls back to direct navigation if the link is missing.
+      const link = document.querySelector('nav.top .nav-links a[href="' + href + '"]');
+      if (link) link.click();
+      else location.href = href;
+    });
   })();
 </script>
