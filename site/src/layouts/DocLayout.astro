@@ -67,40 +67,56 @@ const showToc = tocItems.length >= 2;
   <div class="reading-progress" id="reading-progress" aria-hidden="true"><span></span></div>
   <main id="content" class={`doc${showToc ? ' has-toc' : ''}`}>
     <div class="wrap">
-      <div class="post-prompt">&gt; {promptPath}</div>
-      <h1>{title.replace(/ — Jonathan Abraham$/, '')}</h1>
-      {metaRow && (
-        <div class="meta-row">
-          {metaRow.map((m) => <span><b>{m.label}</b> {m.value}</span>)}
-        </div>
+      {showToc && (
+        <details class="toc toc-mobile" id="toc-mobile" aria-label="table of contents">
+          <summary>
+            <span class="toc-prompt">&gt; ./contents</span>
+            <span class="toc-count">[{tocItems.length}]</span>
+            <span class="toc-caret" aria-hidden="true">▾</span>
+          </summary>
+          <ul>
+            {tocItems.map((h) => (
+              <li class={`d${h.depth}`}>
+                <a href={`#${h.slug}`} data-toc-slug={h.slug}>{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </details>
       )}
-      {tags && tags.length > 0 && (
-        <div style="margin:0 0 24px">
-          {tags.map((t) => <span class="tag">{t}</span>)}
-        </div>
-      )}
-
       <div class={`doc-grid${showToc ? '' : ' no-toc'}`}>
-        <article class="prose" id="post-body">
-          <slot />
-          {postId && (
-            <div class="post-eof" aria-hidden="true">[EOF — {postId}] <span class="ok">[exit 0]</span></div>
+        <div class="doc-main">
+          <div class="post-prompt">&gt; {promptPath}</div>
+          <h1>{title.replace(/ — Jonathan Abraham$/, '')}</h1>
+          {metaRow && (
+            <div class="meta-row">
+              {metaRow.map((m) => <span><b>{m.label}</b> {m.value}</span>)}
+            </div>
           )}
-          {editUrl && (
-            <p class="edit-link">
-              <a href={editUrl} target="_blank" rel="noopener">$ git blame ./{sourcePath}</a>
-            </p>
+          {tags && tags.length > 0 && (
+            <div style="margin:0 0 24px">
+              {tags.map((t) => <span class="tag">{t}</span>)}
+            </div>
           )}
-          <slot name="footer" />
-        </article>
+          <article class="prose" id="post-body">
+            <slot />
+            {postId && (
+              <div class="post-eof" aria-hidden="true">[EOF — {postId}] <span class="ok">[exit 0]</span></div>
+            )}
+            {editUrl && (
+              <p class="edit-link">
+                <a href={editUrl} target="_blank" rel="noopener">$ git blame ./{sourcePath}</a>
+              </p>
+            )}
+            <slot name="footer" />
+          </article>
+        </div>
         {showToc && (
-          <aside class="toc" aria-label="table of contents">
+          <aside class="toc toc-desktop" aria-label="table of contents">
             <div class="toc-head">&gt; ./contents</div>
             <ul>
               {tocItems.map((h) => (
                 <li class={`d${h.depth}`}>
                   <a href={`#${h.slug}`} data-toc-slug={h.slug}>
-                    <span class="rune">{h.depth === 2 ? '├─' : '│  ├─'}</span>
                     <span class="text">{h.text}</span>
                   </a>
                 </li>
@@ -108,6 +124,7 @@ const showToc = tocItems.length >= 2;
             </ul>
           </aside>
         )}
+        {showToc && <div class="doc-spacer" aria-hidden="true"></div>}
       </div>
     </div>
   </main>
@@ -165,6 +182,14 @@ const showToc = tocItems.length >= 2;
         window.addEventListener('scroll', schedule, { passive: true });
         window.addEventListener('resize', schedule);
         update();
+      }
+
+      // Mobile TOC collapses after a link tap so navigation feels snappy.
+      var mtoc = document.getElementById('toc-mobile');
+      if (mtoc) {
+        mtoc.querySelectorAll('a[data-toc-slug]').forEach(function (a) {
+          a.addEventListener('click', function () { mtoc.removeAttribute('open'); });
+        });
       }
 
       // Right-rail TOC: highlight the section currently in view.

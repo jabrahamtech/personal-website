@@ -23,8 +23,12 @@ import { chromium } from 'playwright-core';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
-const SVG_IN = resolve(ROOT, 'public/og/default.svg');
-const PNG_OUT = resolve(ROOT, 'public/og/default.png');
+
+// Optional CLI args: `node render-og.mjs <input.svg> <output.png>`. Both
+// are resolved relative to site/. Defaults render the canonical OG card.
+const [argIn, argOut] = process.argv.slice(2);
+const SVG_IN = resolve(ROOT, argIn ?? 'public/og/default.svg');
+const PNG_OUT = resolve(ROOT, argOut ?? 'public/og/default.png');
 
 // Resolve the bundled chromium that Playwright already installed for tests.
 // Avoids forcing a separate `playwright install` step just for this script.
@@ -58,4 +62,4 @@ await page.setContent(html, { waitUntil: 'networkidle' });
 await page.waitForTimeout(200);
 await page.screenshot({ path: PNG_OUT, clip: { x: 0, y: 0, width: 1200, height: 630 }, omitBackground: false });
 await browser.close();
-console.log(`[og] rendered ${PNG_OUT} (1200x630)`);
+console.log(`[og] rendered ${PNG_OUT} (1200x630) from ${SVG_IN}`);

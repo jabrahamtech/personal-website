@@ -528,7 +528,9 @@ test.describe('post template — slice 2 (TOC, autolinks, edit-link, progress ba
   });
 
   test('right-rail TOC renders on wide viewports with one entry per h2/h3', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 900 });
+    // Desktop TOC requires a wide viewport so the article stays centred and
+    // the TOC sits outside it in the right gutter (>=1320px).
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(examplePost);
     const toc = page.locator('aside.toc');
     await expect(toc).toBeVisible();
@@ -543,10 +545,27 @@ test.describe('post template — slice 2 (TOC, autolinks, edit-link, progress ba
     expect(tocSlugs).toEqual(headingIds);
   });
 
-  test('TOC is hidden on narrow viewports', async ({ page }) => {
-    await page.setViewportSize({ width: 900, height: 900 });
+  test('desktop right-rail TOC is hidden on narrow viewports (mobile bar takes over)', async ({ page }) => {
+    // Anything below the desktop breakpoint (1320px) falls back to the mobile bar.
+    await page.setViewportSize({ width: 1100, height: 900 });
     await page.goto(examplePost);
-    await expect(page.locator('aside.toc')).toBeHidden();
+    await expect(page.locator('aside.toc.toc-desktop')).toBeHidden();
+    // The collapsible mobile TOC bar takes over and is visible.
+    await expect(page.locator('details.toc-mobile')).toBeVisible();
+  });
+
+  test('mobile TOC is sticky-positioned and collapses after a link tap', async ({ page }) => {
+    await page.setViewportSize({ width: 700, height: 900 });
+    await page.goto(examplePost);
+    const mtoc = page.locator('details.toc-mobile');
+    await expect(mtoc).toBeVisible();
+    const position = await mtoc.evaluate((el) => getComputedStyle(el as HTMLElement).position);
+    expect(position).toBe('sticky');
+    // Open the bar, click a link, and verify it auto-collapses.
+    await mtoc.locator('summary').click();
+    await expect(mtoc).toHaveAttribute('open', '');
+    await mtoc.locator('a[data-toc-slug]').first().click();
+    await expect(mtoc).not.toHaveAttribute('open', '');
   });
 
   test('reading progress bar is in the DOM and gets a width on scroll', async ({ page }) => {

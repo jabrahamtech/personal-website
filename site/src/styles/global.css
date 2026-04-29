@@ -256,28 +256,58 @@ nav.top .row{display:flex;align-items:center;justify-content:space-between;heigh
 .reading-progress span{display:block;height:100%;width:0;background:var(--green);box-shadow:0 0 8px rgba(125,255,138,0.6);transition:width 80ms linear}
 @media (prefers-reduced-motion: reduce){.reading-progress span{transition:none}}
 
-/* doc-grid: two columns once the viewport is wide enough for a TOC rail */
+/* doc-grid: full-width by default; widens for posts with a TOC at desktop sizes */
 .doc-grid{display:block}
-.doc-grid.no-toc{display:block}
-@media (min-width: 1100px){
-  .doc.has-toc .doc-grid{display:grid;grid-template-columns:minmax(0, 1fr) 220px;column-gap:48px;align-items:start}
+.doc-main{min-width:0}
+.doc-spacer{display:none}
+
+/* Desktop (>=1320px): widen the wrap so the article stays dead-centred
+   (mirrored spacer | article | TOC). TOC sits in the right gutter, the
+   article column itself is unchanged from the no-TOC layout. */
+@media (min-width: 1320px){
+  .doc.has-toc .wrap{max-width:1356px}
+  .doc.has-toc .doc-grid{display:grid;grid-template-columns:220px minmax(0, 780px) 220px;column-gap:48px;align-items:start;justify-content:center}
+  .doc.has-toc .doc-spacer{display:block;grid-column:1}
+  .doc.has-toc .doc-main{grid-column:2}
+  .doc.has-toc .toc-desktop{grid-column:3}
 }
 
-/* right-rail TOC */
-.toc{display:none}
-@media (min-width: 1100px){
-  .doc.has-toc .toc{display:block;position:sticky;top:80px;font-family:var(--mono);font-size:12px;color:var(--ink-mute);max-height:calc(100vh - 120px);overflow:auto;padding-left:16px;border-left:1px solid var(--line)}
+/* Right-rail TOC (desktop only) */
+.toc-desktop{display:none}
+@media (min-width: 1320px){
+  .doc.has-toc .toc-desktop{display:block;position:sticky;top:80px;font-family:var(--mono);font-size:12px;color:var(--ink-mute);max-height:calc(100vh - 120px);overflow:auto;padding-left:16px;border-left:1px solid var(--line)}
 }
-.toc-head{color:var(--green);letter-spacing:.04em;margin-bottom:10px;font-size:12px}
-.toc ul{list-style:none;margin:0;padding:0}
-.toc li{margin:0;line-height:1.5}
-.toc a{display:flex;gap:6px;color:var(--ink-mute);padding:3px 0;text-decoration:none;border-left:2px solid transparent;padding-left:6px;transition:color .12s ease, border-color .12s ease}
-.toc a:hover{color:var(--ink-dim)}
-.toc a.active{color:var(--green);border-left-color:var(--green-2)}
-.toc .rune{color:var(--line-2);flex:0 0 auto}
-.toc a.active .rune{color:var(--green-2)}
-.toc .text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.toc li.d3 a{padding-left:14px;font-size:11.5px}
+.toc-desktop .toc-head{color:var(--green);letter-spacing:.04em;margin-bottom:10px;font-size:12px}
+.toc-desktop ul{list-style:none;margin:0;padding:0}
+.toc-desktop li{margin:0;line-height:1.5}
+.toc-desktop a{display:flex;gap:6px;color:var(--ink-mute);padding:3px 0 3px 6px;text-decoration:none;border-left:2px solid transparent;transition:color .12s ease, border-color .12s ease}
+.toc-desktop a:hover{color:var(--ink-dim)}
+.toc-desktop a.active{color:var(--green);border-left-color:var(--green-2)}
+.toc-desktop .text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc-desktop li.d3 a{padding-left:14px;font-size:11.5px}
+
+/* Mobile / tablet TOC: sticky collapsible bar pinned just below the nav.
+   Active for everything below the desktop right-rail breakpoint (1320px). */
+.toc-mobile{display:none}
+@media (max-width: 1319.98px){
+  .doc.has-toc .toc-mobile{display:block;margin:0 0 22px;font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--line-2);position:sticky;top:58px;z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
+}
+@media (max-width: 560px){
+  .doc.has-toc .toc-mobile{top:52px}
+}
+.toc-mobile summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--ink-mute);user-select:none}
+.toc-mobile summary::-webkit-details-marker{display:none}
+.toc-mobile .toc-prompt{color:var(--green);letter-spacing:.04em}
+.toc-mobile .toc-count{color:var(--ink-mute);font-size:11px}
+.toc-mobile .toc-caret{margin-left:auto;color:var(--ink-mute);transition:transform .15s ease;font-size:10px}
+.toc-mobile[open] .toc-caret{transform:rotate(180deg)}
+.toc-mobile ul{list-style:none;margin:0;padding:6px 14px 12px;border-top:1px solid var(--line);max-height:50vh;overflow:auto}
+.toc-mobile li{margin:0;line-height:1.7}
+.toc-mobile a{color:var(--ink-dim);text-decoration:none;display:block;padding:3px 0}
+.toc-mobile a:hover,.toc-mobile a:focus-visible{color:var(--green)}
+.toc-mobile a.active{color:var(--green)}
+.toc-mobile li.d3 a{padding-left:14px;font-size:11.5px;color:var(--ink-mute)}
+.toc-mobile li.d3 a.active{color:var(--green)}
 
 /* prev/next */
 .pn{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:48px;padding-top:24px;border-top:1px solid var(--line)}

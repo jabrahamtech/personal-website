@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Building this site with Astro — the post pipeline rendered as a terminal preview">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#070a08"/>
+      <stop offset="100%" stop-color="#0b0e0c"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#152017" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.55"/>
+
+  <!-- terminal frame -->
+  <g transform="translate(60,56)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" fill="#cfe9d3">
+    <!-- frame border + title bar -->
+    <rect x="0" y="0" width="1080" height="518" fill="#0a0e0b" stroke="#2a3a2d" stroke-width="1"/>
+    <rect x="0" y="0" width="1080" height="42" fill="#0a0e0b" stroke="#1d2820" stroke-width="1"/>
+    <!-- traffic lights -->
+    <rect x="14" y="15" width="12" height="12" fill="#ff5f56" stroke="#000" stroke-opacity="0.4"/>
+    <rect x="32" y="15" width="12" height="12" fill="#ffbd2e" stroke="#000" stroke-opacity="0.4"/>
+    <rect x="50" y="15" width="12" height="12" fill="#27c93f" stroke="#000" stroke-opacity="0.4">
+      <animate attributeName="opacity" values="1;0.6;1" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <text x="78" y="27" font-size="13" fill="#9aa39a" letter-spacing="3">post.pipeline ./posts/building-this-site-with-astro.mdx</text>
+    <!-- right corner indicator -->
+    <text x="1066" y="27" font-size="13" fill="#7dff8a" letter-spacing="2" text-anchor="end">[exit 0]</text>
+
+    <!-- body -->
+    <g transform="translate(36,80)">
+      <!-- prompt + post id -->
+      <text x="0" y="0" font-size="18" fill="#7dff8a" letter-spacing="1">&gt; ./posts/building-this-site-with-astro</text>
+      <text x="1006" y="0" font-size="15" fill="#7dff8a" letter-spacing="2" text-anchor="end">id 0x04</text>
+
+      <!-- title -->
+      <text x="-2" y="76" font-size="58" font-weight="700" fill="#ecebe4" letter-spacing="-1">Building this site with Astro</text>
+      <text x="-2" y="124" font-size="30" fill="#8b9286">(and the bits you actually need)</text>
+
+      <!-- meta row -->
+      <g transform="translate(0,160)" font-size="15" fill="#8b9286" letter-spacing="1">
+        <text x="0" y="0"><tspan fill="#c7c6bc">posted</tspan> 2026-04-30  ·  <tspan fill="#c7c6bc">read</tspan> ~ 8 min  ·  <tspan fill="#c7c6bc">tags</tspan> [astro] [mdx] [meta]</text>
+      </g>
+
+      <!-- pipeline arrows -->
+      <g transform="translate(0,210)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace">
+        <!-- step 1 -->
+        <rect x="0" y="0" width="218" height="62" fill="#070a08" stroke="#2a3a2d"/>
+        <text x="14" y="22" font-size="12" fill="#46c463" letter-spacing="2">[01] FRONTMATTER</text>
+        <text x="14" y="44" font-size="13" fill="#cfe9d3">zod-validated</text>
+        <!-- arrow -->
+        <text x="234" y="40" font-size="22" fill="#7dff8a">→</text>
+        <!-- step 2 -->
+        <rect x="262" y="0" width="218" height="62" fill="#070a08" stroke="#2a3a2d"/>
+        <text x="276" y="22" font-size="12" fill="#46c463" letter-spacing="2">[02] MDX BODY</text>
+        <text x="276" y="44" font-size="13" fill="#cfe9d3">+ &lt;CodeBlock /&gt;</text>
+        <!-- arrow -->
+        <text x="496" y="40" font-size="22" fill="#7dff8a">→</text>
+        <!-- step 3 -->
+        <rect x="524" y="0" width="218" height="62" fill="#070a08" stroke="#2a3a2d"/>
+        <text x="538" y="22" font-size="12" fill="#46c463" letter-spacing="2">[03] RENDER</text>
+        <text x="538" y="44" font-size="13" fill="#cfe9d3">slug + autolinks</text>
+        <!-- arrow -->
+        <text x="758" y="40" font-size="22" fill="#7dff8a">→</text>
+        <!-- step 4 -->
+        <rect x="786" y="0" width="218" height="62" fill="#070a08" stroke="#7dff8a"/>
+        <text x="800" y="22" font-size="12" fill="#7dff8a" letter-spacing="2">[04] STATIC HTML</text>
+        <text x="800" y="44" font-size="13" fill="#ecebe4">+ JSON-LD spine</text>
+      </g>
+
+      <!-- code block preview -->
+      <g transform="translate(0,300)">
+        <rect x="0" y="0" width="1004" height="118" fill="#070a08" stroke="#2a3a2d"/>
+        <rect x="0" y="0" width="1004" height="26" fill="#0a0e0b" stroke="#1d2820"/>
+        <rect x="10" y="9" width="8" height="8" fill="#ff5f56"/>
+        <rect x="22" y="9" width="8" height="8" fill="#ffbd2e"/>
+        <rect x="34" y="9" width="8" height="8" fill="#27c93f"/>
+        <text x="52" y="18" font-size="11" fill="#c7c6bc" letter-spacing="2">src/content/config.ts</text>
+        <text x="994" y="18" font-size="11" fill="#8b9286" letter-spacing="2" text-anchor="end">[ts]</text>
+        <g font-size="14" fill="#cfe9d3">
+          <text x="14" y="48"><tspan fill="#6ee7ff">const</tspan> posts = <tspan fill="#6ee7ff">defineCollection</tspan>({</text>
+          <text x="14" y="70">  type: <tspan fill="#7dff8a">'content'</tspan>,</text>
+          <text x="14" y="92">  schema: z.<tspan fill="#6ee7ff">object</tspan>({ title: z.<tspan fill="#6ee7ff">string</tspan>(), tags: z.<tspan fill="#6ee7ff">array</tspan>(z.<tspan fill="#6ee7ff">string</tspan>()) }),</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- bottom status strip outside the frame -->
+  <g transform="translate(60,602)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="12" fill="#5a6d5d">
+    <text x="0" y="0" letter-spacing="2">▸ initialising request [OK]  ·  ▸ resolving route [OK]  ·  ▸ mounting page</text>
+    <text x="1080" y="0" text-anchor="end" letter-spacing="2" fill="#7dff8a">jabrahamtech.com →</text>
+  </g>
+</svg>
