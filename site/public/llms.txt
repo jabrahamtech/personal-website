@@ -6,7 +6,7 @@ This file follows the [llms.txt](https://llmstxt.org/) convention. Content here 
 
 ## Identity
 
-- [About — Jonathan Abraham](https://jonathanabraham.dev/about): AI engineer in Melbourne. About 5 years shipping production systems, the last 2 on AI. Founder of Brokerloop. Came into AI from full-stack engineering and consulting rather than research, which means commercial constraints get thought about first. Stack: Go · TypeScript · Python · Postgres · Redis · OpenAI · Anthropic · Twilio · Deepgram · Pipecat. New work is by referral.
+- [About — Jonathan Abraham](https://jonathanabraham.dev/about): AI engineer in Melbourne. About 5 years shipping production systems, the last 2 on AI. Founder of Brokerloop. Came into AI from full-stack engineering and consulting rather than research, which means commercial constraints get thought about first. Stack: Go · TypeScript · Python · React · Postgres · Redis · OpenAI · Anthropic · Groq · LangGraph · Twilio · Deepgram · Retell.ai · ElevenLabs · AWS · Railway · Cloudflare · PostHog · Sentry · Base · Solana contracts · Ponder.sh. New work is by referral.
 
 ## Capabilities
 
