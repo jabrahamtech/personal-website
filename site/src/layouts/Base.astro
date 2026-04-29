@@ -208,23 +208,49 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
   <Footer />
 
   <div id="page-loader" class="page-loader" hidden aria-hidden="true">
-    <div class="pl-aura">
-      <span class="pl-ring r1"></span>
-      <span class="pl-ring r2"></span>
-      <span class="pl-ring r3"></span>
-      <span class="pl-arc a1">⚡</span>
-      <span class="pl-arc a2">⚡</span>
-      <span class="pl-arc a3">⚡</span>
-      <span class="pl-arc a4">⚡</span>
-      <pre class="pl-figure" aria-hidden="true">  \\\\|////
-  ( o o )
-   \\ ^ /
-   /(_)\\
-  / /|\\ \\
- /_/ | \\_\\
-    /_\\</pre>
+    <div class="pl-stage">
+      <div class="pl-bob">
+        <div class="pl-shake">
+          <svg viewBox="0 0 240 220" class="pl-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="pl-hair" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fff5b8"/>
+                <stop offset="55%" stop-color="#ffd84d"/>
+                <stop offset="100%" stop-color="#e8a934"/>
+              </linearGradient>
+              <linearGradient id="pl-skin" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#a8744f"/>
+                <stop offset="100%" stop-color="#8a5a36"/>
+              </linearGradient>
+            </defs>
+            <g transform="translate(120 110) rotate(-10)">
+              <path d="M -10 30 Q -34 38 -58 36 Q -48 44 -32 44 Q -16 42 -6 36 Z" fill="#0d1012"/>
+              <path d="M -4 28 Q -28 42 -54 46 Q -40 50 -24 48 Q -10 44 -2 36 Z" fill="#15181a"/>
+              <path d="M -16 -2 Q -38 -4 -52 6 Q -38 10 -22 8 Q -12 4 -10 2 Z" fill="#15181a"/>
+              <path d="M -14 8 Q -34 16 -46 26 Q -32 26 -20 18 Z" fill="#0d1012"/>
+              <path d="M -22 -10 Q -10 -16 0 -16 Q 12 -16 22 -10 L 24 24 Q 10 30 0 30 Q -12 30 -24 24 Z" fill="#15181a"/>
+              <path d="M -22 -10 L -16 -6 L -12 18 L -22 24 Z" fill="#0d1012"/>
+              <path d="M 22 -10 L 16 -6 L 12 18 L 22 24 Z" fill="#0d1012"/>
+              <path d="M -8 -10 L 0 2 L 8 -10 L 6 6 L -6 6 Z" fill="#0a0c0d"/>
+              <rect x="-8" y="-22" width="16" height="14" fill="url(#pl-skin)"/>
+              <ellipse cx="0" cy="-9" rx="9" ry="3" fill="#3a2014" opacity="0.35"/>
+              <ellipse cx="0" cy="-36" rx="18" ry="20" fill="url(#pl-skin)"/>
+              <ellipse cx="0" cy="-26" rx="13" ry="5" fill="#3a2014" opacity="0.32"/>
+              <path d="M -12 -43 L -3 -41" stroke="#2a1408" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M 3 -41 L 12 -43" stroke="#2a1408" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M -10 -36 L -4 -36" stroke="#1a0a04" stroke-width="2" stroke-linecap="round"/>
+              <path d="M 4 -36 L 10 -36" stroke="#1a0a04" stroke-width="2" stroke-linecap="round"/>
+              <path d="M -4 -24 L 4 -24" stroke="#3a1a0a" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M -18 -48 L -26 -70 L -14 -60 L -18 -82 L -6 -64 L -8 -86 L 4 -66 L 8 -88 L 12 -66 L 22 -82 L 18 -60 L 30 -68 L 22 -52 L 34 -52 L 24 -44 L 32 -36 L 14 -44 Z" fill="url(#pl-hair)" stroke="#c98a1f" stroke-width="1.1" stroke-linejoin="round"/>
+              <path d="M 16 -44 L 36 -38 L 26 -34 L 40 -30 L 22 -30 Z" fill="url(#pl-hair)" stroke="#c98a1f" stroke-width="0.8" stroke-linejoin="round"/>
+              <path d="M -18 -44 L -32 -36 L -22 -34 L -32 -28 L -16 -32 Z" fill="url(#pl-hair)" stroke="#c98a1f" stroke-width="0.8" stroke-linejoin="round"/>
+              <path d="M -14 -48 L 14 -48 L 12 -44 L -12 -44 Z" fill="#a86b14" opacity="0.55"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="pl-shadow" aria-hidden="true"></div>
     </div>
-    <div class="pl-label">▸ powering up<span class="pl-dots">...</span></div>
   </div>
 
   <script is:inline>
