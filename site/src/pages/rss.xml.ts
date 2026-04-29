@@ -37,10 +37,13 @@ export async function GET(context: APIContext) {
       // and by the W3C feed validator.
       `<atom:link href="${feedUrl}" rel="self" type="application/rss+xml" />`,
       // Image / channel logo. Feed readers display this beside the channel.
+      // <image><link> must match the channel <link> verbatim per the
+      // W3C feed validator. @astrojs/rss derives <channel><link> from
+      // `site` with no trailing slash, so this stays bare too.
       `<image>`,
       `  <url>${site}/og/default.png</url>`,
       `  <title>Jonathan Abraham — posts</title>`,
-      `  <link>${site}/</link>`,
+      `  <link>${site}</link>`,
       `</image>`,
     ].join(''),
 
