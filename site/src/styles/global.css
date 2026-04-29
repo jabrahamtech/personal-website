@@ -18,6 +18,11 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+/* Reserve scrollbar space always so .wrap stays centered identically
+   whether the current page overflows or not. Otherwise short pages
+   (terminal) and long pages (home) end up centered on different
+   widths and the footer / nav appear to shift between routes. */
+html{scrollbar-gutter:stable}
 html{cursor:url('/cursor/crosshair.svg') 12 12, crosshair}
 a,button,[role="button"],summary,label[for],.term-bar .audio,#boot .skip{cursor:url('/cursor/pointer.svg') 9 4, pointer}
 input,textarea,.term-body,.prose p,.prose li,code,pre{cursor:text}
