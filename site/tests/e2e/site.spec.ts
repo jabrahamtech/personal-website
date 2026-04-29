@@ -7,8 +7,9 @@ test.describe('home (posts list)', () => {
     await expect(page).toHaveTitle(/^Jonathan Abraham/);
     await expect(page.locator('.page-head .prompt')).toHaveText('> ./posts');
 
-    // No brandline / tagline / links-row repeating what nav + footer already show
-    await expect(page.locator('.page-head h1')).toHaveCount(0);
+    // The prompt now IS the h1 — exactly one h1 in page-head, with the path text
+    await expect(page.locator('.page-head h1')).toHaveCount(1);
+    await expect(page.locator('.page-head h1')).toHaveText('> ./posts');
     await expect(page.locator('.page-head .tagline')).toHaveCount(0);
     await expect(page.locator('.links-row')).toHaveCount(0);
 
@@ -41,8 +42,8 @@ test.describe('home (posts list)', () => {
     const visible = (await page.locator('main').textContent()) || '';
     expect(visible).not.toContain('Working notes on production AI');
     expect(await page.locator('main .intro').count()).toBe(0);
-    // The page-head still has just the prompt, not an h1 + intro
-    await expect(page.locator('.page-head h1')).toHaveCount(0);
+    // The page-head h1 IS the prompt now (path-as-heading)
+    await expect(page.locator('.page-head h1.prompt')).toHaveCount(1);
   });
 
   test('no pitch-surface or RSS artifacts remain on home', async ({ page }) => {
@@ -77,7 +78,7 @@ test.describe('about page', () => {
   test('renders bio + stack + elsewhere', async ({ page }) => {
     await page.goto('/about');
     await expect(page).toHaveTitle(/About — Jonathan Abraham/);
-    await expect(page.locator('.page-head h1')).toHaveText('About');
+    await expect(page.locator('.page-head h1')).toHaveText('> ./about');
     await expect(page.locator('.prose')).toContainText('Brokerloop');
     await expect(page.locator('.prose')).toContainText('New work is by referral');
     await expect(page.locator('.prose a[href^="mailto:jabrahamtech@gmail.com"]').first()).toBeVisible();
@@ -205,7 +206,7 @@ test.describe('terminal page', () => {
     const r = await page.goto('/terminal');
     expect(r?.status()).toBe(200);
     await expect(page).toHaveTitle(/^operator\.training/);
-    await expect(page.locator('.page-head h1')).toHaveText('operator.training');
+    await expect(page.locator('.page-head h1')).toHaveText('> ./terminal');
     await expect(page.locator('.term .term-bar')).toBeVisible();
     await expect(page.locator('#term-input')).toBeVisible();
     await expect(page.locator('#hud-stage')).toHaveText('0/5');
