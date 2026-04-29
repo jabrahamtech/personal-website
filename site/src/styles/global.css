@@ -62,9 +62,10 @@ nav.top .row{display:flex;align-items:center;justify-content:space-between;heigh
 
 /* page header */
 .page-head{padding:48px 0 20px}
-.page-head .prompt{font-family:var(--mono);color:var(--green);font-size:clamp(24px,3.4vw,36px);font-weight:500;line-height:1.15;letter-spacing:0;display:flex;align-items:center;gap:12px;margin:0 0 16px}
-.page-head .prompt::before{content:"";width:9px;height:9px;background:var(--green);box-shadow:0 0 10px var(--green);flex:0 0 auto}
-.page-head h1.prompt{font-size:clamp(28px,3.6vw,40px);font-weight:600;letter-spacing:-0.005em}
+.page-head .prompt{font-family:var(--mono);color:var(--green);font-size:clamp(15px,1.8vw,18px);font-weight:500;line-height:1.2;letter-spacing:0;display:flex;align-items:center;gap:9px;margin:0 0 12px}
+.page-head .prompt::before{content:"";width:7px;height:7px;background:var(--green);box-shadow:0 0 8px var(--green);flex:0 0 auto;animation:phblink 1.4s ease-in-out infinite}
+@keyframes phblink{0%,100%{opacity:1}50%{opacity:.35}}
+.page-head h1.prompt{font-size:clamp(16px,2vw,20px);font-weight:600;letter-spacing:0}
 .page-head h1{font-family:var(--mono);font-size:clamp(28px,3.6vw,40px);line-height:1.1;letter-spacing:-0.01em;font-weight:700;margin:0 0 14px}
 .page-head p.intro{color:var(--ink-dim);font-size:16px;margin:0;max-width:620px}
 .page-head h1.brandline{font-size:clamp(24px,3.2vw,32px);margin:0 0 6px}
