@@ -327,7 +327,7 @@ test.describe('status strip (Bloomberg-style)', () => {
       await expect(page.locator('.status-strip')).toContainText('STATUS');
       await expect(page.locator('.status-strip')).toContainText('open_to_select_work');
       await expect(page.locator('.status-strip')).toContainText('REGIONS');
-      await expect(page.locator('.status-strip')).toContainText('AU · US');
+      await expect(page.locator('.status-strip')).toContainText('AU + US');
       await expect(page.locator('.status-strip')).toContainText('BUILD');
       // Local time hydrates client-side; just assert the slot exists with HH:MM shape eventually
       await expect(page.locator('#ss-time')).toHaveText(/^\d{2}:\d{2}$/);
