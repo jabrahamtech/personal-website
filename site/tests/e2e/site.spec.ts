@@ -225,14 +225,39 @@ test.describe('terminal page', () => {
     await expect(page.locator('#term-output .term-line')).not.toHaveCount(0);
   });
 
-  test('typing `start` advances stage HUD past 0/5', async ({ page }) => {
+  test('typing `start` shows the scenario menu (no auto-advance)', async ({ page }) => {
     await page.goto('/terminal');
     const input = page.locator('#term-input');
     await input.click();
     await input.fill('start');
     await input.press('Enter');
-    // After start the HUD should reflect that we are inside the game
-    await expect(page.locator('#hud-stage')).not.toHaveText('0/5');
+    // Menu surfaces both scenarios; HUD stays at 0/5 until a scenario is picked
+    await expect(page.locator('#term-output')).toContainText('voice');
+    await expect(page.locator('#term-output')).toContainText('trading');
+    await expect(page.locator('#hud-stage')).toHaveText('0/5');
+  });
+
+  test('`start trading` jumps into the trading scenario and sets HUD scenario label', async ({ page }) => {
+    await page.goto('/terminal');
+    const input = page.locator('#term-input');
+    await input.click();
+    await input.fill('start trading');
+    await input.press('Enter');
+    await expect(page.locator('#hud-scenario')).toHaveText('trading');
+    await expect(page.locator('#hud-stage')).toHaveText('1/5');
+    await expect(page.locator('#term-output')).toContainText('STAGE 1 / TRIAGE');
+    await expect(page.locator('#term-output')).toContainText('data_drift');
+  });
+
+  test('`start voice` jumps into the voice scenario', async ({ page }) => {
+    await page.goto('/terminal');
+    const input = page.locator('#term-input');
+    await input.click();
+    await input.fill('start voice');
+    await input.press('Enter');
+    await expect(page.locator('#hud-scenario')).toHaveText('voice');
+    await expect(page.locator('#hud-stage')).toHaveText('1/5');
+    await expect(page.locator('#term-output')).toContainText('hallucination');
   });
 });
 

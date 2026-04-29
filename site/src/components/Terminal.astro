@@ -1,6 +1,8 @@
 ---
-// /terminal — operator.training: an interactive incident-response game that
-// teaches one production-AI concept per stage.
+// /terminal — operator.training: an interactive incident-response game.
+// Two scenarios: voice (insurance intake) and trading (prop signal failure).
+// Same five-stage teaching structure: triage → root cause → mitigate
+// → verify → postmortem.
 ---
 <div class="term">
   <div class="term-bar">
@@ -16,6 +18,7 @@
   </div>
   <div class="term-foot">
     <span><span class="stat">●</span> session active</span>
+    <span>scenario <b id="hud-scenario" style="color:var(--ink-dim);font-weight:500">—</b></span>
     <span>stage <b id="hud-stage" style="color:var(--ink-dim);font-weight:500">0/5</b></span>
     <span class="score">score <b id="hud-score" style="color:var(--ink-dim);font-weight:500">0</b></span>
     <span>progress <span class="meter" aria-hidden="true" id="hud-meter"><i></i><i></i><i></i><i></i><i></i></span></span>
@@ -27,6 +30,7 @@
   const out = document.getElementById('term-output');
   const input = document.getElementById('term-input');
   const body = document.getElementById('term-body');
+  const hudScenario = document.getElementById('hud-scenario');
   const hudStage = document.getElementById('hud-stage');
   const hudScore = document.getElementById('hud-score');
   const hudMeter = document.getElementById('hud-meter');
@@ -46,201 +50,385 @@
   function teach(html) { write(html, 'teach'); }
   function heading(html) { write(html, 'heading'); }
 
-  /* -------------------------- game data -------------------------- */
-  /*
-   * Each stage is an incident-response decision the operator faces.
-   * Commands are matched case-insensitively, exact prefix.
-   * `correct` answers advance; wrong answers nudge and let the user try again.
-   */
-  const stages = [
-    {
-      id: 'triage',
-      title: 'STAGE 1 / TRIAGE',
-      brief: [
-        '02:14 · pager fires. voice ai for insurance intake is putting <b style="color:var(--amber)">wrong customer addresses</b> in the call summaries that go to the crm. 3 calls in the last hour.',
-        '',
-        'three failure modes look similar in the logs:',
-        '  <b style="color:var(--green)">hallucination</b>   — the model invented content that isn\'t in the input',
-        '  <b style="color:var(--green)">mishearing</b>      — asr transcribed the words wrong; llm faithfully used them',
-        '  <b style="color:var(--green)">stale_state</b>     — the model used data from a previous call that wasn\'t cleared',
-        '',
-        'evidence from <span class="info">call_001</span>:',
-        '  caller said:    "i\'m at <b style="color:var(--cyan)">42 thompson street, brunswick</b>"',
-        '  asr transcript: "i\'m at 42 thompson street, brunswick"',
-        '  llm output:     "address: <b style="color:var(--red)">17 high street, fitzroy</b>"',
-        '  prior_call:     none (first call of session)',
-        ''
-      ],
-      question: 'which failure mode is this? type one: <b style="color:var(--green)">hallucination</b> | <b style="color:var(--green)">mishearing</b> | <b style="color:var(--green)">stale_state</b>',
-      answers: {
-        'hallucination': {
-          correct: true,
-          response: '✓ correct.',
-          teach: '<b>// hallucination</b><br>the diagnostic is whether the bad output appears in the input. asr is fine. there\'s no prior call. the model invented a plausible-but-false address. that is hallucination — the failure mode that production teams underestimate the most because the output looks confident.'
+  /* -------------------------- scenarios -------------------------- */
+  const scenarios = {
+    voice: {
+      id: 'voice',
+      label: 'voice_ai_intake_failure',
+      blurb: 'a voice ai handling insurance intake is putting wrong addresses in call summaries.',
+      stages: [
+        {
+          id: 'triage',
+          title: 'STAGE 1 / TRIAGE',
+          brief: [
+            '02:14 · pager fires. voice ai for insurance intake is putting <b style="color:var(--amber)">wrong customer addresses</b> in the call summaries that go to the crm. 3 calls in the last hour.',
+            '',
+            'three failure modes look similar in the logs:',
+            '  <b style="color:var(--green)">hallucination</b>   — the model invented content that isn\'t in the input',
+            '  <b style="color:var(--green)">mishearing</b>      — asr transcribed the words wrong; llm faithfully used them',
+            '  <b style="color:var(--green)">stale_state</b>     — the model used data from a previous call that wasn\'t cleared',
+            '',
+            'evidence from <span class="info">call_001</span>:',
+            '  caller said:    "i\'m at <b style="color:var(--cyan)">42 thompson street, brunswick</b>"',
+            '  asr transcript: "i\'m at 42 thompson street, brunswick"',
+            '  llm output:     "address: <b style="color:var(--red)">17 high street, fitzroy</b>"',
+            '  prior_call:     none (first call of session)',
+            ''
+          ],
+          question: 'which failure mode is this? <b style="color:var(--green)">hallucination</b> | <b style="color:var(--green)">mishearing</b> | <b style="color:var(--green)">stale_state</b>',
+          answers: {
+            'hallucination': {
+              correct: true,
+              response: '✓ correct.',
+              teach: '<b>// hallucination</b><br>the diagnostic is whether the bad output appears in the input. asr is fine. there\'s no prior call. the model invented a plausible-but-false address. that\'s hallucination — the failure mode production teams underestimate the most because the output looks confident.'
+            },
+            'mishearing': {
+              correct: false,
+              response: '✗ check the asr transcript again — it matches what the caller said exactly. mishearing would show up as a wrong word in the transcript line, not just in the llm output.'
+            },
+            'stale_state': {
+              correct: false,
+              response: '✗ prior_call is none. there\'s no earlier session state to leak through. try again.'
+            }
+          },
+          hint: 'compare what the caller said to what the model output. is the bad data anywhere in the transcript?'
         },
-        'mishearing': {
-          correct: false,
-          response: '✗ check the asr transcript again — it matches what the caller said exactly. mishearing would show up as a wrong word in the transcript line, not just in the llm output.'
+        {
+          id: 'root_cause',
+          title: 'STAGE 2 / ROOT CAUSE',
+          brief: [
+            'so it\'s <b style="color:var(--green)">hallucination</b>. but where in the pipeline is it coming from?',
+            '',
+            'three suspects:',
+            '  <b style="color:var(--green)">prompt</b>    — the prompt template ends with: "if a field is unclear, give your best guess."',
+            '  <b style="color:var(--green)">model</b>     — gpt-class llm, no json schema attached, temperature 0.3',
+            '  <b style="color:var(--green)">scaffold</b>  — no validation step. no abstention path. structured output goes straight to crm.',
+            ''
+          ],
+          question: 'where do you put the blame? <b style="color:var(--green)">prompt</b> | <b style="color:var(--green)">model</b> | <b style="color:var(--green)">scaffold</b>',
+          answers: {
+            'scaffold': {
+              correct: true,
+              response: '✓ canonical answer.',
+              teach: '<b>// the model can\'t say "i don\'t know" if you never let it</b><br>models hallucinate when there\'s no structural way to abstain. you can patch the prompt and lower temperature all you want — without a validation layer that catches "this field has no source in the transcript", the next variant will hallucinate too. fix the system, not the prompt.'
+            },
+            'prompt': {
+              correct: false,
+              response: '✗ partly true — "best guess" is asking for trouble. but a smarter prompt with the same scaffold will fail again. think bigger.'
+            },
+            'model': {
+              correct: false,
+              response: '✗ swapping models for a hallucination problem is the production-ai equivalent of "have you tried turning it off and on again". try again.'
+            }
+          },
+          hint: 'which layer would you have to remove for the model to be unable to fail this way at all?'
         },
-        'stale_state': {
-          correct: false,
-          response: '✗ prior_call is none. there\'s no earlier session state to leak through. try again.'
+        {
+          id: 'mitigation',
+          title: 'STAGE 3 / MITIGATION',
+          brief: [
+            'time to ship a fix. four options:',
+            '',
+            '  <b style="color:var(--green)">prompt_tweak</b>      — rewrite the template, drop "best guess", add "say UNKNOWN if unsure"',
+            '  <b style="color:var(--green)">json_schema</b>       — force structured output with a strict schema; required fields, no extras',
+            '  <b style="color:var(--green)">verify_step</b>       — after extraction, a deterministic pass checks every field against the transcript. mismatch → flag for human.',
+            '  <b style="color:var(--green)">all</b>               — ship all three, in that order',
+            ''
+          ],
+          question: 'pick the fix: <b style="color:var(--green)">prompt_tweak</b> | <b style="color:var(--green)">json_schema</b> | <b style="color:var(--green)">verify_step</b> | <b style="color:var(--green)">all</b>',
+          answers: {
+            'all': {
+              correct: true,
+              response: '✓ defense in depth.',
+              teach: '<b>// production ai is layered</b><br>each layer in isolation has a failure mode. prompt tweaks regress under prompt drift. schemas catch shape but not content. verification catches content but is expensive. stack them and one failing closes the others. the right answer to "which fix?" in production is almost always "more than one".'
+            },
+            'verify_step': {
+              correct: false,
+              response: '✗ closest single answer, and the most important if you can only ship one. but if you\'re shipping a real fix you stack all three. try `all`.'
+            },
+            'json_schema': {
+              correct: false,
+              response: '✗ schemas catch shape problems (missing fields, wrong types). they do not catch a model confidently writing a fake address. that\'s a content problem.'
+            },
+            'prompt_tweak': {
+              correct: false,
+              response: '✗ prompt tweaks are the cheapest thing to try. they\'re also the least durable. you want layers, not a better prompt. try `all`.'
+            }
+          },
+          hint: 'one of these is "ship them all in order". in production, that\'s usually the right move.'
+        },
+        {
+          id: 'verify',
+          title: 'STAGE 4 / VERIFY',
+          brief: [
+            'fix is deployed to staging. how do you know it works before pushing to prod?',
+            '',
+            '  <b style="color:var(--green)">eyeball</b>           — manually call the system a few times, listen, look at outputs',
+            '  <b style="color:var(--green)">replay_evals</b>      — replay the 3 broken calls + 50 known-good calls against the new pipeline; assert pass',
+            '  <b style="color:var(--green)">deploy_and_watch</b>  — push to 5% of traffic, watch metrics for an hour, expand if green',
+            ''
+          ],
+          question: 'pick a verification strategy: <b style="color:var(--green)">eyeball</b> | <b style="color:var(--green)">replay_evals</b> | <b style="color:var(--green)">deploy_and_watch</b>',
+          answers: {
+            'replay_evals': {
+              correct: true,
+              response: '✓ correct — and ideally followed by a small canary, but evals first.',
+              teach: '<b>// vibes are how regressions ship</b><br>eyeballing 3-5 calls gives you about 0 statistical signal. an eval suite — frozen failure cases plus a representative sample of good cases — is the only way to know "this fix didn\'t break the thing that was working." every production ai team should be able to answer "what does our eval set look like?" in one sentence.'
+            },
+            'eyeball': {
+              correct: false,
+              response: '✗ eyeballing 3 calls cannot tell you whether the fix held. you need replay against a frozen set of cases, including the broken ones.'
+            },
+            'deploy_and_watch': {
+              correct: false,
+              response: '✗ canary is fine — after evals. shipping to traffic without an offline check first means your customers are your eval set.'
+            }
+          },
+          hint: 'which one tells you "the broken cases now pass and the good cases still pass" before any user sees the fix?'
+        },
+        {
+          id: 'postmortem',
+          title: 'STAGE 5 / POSTMORTEM',
+          brief: [
+            'incident closed. now you write the postmortem. four sections compete for the most important slot:',
+            '',
+            '  <b style="color:var(--green)">timeline</b>          — minute-by-minute reconstruction of what happened',
+            '  <b style="color:var(--green)">five_whys</b>         — chain of "but why?" questions ending in a root cause',
+            '  <b style="color:var(--green)">what_we_changed</b>   — list of the actual changes shipped + why they prevent this class',
+            '  <b style="color:var(--green)">blame</b>             — who deployed what and when',
+            ''
+          ],
+          question: 'which section matters most? <b style="color:var(--green)">timeline</b> | <b style="color:var(--green)">five_whys</b> | <b style="color:var(--green)">what_we_changed</b> | <b style="color:var(--green)">blame</b>',
+          answers: {
+            'what_we_changed': {
+              correct: true,
+              response: '✓ correct.',
+              teach: '<b>// postmortems are for future you, not past you</b><br>blameless culture is table stakes — never `blame`. timeline and five whys are useful for understanding. but the artifact most likely to prevent the next 2am page is a clear, plain list of "what did we change, and what class of failure does that close." optimise the postmortem for the reader who hasn\'t had this incident yet.'
+            },
+            'timeline': {
+              correct: false,
+              response: '✗ timelines are useful but they don\'t prevent the next incident. think about what future-you actually needs.'
+            },
+            'five_whys': {
+              correct: false,
+              response: '✗ five whys is a technique, not the artifact. the question is what the postmortem document optimises for.'
+            },
+            'blame': {
+              correct: false,
+              response: '✗ blameless. always. who shipped it is the least useful information in the document.'
+            }
+          },
+          hint: 'imagine you\'re the next operator on call, six months from now, who has never seen this system. which section helps you most?'
         }
-      },
-      hint: 'compare what the caller said to what the model output. is the bad data in the transcript?'
+      ]
     },
 
-    {
-      id: 'root_cause',
-      title: 'STAGE 2 / ROOT CAUSE',
-      brief: [
-        'now you know <b style="color:var(--green)">it\'s hallucination</b>. but where in the pipeline is it coming from?',
-        '',
-        'three suspects:',
-        '  <b style="color:var(--green)">prompt</b>    — the prompt template ends with: "if a field is unclear, give your best guess."',
-        '  <b style="color:var(--green)">model</b>     — gpt-class llm, no json schema attached, temperature 0.3',
-        '  <b style="color:var(--green)">scaffold</b>  — no validation step. no abstention path. structured output goes straight to crm.',
-        ''
-      ],
-      question: 'where do you put the blame? <b style="color:var(--green)">prompt</b> | <b style="color:var(--green)">model</b> | <b style="color:var(--green)">scaffold</b>',
-      answers: {
-        'scaffold': {
-          correct: true,
-          response: '✓ canonical answer.',
-          teach: '<b>// the model can\'t say "i don\'t know" if you never let it</b><br>models hallucinate when there\'s no structural way to abstain. you can patch the prompt and lower temperature all you want — without a validation layer that catches "this field has no source in the transcript", the next variant will hallucinate too. fix the system, not the prompt.'
+    trading: {
+      id: 'trading',
+      label: 'signal_outage_at_open',
+      blurb: 'a live trading signal is printing the wrong sign. the desk has $4M deployed.',
+      stages: [
+        {
+          id: 'triage',
+          title: 'STAGE 1 / TRIAGE',
+          brief: [
+            '03:14 ET. asia is opening. your live signal — sharpe ~3 in backtest, ~2.5 in last week of paper — has just printed the wrong sign on its last <b style="color:var(--amber)">6 fills</b>. the desk has <b style="color:var(--amber)">$4M</b> deployed.',
+            '',
+            'three failure modes look similar in the metrics:',
+            '  <b style="color:var(--green)">data_drift</b>      — input distribution shifted; model still confident',
+            '  <b style="color:var(--green)">pipeline_lag</b>    — features arriving stale; model trading on old snapshots',
+            '  <b style="color:var(--green)">regime_change</b>   — market is in a regime the model never saw in training',
+            '',
+            'evidence:',
+            '  feature timestamps:    fresh (&lt;<b style="color:var(--cyan)">300ms</b> behind market)',
+            '  realised vol last hr:  <b style="color:var(--cyan)">14.2%</b> (training set range: 8 — 22%)',
+            '  model confidence:      bimodal — clustered at <b style="color:var(--red)">±1</b>, nothing in middle',
+            ''
+          ],
+          question: 'which failure mode? <b style="color:var(--green)">data_drift</b> | <b style="color:var(--green)">pipeline_lag</b> | <b style="color:var(--green)">regime_change</b>',
+          answers: {
+            'data_drift': {
+              correct: true,
+              response: '✓ correct.',
+              teach: '<b>// the joint distribution shifts before any single feature looks weird</b><br>fresh inputs and in-distribution vol — but bimodal confidence — means the model is seeing inputs whose marginals look familiar but whose joint shape is new. classic distribution drift. pipeline lag would show stale timestamps. regime change would push vol or a feature outside the training range. when no single signal looks broken but the model is suddenly overconfident, that\'s the joint shifting.'
+            },
+            'pipeline_lag': {
+              correct: false,
+              response: '✗ feature timestamps are fresh — under 300ms behind. lag would show as stale data, not bad data.'
+            },
+            'regime_change': {
+              correct: false,
+              response: '✗ realised vol is inside the training range (14% vs 8 — 22%). regime change would push at least one observable feature outside what the model has seen.'
+            }
+          },
+          hint: 'when every feature looks fine on its own but the model is suddenly bimodal, what kind of shift is happening?'
         },
-        'prompt': {
-          correct: false,
-          response: '✗ partly true — "best guess" is asking for trouble. but a smarter prompt with the same scaffold will fail again. think bigger.'
+        {
+          id: 'root_cause',
+          title: 'STAGE 2 / ROOT CAUSE',
+          brief: [
+            'so it\'s <b style="color:var(--green)">data drift</b>. where did the drift come in?',
+            '',
+            'three suspects:',
+            '  <b style="color:var(--green)">training_window</b>    — model trained on a calmer regime; today is novel',
+            '  <b style="color:var(--green)">feature_drift</b>      — one feature\'s upstream source changed (broker swapped feeds friday)',
+            '  <b style="color:var(--green)">no_calibration</b>     — raw logits → trades; no calibration layer',
+            '',
+            'evidence:',
+            '  training window:       mar 2024 — mar 2026 (covers last year\'s vol spike)',
+            '  features:              all green except <b style="color:var(--cyan)">correlation_matrix</b>',
+            '  correlation_matrix:    sourced from <b style="color:var(--cyan)">broker A</b>; switched to <b style="color:var(--red)">broker B</b> at friday close',
+            '  outputs:               raw logits, no calibration',
+            ''
+          ],
+          question: 'where do you put the blame? <b style="color:var(--green)">training_window</b> | <b style="color:var(--green)">feature_drift</b> | <b style="color:var(--green)">no_calibration</b>',
+          answers: {
+            'feature_drift': {
+              correct: true,
+              response: '✓ canonical answer.',
+              teach: '<b>// silent feed switches are the most common drift cause in production trading</b><br>your training window covers enough variation; the model has the right shape. but feature pipelines are external systems the model can\'t validate. broker B computes the correlation matrix differently — different lookback, different rebalance schedule, anything — and the model has never seen that distribution. the fix isn\'t a better model. it\'s a contract test on every external feature source so a vendor change can\'t bypass it.'
+            },
+            'training_window': {
+              correct: false,
+              response: '✗ training window is two years; covers last year\'s vol spike and a calm period. the shape is fine. look at what changed yesterday.'
+            },
+            'no_calibration': {
+              correct: false,
+              response: '✗ calibration helps with confidence, not with bad inputs producing wrong-but-confident signals. the issue is upstream of the model.'
+            }
+          },
+          hint: 'what changed externally between the model working and the model failing?'
         },
-        'model': {
-          correct: false,
-          response: '✗ swapping models for a hallucination problem is the production-ai equivalent of "have you tried turning it off and on again". try again.'
+        {
+          id: 'mitigation',
+          title: 'STAGE 3 / MITIGATION',
+          brief: [
+            'time to act. live capital is bleeding.',
+            '',
+            '  <b style="color:var(--green)">pull_strategy</b>      — kill the signal now, no trades till diagnosed',
+            '  <b style="color:var(--green)">size_down</b>          — cut position size 90%, keep monitoring',
+            '  <b style="color:var(--green)">contract_check</b>     — add input contract checks; reject trades when violated',
+            '  <b style="color:var(--green)">all</b>                — pull first, then ship the contract, then redeploy',
+            ''
+          ],
+          question: 'pick the response: <b style="color:var(--green)">pull_strategy</b> | <b style="color:var(--green)">size_down</b> | <b style="color:var(--green)">contract_check</b> | <b style="color:var(--green)">all</b>',
+          answers: {
+            'all': {
+              correct: true,
+              response: '✓ stop the bleeding, then fix.',
+              teach: '<b>// in trading, "stop the bleeding" comes before "find the bug"</b><br>pull first, then fix the contract, then redeploy with the check that would have caught this. sizing down assumes the strategy is degraded but still net-positive — you don\'t know that yet. shipping the contract check while bad fills keep firing means you keep paying for the bug while you fix it. order matters.'
+            },
+            'pull_strategy': {
+              correct: false,
+              response: '✗ closest single answer, and the right thing to do first. but if you stop there you\'re staring at a dead signal for hours. you want pull AND ship the fix. try `all`.'
+            },
+            'size_down': {
+              correct: false,
+              response: '✗ sizing down assumes the strategy is degraded but still net-positive. you don\'t know that yet. wrong default for active failure of unknown shape.'
+            },
+            'contract_check': {
+              correct: false,
+              response: '✗ shipping the check is the right fix. but every minute you spend writing it the desk pays for bad fills. pull first.'
+            }
+          },
+          hint: 'what\'s the order of operations when capital is at risk?'
+        },
+        {
+          id: 'verify',
+          title: 'STAGE 4 / VERIFY',
+          brief: [
+            'fix is in staging. how do you confirm it works before going live?',
+            '',
+            '  <b style="color:var(--green)">paper_trade</b>        — paper-trade for 24h, watch pnl',
+            '  <b style="color:var(--green)">replay_backtest</b>    — replay last 30 days against new pipeline; assert sharpe holds and the broken period now rejects via contract',
+            '  <b style="color:var(--green)">small_canary</b>       — go live at 1% size, expand if green',
+            ''
+          ],
+          question: 'pick a verification path: <b style="color:var(--green)">paper_trade</b> | <b style="color:var(--green)">replay_backtest</b> | <b style="color:var(--green)">small_canary</b>',
+          answers: {
+            'replay_backtest': {
+              correct: true,
+              response: '✓ correct — followed by a small canary, but replay first.',
+              teach: '<b>// vibes are how regressions ship in trading too</b><br>paper-trading 24h tells you about today\'s market, not whether the fix is sound. replay against held-out historical data — including the broken period — and assert (a) the bad fills now reject via contract, (b) the good days still produce expected pnl. that catches the regression class. then canary for deployment issues. without replay, your pnl is your eval set.'
+            },
+            'paper_trade': {
+              correct: false,
+              response: '✗ 24h of paper tells you about today\'s market, not whether the fix is structurally sound. you need historical replay including the broken period.'
+            },
+            'small_canary': {
+              correct: false,
+              response: '✗ canary is fine — after replay. shipping to live capital before checking that the broken period now rejects means you might be re-running the same incident.'
+            }
+          },
+          hint: 'how do you confirm the broken period now rejects, without putting capital at risk?'
+        },
+        {
+          id: 'postmortem',
+          title: 'STAGE 5 / POSTMORTEM',
+          brief: [
+            'incident closed. now write the postmortem. four sections compete for the most important slot:',
+            '',
+            '  <b style="color:var(--green)">pnl_attribution</b>    — minute-by-minute pnl impact vs counterfactual',
+            '  <b style="color:var(--green)">five_whys</b>          — chain of "but why?" back to root cause',
+            '  <b style="color:var(--green)">what_we_changed</b>    — concrete list of code/config changes shipped and what class of failure each closes',
+            '  <b style="color:var(--green)">who_pushed</b>         — who deployed what and when',
+            ''
+          ],
+          question: 'which section matters most? <b style="color:var(--green)">pnl_attribution</b> | <b style="color:var(--green)">five_whys</b> | <b style="color:var(--green)">what_we_changed</b> | <b style="color:var(--green)">who_pushed</b>',
+          answers: {
+            'what_we_changed': {
+              correct: true,
+              response: '✓ correct.',
+              teach: '<b>// postmortems are for the next operator</b><br>blameless culture is non-negotiable — never `who_pushed`. pnl attribution helps explain what it cost. five whys helps understand why. but the artifact most likely to prevent the next 3am page is a plain list of what changed and what class of failure each thing closes. optimise the postmortem for the reader who hasn\'t had this incident yet.'
+            },
+            'pnl_attribution': {
+              correct: false,
+              response: '✗ attribution helps you explain it to the desk. it doesn\'t help the next operator avoid it.'
+            },
+            'five_whys': {
+              correct: false,
+              response: '✗ five whys is a technique, not the artifact. what does the document optimise for?'
+            },
+            'who_pushed': {
+              correct: false,
+              response: '✗ blameless. always. who pushed it is the least useful information.'
+            }
+          },
+          hint: 'imagine the next operator on call six months from now who has never seen this system. which section helps them most?'
         }
-      },
-      hint: 'which layer would you have to remove for the model to be unable to fail this way at all?'
-    },
-
-    {
-      id: 'mitigation',
-      title: 'STAGE 3 / MITIGATION',
-      brief: [
-        'time to ship a fix. you have four options:',
-        '',
-        '  <b style="color:var(--green)">prompt_tweak</b>      — rewrite the template, drop "best guess", add "say UNKNOWN if unsure"',
-        '  <b style="color:var(--green)">json_schema</b>       — force structured output with a strict schema; required fields, no extras',
-        '  <b style="color:var(--green)">verify_step</b>       — after extraction, a deterministic pass checks every field against the transcript. mismatch → flag for human.',
-        '  <b style="color:var(--green)">all</b>               — ship all three, in that order',
-        ''
-      ],
-      question: 'pick the fix: <b style="color:var(--green)">prompt_tweak</b> | <b style="color:var(--green)">json_schema</b> | <b style="color:var(--green)">verify_step</b> | <b style="color:var(--green)">all</b>',
-      answers: {
-        'all': {
-          correct: true,
-          response: '✓ defense in depth.',
-          teach: '<b>// production ai is layered</b><br>each layer in isolation has a failure mode. prompt tweaks regress under prompt drift. schemas catch shape but not content. verification catches content but is expensive. stack them and one failing closes the others. the right answer to "which fix?" in production is almost always "more than one".'
-        },
-        'verify_step': {
-          correct: false,
-          response: '✗ closest single answer, and the most important if you can only ship one. but if you\'re shipping a real fix you stack all three. try `all`.'
-        },
-        'json_schema': {
-          correct: false,
-          response: '✗ schemas catch shape problems (missing fields, wrong types). they do not catch a model confidently writing a fake address. that\'s a content problem.'
-        },
-        'prompt_tweak': {
-          correct: false,
-          response: '✗ prompt tweaks are the cheapest thing to try. they\'re also the least durable. you want layers, not a better prompt. try `all`.'
-        }
-      },
-      hint: 'one of these is "ship them all in order". in production, that is usually the right move.'
-    },
-
-    {
-      id: 'verify',
-      title: 'STAGE 4 / VERIFY',
-      brief: [
-        'fix is deployed to staging. how do you know it actually works before pushing to prod?',
-        '',
-        '  <b style="color:var(--green)">eyeball</b>           — manually call the system a few times, listen, look at outputs',
-        '  <b style="color:var(--green)">replay_evals</b>      — replay the 3 broken calls + 50 known-good calls against the new pipeline; assert pass',
-        '  <b style="color:var(--green)">deploy_and_watch</b>  — push to 5% of traffic, watch metrics for an hour, expand if green',
-        ''
-      ],
-      question: 'pick a verification strategy: <b style="color:var(--green)">eyeball</b> | <b style="color:var(--green)">replay_evals</b> | <b style="color:var(--green)">deploy_and_watch</b>',
-      answers: {
-        'replay_evals': {
-          correct: true,
-          response: '✓ correct — and ideally followed by a small canary, but evals first.',
-          teach: '<b>// vibes are how regressions ship</b><br>eyeballing 3-5 calls gives you about 0 statistical signal. an eval suite — frozen failure cases plus a representative sample of good cases — is the only way to know "this fix didn\'t break the thing that was working." every production ai team should be able to answer "what does our eval set look like?" in one sentence.'
-        },
-        'eyeball': {
-          correct: false,
-          response: '✗ eyeballing 3 calls cannot tell you whether the fix held. you need replay against a frozen set of cases, including the broken ones.'
-        },
-        'deploy_and_watch': {
-          correct: false,
-          response: '✗ canary is fine — after evals. shipping to traffic without an offline check first means your customers are your eval set.'
-        }
-      },
-      hint: 'which one tells you "the broken cases now pass and the good cases still pass" before any user sees the fix?'
-    },
-
-    {
-      id: 'postmortem',
-      title: 'STAGE 5 / POSTMORTEM',
-      brief: [
-        'incident closed. now you write the postmortem. four sections compete for the most important slot:',
-        '',
-        '  <b style="color:var(--green)">timeline</b>          — minute-by-minute reconstruction of what happened',
-        '  <b style="color:var(--green)">five_whys</b>         — chain of "but why?" questions ending in a root cause',
-        '  <b style="color:var(--green)">what_we_changed</b>   — list of the actual changes shipped + why they prevent this class',
-        '  <b style="color:var(--green)">blame</b>             — who deployed what and when',
-        ''
-      ],
-      question: 'which section matters most? <b style="color:var(--green)">timeline</b> | <b style="color:var(--green)">five_whys</b> | <b style="color:var(--green)">what_we_changed</b> | <b style="color:var(--green)">blame</b>',
-      answers: {
-        'what_we_changed': {
-          correct: true,
-          response: '✓ correct.',
-          teach: '<b>// postmortems are for future you, not past you</b><br>blameless culture is table stakes — never `blame`. timeline + five whys are useful for understanding. but the artifact most likely to prevent the next 2am page is a clear, plain list of "what did we change, and what class of failure does that close." optimise the postmortem for the reader who hasn\'t had this incident yet.'
-        },
-        'timeline': {
-          correct: false,
-          response: '✗ timelines are useful but they don\'t prevent the next incident. think about what future-you actually needs.'
-        },
-        'five_whys': {
-          correct: false,
-          response: '✗ five whys is a technique, not the artifact. the question is what the postmortem document optimises for.'
-        },
-        'blame': {
-          correct: false,
-          response: '✗ blameless. always. who shipped it is the least useful information in the document.'
-        }
-      },
-      hint: 'imagine you\'re the next operator on call, six months from now, who has never seen this system. which section helps you most?'
+      ]
     }
-  ];
+  };
 
   /* -------------------------- state -------------------------- */
   let state = {
     started: false,
+    scenario: null,
     stageIdx: 0,
     score: 0,
     attempts: 0,
     done: false
   };
 
+  function activeStages() {
+    return state.scenario ? scenarios[state.scenario].stages : null;
+  }
+
   function updateHud() {
-    if (!state.started) {
-      hudStage.textContent = '0/' + stages.length;
+    const stages = activeStages();
+    const total = stages ? stages.length : 5;
+    if (!state.started || !stages) {
+      hudScenario.textContent = '—';
+      hudStage.textContent = '0/' + total;
     } else if (state.done) {
-      hudStage.textContent = stages.length + '/' + stages.length;
+      hudScenario.textContent = scenarios[state.scenario].id;
+      hudStage.textContent = total + '/' + total;
     } else {
-      hudStage.textContent = (state.stageIdx + 1) + '/' + stages.length;
+      hudScenario.textContent = scenarios[state.scenario].id;
+      hudStage.textContent = (state.stageIdx + 1) + '/' + total;
     }
     hudScore.textContent = String(state.score);
-    const lit = state.done ? stages.length : state.stageIdx;
+    const lit = state.done ? total : (stages ? state.stageIdx : 0);
     Array.from(hudMeter.children).forEach((bar, i) => {
       bar.classList.toggle('on', i < lit);
     });
@@ -249,17 +437,21 @@
   /* -------------------------- flow -------------------------- */
   function intro() {
     writeBlock([
-      { t: 'operator.training v0.1 — ai systems incident sim', c: 'dim' },
+      { t: 'operator.training v0.1 — production ai incident sim', c: 'dim' },
       { t: '' },
-      { t: 'you are on-call. a voice ai handling insurance intake is failing in production and customers are getting bad data. you have <b style="color:var(--amber)">5 stages</b> to diagnose, fix, verify, and document the incident.' },
+      { t: 'two scenarios. same five-stage structure: triage, root cause, mitigate, verify, postmortem. each stage teaches one production-ai concept.' },
       { t: '' },
-      { t: 'commands available throughout: <b style="color:var(--green)">help</b>  <b style="color:var(--green)">hint</b>  <b style="color:var(--green)">repeat</b>  <b style="color:var(--green)">restart</b>  <b style="color:var(--green)">clear</b>' },
+      { t: '  <b style="color:var(--green)">[1] voice</b>     ' + scenarios.voice.blurb },
+      { t: '  <b style="color:var(--green)">[2] trading</b>   ' + scenarios.trading.blurb },
       { t: '' },
-      { t: 'type <b style="color:var(--green)">start</b> when you\'re ready.', c: 'dim' }
+      { t: 'commands: <b style="color:var(--green)">help</b>  <b style="color:var(--green)">hint</b>  <b style="color:var(--green)">repeat</b>  <b style="color:var(--green)">restart</b>  <b style="color:var(--green)">clear</b>' },
+      { t: '' },
+      { t: 'type <b style="color:var(--green)">start</b> for the menu, or jump straight in: <b style="color:var(--green)">start voice</b> · <b style="color:var(--green)">start trading</b>.', c: 'dim' }
     ]);
   }
 
   function showStage() {
+    const stages = activeStages();
     const s = stages[state.stageIdx];
     heading('▸ ' + s.title);
     s.brief.forEach((line) => write(line || '&nbsp;'));
@@ -269,36 +461,54 @@
     scroll();
   }
 
-  function start() {
+  function startScenario(id) {
+    if (!scenarios[id]) {
+      write('<span class="err">unknown scenario.</span> options: <b style="color:var(--green)">voice</b> | <b style="color:var(--green)">trading</b>.');
+      scroll();
+      return;
+    }
     state.started = true;
+    state.scenario = id;
     state.stageIdx = 0;
     state.score = 0;
     state.attempts = 0;
     state.done = false;
-    write('<span class="info">▸ session start.</span> good luck, operator.');
+    write('<span class="info">▸ session start.</span> scenario: <b style="color:var(--green)">' + scenarios[id].label + '</b>. good luck, operator.');
     write('');
     showStage();
   }
 
+  function showMenu() {
+    writeBlock([
+      { t: 'pick a scenario:', c: 'heading' },
+      { t: '  <b style="color:var(--green)">[1] voice</b>     ' + scenarios.voice.blurb },
+      { t: '  <b style="color:var(--green)">[2] trading</b>   ' + scenarios.trading.blurb },
+      { t: 'type <b style="color:var(--green)">1</b>, <b style="color:var(--green)">voice</b>, <b style="color:var(--green)">2</b>, or <b style="color:var(--green)">trading</b> to begin.', c: 'dim' }
+    ]);
+    scroll();
+  }
+
   function endGame() {
+    const stages = activeStages();
     state.done = true;
     write('');
     heading('▸ INCIDENT CLOSED');
     write('final score: <b style="color:var(--green)">' + state.score + '</b> / ' + stages.length, 'dim');
     if (state.score === stages.length) {
-      write('<span class="ok">✓ first-try clean run. that almost never happens at 2am. nice work.</span>');
+      write('<span class="ok">✓ first-try clean run. that almost never happens at 3am. nice work.</span>');
     } else if (state.score >= stages.length - 1) {
       write('<span class="ok">✓ shipped. the lesson lives in the one you missed — re-read the teach blocks above.</span>');
     } else {
-      write('<span class="warn">▸ shipped, but not pretty. the production-ai instincts here come from doing this a few times — type <b>restart</b> to run it again.</span>');
+      write('<span class="warn">▸ shipped, but not pretty. the production-ai instincts here come from running this a few times — type <b>restart</b> to play again, or jump scenarios.</span>');
     }
     write('');
-    write('type <b style="color:var(--green)">restart</b> to play again, or hit <b style="color:var(--green)">posts</b> in the nav for the long-form notes.', 'dim');
+    write('type <b style="color:var(--green)">restart</b> to play again, or try the other scenario: <b style="color:var(--green)">start voice</b> · <b style="color:var(--green)">start trading</b>.', 'dim');
     updateHud();
     scroll();
   }
 
   function answer(raw) {
+    const stages = activeStages();
     const s = stages[state.stageIdx];
     const cmd = raw.trim().toLowerCase();
     state.attempts++;
@@ -311,7 +521,6 @@
     if (a.correct) {
       write('<span class="ok">' + a.response + '</span>');
       if (a.teach) teach(a.teach);
-      // score: full point first try, half point otherwise (rounded)
       const stageAttempts = state.attempts;
       const pointsThisStage = stageAttempts <= 1 ? 1 : 0;
       state.score += pointsThisStage;
@@ -333,14 +542,17 @@
   const meta = {
     help: () => writeBlock([
       { t: '<span class="dim">commands available anytime:</span>' },
-      { t: '  <b style="color:var(--green)">start</b>     begin the incident' },
-      { t: '  <b style="color:var(--green)">hint</b>      get a nudge for the current stage' },
-      { t: '  <b style="color:var(--green)">repeat</b>    re-show the current stage brief' },
-      { t: '  <b style="color:var(--green)">restart</b>   reset and play again' },
-      { t: '  <b style="color:var(--green)">clear</b>     clear the screen' }
+      { t: '  <b style="color:var(--green)">start</b>           show scenario menu' },
+      { t: '  <b style="color:var(--green)">start voice</b>     run the voice ai scenario' },
+      { t: '  <b style="color:var(--green)">start trading</b>   run the prop trading scenario' },
+      { t: '  <b style="color:var(--green)">hint</b>            nudge for the current stage' },
+      { t: '  <b style="color:var(--green)">repeat</b>          re-show the current stage brief' },
+      { t: '  <b style="color:var(--green)">restart</b>         reset and pick a scenario' },
+      { t: '  <b style="color:var(--green)">clear</b>           clear the screen' }
     ]),
     hint: () => {
-      if (!state.started || state.done) {
+      const stages = activeStages();
+      if (!state.started || state.done || !stages) {
         write('hint: there\'s no active stage. type <b style="color:var(--green)">start</b>.', 'dim');
         return;
       }
@@ -356,18 +568,28 @@
     },
     restart: () => {
       out.innerHTML = '';
-      state = { started: false, stageIdx: 0, score: 0, attempts: 0, done: false };
+      state = { started: false, scenario: null, stageIdx: 0, score: 0, attempts: 0, done: false };
       updateHud();
       intro();
     },
     clear: () => { out.innerHTML = ''; },
-    cls: () => { out.innerHTML = ''; },
-    start: () => {
-      if (state.started && !state.done) { write('session already in progress. type <b style="color:var(--green)">restart</b> to reset.', 'dim'); return; }
-      start();
-    }
+    cls: () => { out.innerHTML = ''; }
   };
   meta['?'] = meta.help;
+
+  /* `start [scenario]` — handled separately so we can take an arg */
+  function handleStart(arg) {
+    if (state.started && !state.done) {
+      write('session already in progress. type <b style="color:var(--green)">restart</b> to switch scenarios.', 'dim');
+      return;
+    }
+    const a = (arg || '').trim().toLowerCase();
+    if (!a) { showMenu(); return; }
+    const map = { '1': 'voice', '2': 'trading', 'voice': 'voice', 'trading': 'trading' };
+    if (map[a]) { startScenario(map[a]); return; }
+    write('<span class="err">unknown scenario.</span> options: <b style="color:var(--green)">voice</b> | <b style="color:var(--green)">trading</b>.');
+    scroll();
+  }
 
   /* -------------------------- input loop -------------------------- */
   const history = []; let hIdx = -1;
@@ -379,7 +601,22 @@
       write('<span class="pmt">$</span> ' + raw);
       const cmd = raw.trim().toLowerCase();
       if (!cmd) { scroll(); return; }
+      // start <scenario>
+      if (cmd === 'start' || cmd.startsWith('start ')) {
+        const arg = cmd === 'start' ? '' : cmd.slice(6);
+        handleStart(arg);
+        scroll();
+        return;
+      }
+      // simple meta
       if (meta[cmd]) { meta[cmd](); scroll(); return; }
+      // scenario shortcut from the menu (1/2/voice/trading) when not yet started
+      const shortcut = { '1': 'voice', '2': 'trading', 'voice': 'voice', 'trading': 'trading' };
+      if (shortcut[cmd] && (!state.started || state.done)) {
+        startScenario(shortcut[cmd]);
+        scroll();
+        return;
+      }
       // forward to game logic if we're in an active stage
       if (state.started && !state.done) {
         answer(raw);
