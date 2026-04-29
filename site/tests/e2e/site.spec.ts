@@ -106,7 +106,9 @@ test.describe('post pages', () => {
       const response = await page.goto(`/posts/${slug}`);
       expect(response?.status()).toBe(200);
       await expect(page.locator('.doc h1')).toBeVisible();
-      await expect(page.locator('.crumbs')).toContainText('posts');
+      // Crumbs were removed in favour of the prompt-style path; just one path indicator now.
+      await expect(page.locator('.doc .crumbs')).toHaveCount(0);
+      await expect(page.locator('.doc .post-prompt')).toContainText(slug);
       await expect(page.locator('.prose blockquote')).toContainText('status: drafting');
       await expect(page.locator('.meta-row')).toContainText('draft');
     });
@@ -292,15 +294,10 @@ test.describe('mobile layout (iPhone-class viewport, 390x844)', () => {
   });
 });
 
-test.describe('home ticker (decorative market quotes)', () => {
-  test('renders the ticker with multiple symbols and up/down classes', async ({ page }) => {
+test.describe('home — no decorative ticker', () => {
+  test('the market ticker is gone', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.ticker')).toBeVisible();
-    const symbols = await page.locator('.ticker .q b').allTextContents();
-    expect(symbols.length).toBeGreaterThanOrEqual(10); // 10 quotes × 2 duplicate rows = 20
-    expect(symbols).toEqual(expect.arrayContaining(['AUD/USD', 'BTC', 'S&P500', 'AU 10Y', 'US 10Y']));
-    expect(await page.locator('.ticker .q.up').count()).toBeGreaterThan(0);
-    expect(await page.locator('.ticker .q.down').count()).toBeGreaterThan(0);
+    await expect(page.locator('.ticker')).toHaveCount(0);
   });
 });
 
@@ -348,6 +345,8 @@ test.describe('selected work on /about', () => {
     await expect(work).toContainText('US engineering contract');
     await expect(work).toContainText('Los Angeles');
     await expect(work).toContainText('Brokerloop');
+    await expect(work).toContainText('IoT automation');
+    await expect(work).toContainText('largest laundry in the southern hemisphere');
     await expect(work).toContainText('Low-latency event-driven architecture');
     await expect(work).toContainText('nautilus_trader');
   });

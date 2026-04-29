@@ -16,6 +16,8 @@ Business-facing language for what Jonathan ships:
 - Voice AI and conversational AI systems
 - Intake automation and AI workflow design
 - Backend infrastructure for AI applications
+- IoT and industrial automation (built for the largest laundry in the southern hemisphere)
+- Greenfield 0-to-1 builds — small startup systems through to large production deployments
 - AI advisory and engineering consulting (by referral)
 - Available for contract engagements across Australia and the United States. Prior US work includes a venture-funded company in Los Angeles (2024).
 

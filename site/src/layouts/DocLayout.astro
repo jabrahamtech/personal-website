@@ -49,14 +49,6 @@ const {
 >
   <main id="content" class="doc">
     <div class="wrap">
-      <nav class="crumbs" aria-label="Breadcrumb">
-        {crumbs.map((c, i) => (
-          <>
-            {c.href ? <a href={c.href}>{c.label}</a> : <span aria-current={i === crumbs.length - 1 ? 'page' : undefined}>{c.label}</span>}
-            {i < crumbs.length - 1 && <span class="sep">/</span>}
-          </>
-        ))}
-      </nav>
       <div class="post-prompt">&gt; {promptPath}</div>
       <h1>{title.replace(/ — Jonathan Abraham$/, '')}</h1>
       {metaRow && (

@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import Ticker from '../components/Ticker.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 type Post = CollectionEntry<'posts'>;
@@ -86,7 +85,6 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
   description={description}
   jsonLd={blogJsonLd}
 >
-  <Ticker />
   <main id="content" class="wrap">
     <header class="page-head">
       <div class="prompt">&gt; ./posts</div>
