@@ -33,7 +33,12 @@ interface Props {
 
 const { post, postId, newer, older } = Astro.props;
 const { data } = post;
-const { Content } = await post.render();
+const { Content, headings } = await post.render();
+
+// Source path for edit-on-GitHub link. Astro doesn't expose post.id reliably
+// across versions, so we reconstruct from the slug.
+const sourcePath = `site/src/content/posts/${post.slug}.mdx`;
+const editUrl = `https://github.com/jabrahamtech/personal-website/edit/main/${sourcePath}`;
 
 const metaRow: { label: string; value: string }[] = [];
 metaRow.push({ label: 'id', value: postId });
@@ -96,6 +101,9 @@ const breadcrumb = {
   modifiedAt={data.posted}
   jsonLd={[blogPosting, breadcrumb]}
   postId={postId}
+  headings={headings}
+  editUrl={editUrl}
+  sourcePath={sourcePath}
 >
   {data.image && (
     <figure class="cover">

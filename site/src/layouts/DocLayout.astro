@@ -2,6 +2,7 @@
 import Base from './Base.astro';
 
 interface Crumb { href?: string; label: string }
+interface Heading { depth: number; slug: string; text: string }
 
 interface Props {
   title: string;
@@ -21,6 +22,12 @@ interface Props {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   /** Optional hex post identifier (e.g. "0x03") rendered in meta + EOF. */
   postId?: string;
+  /** Headings extracted from MDX render() — used to build the right-rail TOC. */
+  headings?: Heading[];
+  /** GitHub edit URL for the source MDX file. */
+  editUrl?: string;
+  /** Repo-relative source path, shown in the edit link. */
+  sourcePath?: string;
 }
 
 const {
@@ -37,7 +44,14 @@ const {
   modifiedAt,
   jsonLd,
   postId,
+  headings = [],
+  editUrl,
+  sourcePath,
 } = Astro.props;
+
+// Right-rail TOC: only H2/H3 (H1 is the page title; H4+ is too noisy).
+const tocItems = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const showToc = tocItems.length >= 2;
 ---
 <Base
   title={title}
@@ -50,7 +64,8 @@ const {
   tags={tags}
   jsonLd={jsonLd}
 >
-  <main id="content" class="doc">
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"><span></span></div>
+  <main id="content" class={`doc${showToc ? ' has-toc' : ''}`}>
     <div class="wrap">
       <div class="post-prompt">&gt; {promptPath}</div>
       <h1>{title.replace(/ — Jonathan Abraham$/, '')}</h1>
@@ -65,13 +80,35 @@ const {
         </div>
       )}
 
-      <article class="prose">
-        <slot />
-        {postId && (
-          <div class="post-eof" aria-hidden="true">[EOF — {postId}] <span class="ok">[exit 0]</span></div>
+      <div class={`doc-grid${showToc ? '' : ' no-toc'}`}>
+        <article class="prose" id="post-body">
+          <slot />
+          {postId && (
+            <div class="post-eof" aria-hidden="true">[EOF — {postId}] <span class="ok">[exit 0]</span></div>
+          )}
+          {editUrl && (
+            <p class="edit-link">
+              <a href={editUrl} target="_blank" rel="noopener">$ git blame ./{sourcePath}</a>
+            </p>
+          )}
+          <slot name="footer" />
+        </article>
+        {showToc && (
+          <aside class="toc" aria-label="table of contents">
+            <div class="toc-head">&gt; ./contents</div>
+            <ul>
+              {tocItems.map((h) => (
+                <li class={`d${h.depth}`}>
+                  <a href={`#${h.slug}`} data-toc-slug={h.slug}>
+                    <span class="rune">{h.depth === 2 ? '├─' : '│  ├─'}</span>
+                    <span class="text">{h.text}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </aside>
         )}
-        <slot name="footer" />
-      </article>
+      </div>
     </div>
   </main>
   <script is:inline>
@@ -103,6 +140,57 @@ const {
         });
         pre.appendChild(btn);
       });
+
+      // Reading progress bar — bound to the post body's scroll progress so
+      // it hits 100% when the article ends, not when the page footer ends.
+      var bar = document.getElementById('reading-progress');
+      var body = document.getElementById('post-body');
+      if (bar && body) {
+        var fill = bar.firstElementChild;
+        var ticking = false;
+        var update = function () {
+          var rect = body.getBoundingClientRect();
+          var vh = window.innerHeight || document.documentElement.clientHeight;
+          var total = rect.height - vh;
+          var passed = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+          var pct = total > 0 ? (passed / total) * 100 : 0;
+          fill.style.width = pct.toFixed(2) + '%';
+          ticking = false;
+        };
+        var schedule = function () {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(update);
+        };
+        window.addEventListener('scroll', schedule, { passive: true });
+        window.addEventListener('resize', schedule);
+        update();
+      }
+
+      // Right-rail TOC: highlight the section currently in view.
+      var tocLinks = document.querySelectorAll('.toc a[data-toc-slug]');
+      if (tocLinks.length && 'IntersectionObserver' in window) {
+        var bySlug = {};
+        tocLinks.forEach(function (a) { bySlug[a.getAttribute('data-toc-slug')] = a; });
+        var headings = Array.prototype.filter.call(
+          document.querySelectorAll('article.prose h2[id], article.prose h3[id]'),
+          function (h) { return bySlug[h.id]; }
+        );
+        var visible = new Set();
+        var setActive = function (slug) {
+          tocLinks.forEach(function (a) { a.classList.toggle('active', a.getAttribute('data-toc-slug') === slug); });
+        };
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) visible.add(e.target.id); else visible.delete(e.target.id);
+          });
+          // Pick the first heading in document order that's currently visible.
+          for (var i = 0; i < headings.length; i++) {
+            if (visible.has(headings[i].id)) { setActive(headings[i].id); return; }
+          }
+        }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+        headings.forEach(function (h) { io.observe(h); });
+      }
     })();
   </script>
 </Base>

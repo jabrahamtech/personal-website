@@ -510,3 +510,81 @@ test.describe('AEO — llms.txt + AI crawler robots', () => {
     }
   });
 });
+
+test.describe('post template — slice 2 (TOC, autolinks, edit-link, progress bar)', () => {
+  const examplePost = '/posts/building-this-site-with-astro';
+
+  test('headings are slugged and autolinked with a permalink anchor', async ({ page }) => {
+    await page.goto(examplePost);
+    // Every h2/h3 in the prose body has an id (rehype-slug).
+    const headings = page.locator('article.prose h2[id], article.prose h3[id]');
+    expect(await headings.count()).toBeGreaterThanOrEqual(3);
+    // Every heading carries a .heading-anchor link pointing back to its own id.
+    const first = headings.first();
+    const id = await first.getAttribute('id');
+    const anchor = first.locator('a.heading-anchor');
+    await expect(anchor).toHaveCount(1);
+    await expect(anchor).toHaveAttribute('href', `#${id}`);
+  });
+
+  test('right-rail TOC renders on wide viewports with one entry per h2/h3', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(examplePost);
+    const toc = page.locator('aside.toc');
+    await expect(toc).toBeVisible();
+    const tocLinks = toc.locator('a[data-toc-slug]');
+    const headingIds = await page
+      .locator('article.prose h2[id], article.prose h3[id]')
+      .evaluateAll((els) => els.map((e) => e.id));
+    await expect(tocLinks).toHaveCount(headingIds.length);
+    const tocSlugs = await tocLinks.evaluateAll((els) =>
+      els.map((e) => e.getAttribute('data-toc-slug')),
+    );
+    expect(tocSlugs).toEqual(headingIds);
+  });
+
+  test('TOC is hidden on narrow viewports', async ({ page }) => {
+    await page.setViewportSize({ width: 900, height: 900 });
+    await page.goto(examplePost);
+    await expect(page.locator('aside.toc')).toBeHidden();
+  });
+
+  test('reading progress bar is in the DOM and gets a width on scroll', async ({ page }) => {
+    await page.goto(examplePost);
+    const fill = page.locator('#reading-progress > span');
+    await expect(fill).toHaveCount(1);
+    // Scroll a chunk down the article and the fill should grow past 0.
+    await page.evaluate(() => window.scrollTo(0, 800));
+    await page.waitForFunction(() => {
+      const el = document.querySelector('#reading-progress > span') as HTMLElement | null;
+      return !!el && parseFloat(el.style.width || '0') > 0;
+    }, null, { timeout: 2000 });
+  });
+
+  test('edit-on-GitHub link points at the correct repo path for this post', async ({ page }) => {
+    await page.goto(examplePost);
+    const link = page.locator('.edit-link a');
+    await expect(link).toHaveCount(1);
+    await expect(link).toHaveAttribute(
+      'href',
+      'https://github.com/jabrahamtech/personal-website/edit/main/site/src/content/posts/building-this-site-with-astro.mdx',
+    );
+  });
+
+  test('every <pre> in a post gets a [copy] button mounted by the layout script', async ({ page }) => {
+    await page.goto(examplePost);
+    const preCount = await page.locator('article.prose pre').count();
+    expect(preCount).toBeGreaterThan(0);
+    await expect(page.locator('article.prose pre .copy-btn')).toHaveCount(preCount);
+  });
+
+  test('post id renders in the meta row and matches the EOF marker', async ({ page }) => {
+    await page.goto(examplePost);
+    const idCell = page.locator('.meta-row span', { hasText: /^id\s+0x[0-9A-F]+/i }).first();
+    await expect(idCell).toBeVisible();
+    const idText = ((await idCell.textContent()) || '').trim().replace(/^id\s+/i, '');
+    const eof = page.locator('.post-eof');
+    await expect(eof).toContainText(`[EOF — ${idText}]`);
+    await expect(eof).toContainText('[exit 0]');
+  });
+});
