@@ -70,8 +70,8 @@ a{color:inherit;text-decoration:none}
 .pl-cursor{display:inline-block;width:7px;height:13px;background:var(--green);box-shadow:0 0 8px var(--green);margin-left:3px;vertical-align:text-bottom;animation:plCursor 0.85s steps(2,start) infinite}
 
 .pl-label{font-family:var(--mono);font-size:13px;color:var(--ink-dim);letter-spacing:.02em;text-align:center}
-.pl-dots{display:inline-block;width:18px;text-align:left;color:var(--green);position:relative}
-.pl-dots::after{content:"...";display:inline-block;clip-path:inset(0 100% 0 0);animation:plDots 1.4s steps(4,jump-none) infinite}
+.pl-dots{display:inline-block;min-width:24px;text-align:left;color:var(--green);position:relative;line-height:1;vertical-align:baseline}
+.pl-dots::after{content:"...";display:inline-block;clip-path:inset(0 100% 0 0);animation:plDots 1.4s steps(4,jump-none) infinite;letter-spacing:1px}
 
 @keyframes plLineIn{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:none}}
 @keyframes plCursor{0%,50%{opacity:1}50.01%,100%{opacity:0.15}}
