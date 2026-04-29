@@ -31,10 +31,8 @@
     .item p{margin:0 0 10px;color:var(--ink-dim)}
     .meta{font-family:var(--mono);font-size:12px;color:var(--ink-mute)}
     .meta .sep{margin:0 8px;opacity:.5}
-    .row-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px}
-    .back{display:inline-block;font-family:var(--mono);font-size:13px;color:var(--ink-dim);border:1px solid var(--line);padding:8px 12px;text-decoration:none}
+    .back{display:inline-block;margin-top:32px;font-family:var(--mono);font-size:13px;color:var(--ink-dim);border:1px solid var(--line);padding:8px 12px;text-decoration:none}
     .back:hover{color:var(--green);border-color:var(--green-2)}
-    .back.valid{color:var(--ink-mute)}
     a{color:inherit}
   </style>
 </head>
@@ -56,10 +54,7 @@
       </article>
     </xsl:for-each>
 
-    <div class="row-actions">
-      <a class="back"><xsl:attribute name="href"><xsl:value-of select="rss/channel/link"/></xsl:attribute>← back to the site</a>
-      <a class="back valid" href="https://validator.w3.org/feed/check.cgi?url=https%3A%2F%2Fjonathanabraham.dev%2Frss.xml" rel="noopener" target="_blank">[ valid rss ↗ ]</a>
-    </div>
+    <a class="back"><xsl:attribute name="href"><xsl:value-of select="rss/channel/link"/></xsl:attribute>← back to the site</a>
   </main>
 </body>
 </html>
