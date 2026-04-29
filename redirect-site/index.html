@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Moved — Jonathan Abraham</title>
+
+  <!-- Most aggressive redirect signals available to a pure-static page.
+       (1) <meta http-equiv="refresh" 0; url=...> with the canonical
+           target. Browsers honour this immediately. Google honours it
+           as a 301-equivalent provided the page also returns 200, the
+           target is on a stable host, and the URL is identical to a
+           canonical link in the head. (See: developers.google.com/
+           search/docs/crawling-indexing/301-redirects)
+       (2) <link rel="canonical"> pointing at the new URL — explicit
+           consolidation signal so Google doesn't index this page as
+           its own document.
+       (3) Inline JS using location.replace so no history entry is
+           created on the old domain (better UX than href= and back
+           button works correctly).
+       (4) noindex robots meta as a belt + suspenders. -->
+  <meta http-equiv="refresh" content="0; url=https://jabrahamtech.com/">
+  <link rel="canonical" href="https://jabrahamtech.com/">
+  <meta name="robots" content="noindex,follow">
+  <meta name="description" content="This site moved. Now at https://jabrahamtech.com/.">
+
+  <style>
+    :root{color-scheme:dark}
+    html,body{margin:0;background:#0b0e0c;color:#ecebe4;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;height:100%}
+    body{display:flex;align-items:center;justify-content:center;padding:24px}
+    main{max-width:540px;text-align:center}
+    h1{font-size:18px;font-weight:500;color:#7dff8a;margin:0 0 14px;letter-spacing:0.02em}
+    p{font-size:14px;color:#c7c6bc;margin:0 0 18px;line-height:1.6}
+    a{color:#7dff8a;text-decoration:none;border-bottom:1px solid #46c463;padding-bottom:1px}
+    a:hover{color:#ffe066;border-color:#ffe066}
+    .dot{display:inline-block;width:7px;height:7px;background:#7dff8a;box-shadow:0 0 8px #7dff8a;margin-right:9px;vertical-align:middle;animation:b 1.4s ease-in-out infinite}
+    @keyframes b{0%,100%{opacity:1}50%{opacity:.35}}
+  </style>
+  <script>
+    // Preserve the path + query + hash so deep-links still work.
+    // e.g. /posts/voice-ai-after-demo?utm=x → same on the new domain.
+    (function () {
+      var dest = 'https://jabrahamtech.com' + location.pathname + location.search + location.hash;
+      // Use replace (not assign) so the old URL doesn't enter history.
+      location.replace(dest);
+    })();
+  </script>
+</head>
+<body>
+  <main>
+    <h1><span class="dot"></span>&gt; ./moved</h1>
+    <p>this site is now at <a href="https://jabrahamtech.com/">jabrahamtech.com</a>. you'll be redirected automatically — if not, click the link.</p>
+  </main>
+</body>
+</html>

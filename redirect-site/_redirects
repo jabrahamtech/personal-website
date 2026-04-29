@@ -1,0 +1,6 @@
+# Netlify / Cloudflare Pages format. If this redirect bundle is hosted
+# on either platform, every path returns a real HTTP 301 — strictly
+# better for SEO than the meta-refresh fallback in index.html.
+#
+# Path + query + fragment all preserve via :splat.
+/*  https://jabrahamtech.com/:splat  301!

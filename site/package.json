@@ -10,6 +10,7 @@
     "preview": "astro preview",
     "start": "serve dist --listen tcp://0.0.0.0:${PORT:-4321} --no-clipboard",
     "test:e2e": "playwright test",
+    "render:og": "node scripts/render-og.mjs",
     "astro": "astro"
   },
   "dependencies": {

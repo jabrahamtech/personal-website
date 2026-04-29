@@ -1,0 +1,6 @@
+# Netlify / Cloudflare Pages format. Cache the redirect HTML aggressively
+# at the edge — it's a static page that will basically never change, and
+# every cache hit is one less origin request to serve a redirect.
+/*
+  Cache-Control: public, max-age=86400, immutable
+  X-Robots-Tag: noindex, follow

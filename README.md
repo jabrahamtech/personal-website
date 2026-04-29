@@ -72,7 +72,7 @@ The post appears in the home list and the RSS feed automatically; the dynamic ro
 - Service Root Directory = `site`
 - Service Public Networking → port `4321`
 - `npm start` runs `serve dist --listen tcp://0.0.0.0:${PORT:-4321}`
-- Custom domain: jonathanabraham.dev
+- Custom domain: jabrahamtech.com (old: jonathanabraham.dev — see `redirect-site/`)
 
 ## Production TODO
 
