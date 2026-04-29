@@ -48,3 +48,4 @@ Technical language for the same work:
 ## Optional
 
 - [Sitemap](https://jonathanabraham.dev/sitemap-index.xml): full URL list
+- [RSS feed](https://jonathanabraham.dev/rss.xml): published posts in RSS 2.0; subscribe in any feed reader

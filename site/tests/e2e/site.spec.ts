@@ -46,14 +46,13 @@ test.describe('home (posts list)', () => {
     await expect(page.locator('.page-head h1.prompt')).toHaveCount(1);
   });
 
-  test('no pitch-surface or RSS artifacts remain on home', async ({ page }) => {
+  test('no pitch-surface artifacts remain on home', async ({ page }) => {
     await page.goto('/');
     const html = await page.content();
     for (const needle of [
       'status-hud', 'sprite',
       'Production Readiness Sprint', 'Operating system',
       'Founder-engineer building',
-      'rss.xml',                                            // RSS removed
     ]) {
       expect(html, `unexpected leftover: ${needle}`).not.toContain(needle);
     }
@@ -140,9 +139,34 @@ test.describe('post pages', () => {
 });
 
 test.describe('infrastructure', () => {
-  test('rss.xml route is removed', async ({ page }) => {
+  test('rss.xml is served as RSS 2.0 with the right meta', async ({ page }) => {
     const r = await page.request.get('/rss.xml');
-    expect(r.status()).toBe(404);
+    expect(r.status()).toBe(200);
+    const ct = r.headers()['content-type'] || '';
+    expect(ct).toMatch(/xml/);
+    const body = await r.text();
+    // Channel-level requirements per RSS 2.0 + RSS Best Practices.
+    expect(body).toContain('<rss version="2.0"');
+    expect(body).toContain('<title>Jonathan Abraham — posts</title>');
+    expect(body).toContain('<atom:link');
+    expect(body).toContain('rel="self"');
+    expect(body).toContain('<language>en-au</language>');
+    // Stylesheet so humans hitting the URL get a styled page, not raw XML.
+    expect(body).toContain('xml-stylesheet');
+  });
+
+  test('every page advertises the RSS feed via <link rel=alternate>', async ({ page }) => {
+    for (const path of ['/', '/about', '/terminal', '/posts/voice-ai-after-demo']) {
+      await page.goto(path);
+      const link = page.locator('head link[rel="alternate"][type="application/rss+xml"]');
+      await expect(link, `missing rss <link> on ${path}`).toHaveCount(1);
+      await expect(link).toHaveAttribute('href', '/rss.xml');
+    }
+  });
+
+  test('footer surfaces an rss link', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('footer .links a[href="/rss.xml"]')).toHaveText('rss');
   });
 
   test('sitemap-index.xml + sitemap-0.xml include posts and about', async ({ page }) => {
