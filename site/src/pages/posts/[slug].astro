@@ -55,7 +55,7 @@ const blogPosting: Record<string, unknown> = {
   dateModified: (data.posted ?? new Date()).toISOString(),
   image: {
     '@type': 'ImageObject',
-    url: new URL(data.image?.src ?? '/og/default.svg', siteOrigin + '/').toString(),
+    url: new URL(data.image?.src ?? '/og/default.png', siteOrigin + '/').toString(),
     caption: data.image?.alt ?? 'jonathan_abraham.os — shipping production AI for over 2 years',
   },
   ...(data.draft ? { creativeWorkStatus: 'Draft' } : {}),
