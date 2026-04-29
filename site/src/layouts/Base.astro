@@ -54,10 +54,21 @@ const siteWideJsonLd = [
     name: 'Jonathan Abraham',
     givenName: 'Jonathan',
     familyName: 'Abraham',
+    alternateName: ['Jono Abraham', 'jabrahamtech'],
     url: siteOrigin + '/',
     image: new URL('/about/avatar.jpeg', siteOrigin + '/').toString(),
     jobTitle: 'AI engineer',
     description: 'About 5 years building production systems, the last 2 on AI. Voice agents, intake automation, and the backend they sit on. Founder of Brokerloop. Open to select work in Australia and the US.',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Melbourne',
+      addressRegion: 'VIC',
+      addressCountry: 'AU',
+    },
+    homeLocation: {
+      '@type': 'Place',
+      name: 'Melbourne, Australia',
+    },
     worksFor: {
       '@type': 'Organization',
       name: 'Brokerloop',
