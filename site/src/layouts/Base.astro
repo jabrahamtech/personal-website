@@ -211,40 +211,98 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
     <div class="pl-stage">
       <div class="pl-bob">
         <div class="pl-shake">
-          <svg viewBox="0 0 240 220" class="pl-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 200 240" class="pl-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="pl-hair" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#fff5b8"/>
                 <stop offset="55%" stop-color="#ffd84d"/>
-                <stop offset="100%" stop-color="#e8a934"/>
+                <stop offset="100%" stop-color="#d49920"/>
               </linearGradient>
               <linearGradient id="pl-skin" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#a8744f"/>
-                <stop offset="100%" stop-color="#8a5a36"/>
+                <stop offset="100%" stop-color="#7a4f30"/>
+              </linearGradient>
+              <linearGradient id="pl-jacket" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#23262c"/>
+                <stop offset="100%" stop-color="#0a0c0e"/>
               </linearGradient>
             </defs>
-            <g transform="translate(120 110) rotate(-10)">
-              <path d="M -10 30 Q -34 38 -58 36 Q -48 44 -32 44 Q -16 42 -6 36 Z" fill="#0d1012"/>
-              <path d="M -4 28 Q -28 42 -54 46 Q -40 50 -24 48 Q -10 44 -2 36 Z" fill="#15181a"/>
-              <path d="M -16 -2 Q -38 -4 -52 6 Q -38 10 -22 8 Q -12 4 -10 2 Z" fill="#15181a"/>
-              <path d="M -14 8 Q -34 16 -46 26 Q -32 26 -20 18 Z" fill="#0d1012"/>
-              <path d="M -22 -10 Q -10 -16 0 -16 Q 12 -16 22 -10 L 24 24 Q 10 30 0 30 Q -12 30 -24 24 Z" fill="#15181a"/>
-              <path d="M -22 -10 L -16 -6 L -12 18 L -22 24 Z" fill="#0d1012"/>
-              <path d="M 22 -10 L 16 -6 L 12 18 L 22 24 Z" fill="#0d1012"/>
-              <path d="M -8 -10 L 0 2 L 8 -10 L 6 6 L -6 6 Z" fill="#0a0c0d"/>
-              <rect x="-8" y="-22" width="16" height="14" fill="url(#pl-skin)"/>
-              <ellipse cx="0" cy="-9" rx="9" ry="3" fill="#3a2014" opacity="0.35"/>
-              <ellipse cx="0" cy="-36" rx="18" ry="20" fill="url(#pl-skin)"/>
-              <ellipse cx="0" cy="-26" rx="13" ry="5" fill="#3a2014" opacity="0.32"/>
-              <path d="M -12 -43 L -3 -41" stroke="#2a1408" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M 3 -41 L 12 -43" stroke="#2a1408" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M -10 -36 L -4 -36" stroke="#1a0a04" stroke-width="2" stroke-linecap="round"/>
-              <path d="M 4 -36 L 10 -36" stroke="#1a0a04" stroke-width="2" stroke-linecap="round"/>
-              <path d="M -4 -24 L 4 -24" stroke="#3a1a0a" stroke-width="1.6" stroke-linecap="round"/>
-              <path d="M -18 -48 L -26 -70 L -14 -60 L -18 -82 L -6 -64 L -8 -86 L 4 -66 L 8 -88 L 12 -66 L 22 -82 L 18 -60 L 30 -68 L 22 -52 L 34 -52 L 24 -44 L 32 -36 L 14 -44 Z" fill="url(#pl-hair)" stroke="#c98a1f" stroke-width="1.1" stroke-linejoin="round"/>
-              <path d="M 16 -44 L 36 -38 L 26 -34 L 40 -30 L 22 -30 Z" fill="url(#pl-hair)" stroke="#c98a1f" stroke-width="0.8" stroke-linejoin="round"/>
-              <path d="M -18 -44 L -32 -36 L -22 -34 L -32 -28 L -16 -32 Z" fill="url(#pl-hair)" stroke="#c98a1f" stroke-width="0.8" stroke-linejoin="round"/>
-              <path d="M -14 -48 L 14 -48 L 12 -44 L -12 -44 Z" fill="#a86b14" opacity="0.55"/>
+
+            <!-- center origin near sternum so rotation pivots correctly -->
+            <g transform="translate(100 120)">
+              <!-- whole figure leans -8° forward (right) for hovering forward feel -->
+              <g transform="rotate(-8)">
+
+                <!-- LEGS — chibi proportions, slightly bent, toes pointed down (hovering tell) -->
+                <!-- left leg (back) -->
+                <path d="M -10 26 Q -12 46 -10 64 Q -6 70 0 70 Q 2 56 0 26 Z" fill="#15181a"/>
+                <ellipse cx="-3" cy="72" rx="7" ry="3.5" fill="#0a0c0e"/>
+                <!-- right leg (front) -->
+                <path d="M 0 26 Q 4 46 6 64 Q 12 70 18 66 Q 14 50 10 26 Z" fill="url(#pl-jacket)"/>
+                <ellipse cx="13" cy="68" rx="7" ry="3.5" fill="#0a0c0e"/>
+
+                <!-- TORSO (blazer + shirt) -->
+                <!-- jacket body -->
+                <path d="M -18 -8 Q -8 -14 0 -14 Q 9 -14 18 -8 L 20 26 Q 9 30 0 30 Q -10 30 -20 26 Z" fill="url(#pl-jacket)"/>
+                <!-- left lapel shadow -->
+                <path d="M -18 -8 L -10 -4 L -8 26 L -20 26 Z" fill="#0a0c0e"/>
+                <!-- right lapel shadow -->
+                <path d="M 18 -8 L 10 -4 L 8 26 L 20 26 Z" fill="#0a0c0e"/>
+                <!-- inner v-neck shirt -->
+                <path d="M -7 -8 L 0 2 L 7 -8 L 6 14 L -6 14 Z" fill="#06080a"/>
+
+                <!-- ARMS — bent at elbows, fists clenched at hip-level (classic SSJ stance) -->
+                <!-- left arm (upper) -->
+                <path d="M -18 -4 Q -28 4 -28 16 Q -22 18 -18 14 Q -14 8 -12 0 Z" fill="#15181a"/>
+                <!-- left forearm + fist -->
+                <path d="M -28 14 Q -28 24 -22 28 Q -16 28 -14 22 L -16 14 Z" fill="url(#pl-jacket)"/>
+                <circle cx="-19" cy="28" r="5" fill="url(#pl-skin)"/>
+                <path d="M -22 27 L -16 27" stroke="#3a2014" stroke-width="0.7" stroke-linecap="round" opacity="0.5"/>
+
+                <!-- right arm (upper) — mirror, slightly forward -->
+                <path d="M 18 -4 Q 28 4 28 16 Q 22 18 18 14 Q 14 8 12 0 Z" fill="url(#pl-jacket)"/>
+                <!-- right forearm + fist -->
+                <path d="M 28 14 Q 28 24 22 28 Q 16 28 14 22 L 16 14 Z" fill="url(#pl-jacket)"/>
+                <circle cx="19" cy="28" r="5" fill="url(#pl-skin)"/>
+                <path d="M 16 27 L 22 27" stroke="#3a2014" stroke-width="0.7" stroke-linecap="round" opacity="0.5"/>
+
+                <!-- NECK -->
+                <rect x="-6" y="-20" width="12" height="10" fill="url(#pl-skin)"/>
+                <ellipse cx="0" cy="-10" rx="7" ry="2.5" fill="#2a1408" opacity="0.4"/>
+
+                <!-- HEAD -->
+                <ellipse cx="14" cy="-30" rx="3" ry="5" fill="url(#pl-skin)"/>
+                <ellipse cx="0" cy="-30" rx="16" ry="18" fill="url(#pl-skin)"/>
+                <!-- jaw stubble -->
+                <ellipse cx="0" cy="-20" rx="11" ry="4" fill="#2a1408" opacity="0.3"/>
+                <!-- eyebrows: angled, determined -->
+                <path d="M -11 -37 L -3 -34" stroke="#1a0a04" stroke-width="2.4" stroke-linecap="round"/>
+                <path d="M 3 -34 L 11 -37" stroke="#1a0a04" stroke-width="2.4" stroke-linecap="round"/>
+                <!-- eyes -->
+                <path d="M -9 -30 L -3 -30" stroke="#1a0a04" stroke-width="2" stroke-linecap="round"/>
+                <path d="M 3 -30 L 9 -30" stroke="#1a0a04" stroke-width="2" stroke-linecap="round"/>
+                <!-- mouth: set, focused -->
+                <path d="M -3 -20 L 3 -20" stroke="#3a1a0a" stroke-width="1.4" stroke-linecap="round"/>
+
+                <!-- HAIR — only on top + front of head, no random side bolts -->
+                <g class="pl-hair">
+                  <!-- forehead-anchored fan of golden spikes pointing UP -->
+                  <path d="
+                    M -16 -42
+                    L -22 -64 L -10 -52
+                    L -16 -78 L -4 -56
+                    L -8 -84 L 2 -58
+                    L 0 -90 L 8 -60
+                    L 6 -86 L 14 -58
+                    L 12 -78 L 20 -54
+                    L 22 -68 L 26 -52
+                    L 26 -42
+                    Z"
+                    fill="url(#pl-hair)" stroke="#a87010" stroke-width="1.2" stroke-linejoin="round"/>
+                  <!-- forehead shadow under hair -->
+                  <path d="M -14 -42 L 14 -42 L 12 -38 L -12 -38 Z" fill="#a87010" opacity="0.6"/>
+                </g>
+              </g>
             </g>
           </svg>
         </div>
