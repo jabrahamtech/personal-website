@@ -9,10 +9,57 @@ const links = [
 <nav class="top">
   <div class="wrap row">
     <a class="brand" href="/">jonathan_abraham<span class="accent">.os</span></a>
-    <div class="nav-links">
+    <div class="nav-links" id="nav-links-desktop">
       {links.map((l) => (
         <a href={l.href} data-fkey={l.fkey} aria-current={l.match(path) ? 'page' : undefined}>{l.label}</a>
       ))}
     </div>
+    <button type="button" class="nav-kebab" id="nav-kebab" aria-label="open menu" aria-haspopup="dialog" aria-controls="nav-sheet" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<dialog id="nav-sheet" class="nav-sheet" aria-label="site menu">
+  <div class="nav-sheet-inner">
+    <div class="nav-sheet-head">
+      <span class="nav-sheet-title">&gt; ./menu</span>
+      <button type="button" class="nav-sheet-close" id="nav-sheet-close" aria-label="close menu">[esc]</button>
+    </div>
+    <ul class="nav-sheet-list">
+      {links.map((l) => (
+        <li>
+          <a href={l.href} aria-current={l.match(path) ? 'page' : undefined}>
+            <span class="fkey">[{l.fkey}]</span>
+            <span class="label">{l.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</dialog>
+
+<script is:inline>
+  (function () {
+    const btn = document.getElementById('nav-kebab');
+    const sheet = document.getElementById('nav-sheet');
+    const close = document.getElementById('nav-sheet-close');
+    if (!btn || !sheet) return;
+    function open() {
+      btn.setAttribute('aria-expanded', 'true');
+      if (typeof sheet.showModal === 'function') sheet.showModal();
+      else sheet.setAttribute('open', '');
+    }
+    function shut() {
+      btn.setAttribute('aria-expanded', 'false');
+      if (typeof sheet.close === 'function') sheet.close();
+      else sheet.removeAttribute('open');
+    }
+    btn.addEventListener('click', open);
+    close && close.addEventListener('click', shut);
+    // Click on backdrop (the dialog itself) — anything inside .nav-sheet-inner stops propagation.
+    sheet.addEventListener('click', (e) => { if (e.target === sheet) shut(); });
+    // Any link tap closes the sheet so navigation feels instant.
+    sheet.querySelectorAll('a').forEach((a) => a.addEventListener('click', shut));
+  })();
+</script>
