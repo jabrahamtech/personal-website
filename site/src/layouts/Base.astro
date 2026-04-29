@@ -210,7 +210,7 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
   <div id="page-loader" class="page-loader" hidden aria-hidden="true">
     <div class="pl-stage">
       <div class="pl-bob">
-        <div class="pl-shake">
+        <div>
           <svg viewBox="0 0 200 240" class="pl-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="pl-hair" x1="0" y1="0" x2="0" y2="1">
@@ -228,10 +228,10 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
               </linearGradient>
             </defs>
 
-            <!-- center origin near sternum so rotation pivots correctly -->
+            <!-- center origin near sternum -->
             <g transform="translate(100 120)">
-              <!-- whole figure leans -8° forward (right) for hovering forward feel -->
-              <g transform="rotate(-8)">
+              <!-- standing upright, just gently floating -->
+              <g>
 
                 <!-- LEGS — chibi proportions, slightly bent, toes pointed down (hovering tell) -->
                 <!-- left leg (back) -->
@@ -275,14 +275,14 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
                 <ellipse cx="0" cy="-30" rx="16" ry="18" fill="url(#pl-skin)"/>
                 <!-- jaw stubble -->
                 <ellipse cx="0" cy="-20" rx="11" ry="4" fill="#2a1408" opacity="0.3"/>
-                <!-- eyebrows: angled, determined -->
-                <path d="M -11 -37 L -3 -34" stroke="#1a0a04" stroke-width="2.4" stroke-linecap="round"/>
-                <path d="M 3 -34 L 11 -37" stroke="#1a0a04" stroke-width="2.4" stroke-linecap="round"/>
-                <!-- eyes -->
-                <path d="M -9 -30 L -3 -30" stroke="#1a0a04" stroke-width="2" stroke-linecap="round"/>
-                <path d="M 3 -30 L 9 -30" stroke="#1a0a04" stroke-width="2" stroke-linecap="round"/>
-                <!-- mouth: set, focused -->
-                <path d="M -3 -20 L 3 -20" stroke="#3a1a0a" stroke-width="1.4" stroke-linecap="round"/>
+                <!-- eyebrows: gentle arch (relaxed, friendly) -->
+                <path d="M -11 -38 Q -7 -39 -3 -38" stroke="#1a0a04" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <path d="M 3 -38 Q 7 -39 11 -38" stroke="#1a0a04" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <!-- eyes: closed/smiling arcs (curve up like ^ ^) -->
+                <path d="M -9 -31 Q -6 -33 -3 -31" stroke="#1a0a04" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M 3 -31 Q 6 -33 9 -31" stroke="#1a0a04" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <!-- mouth: warm smile curve -->
+                <path d="M -5 -21 Q 0 -16 5 -21" stroke="#2a1208" stroke-width="1.6" stroke-linecap="round" fill="none"/>
 
                 <!-- HAIR — only on top + front of head, no random side bolts -->
                 <g class="pl-hair">
@@ -309,6 +309,7 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
       </div>
       <div class="pl-shadow" aria-hidden="true"></div>
     </div>
+    <div class="pl-label">one moment please<span class="pl-dots">...</span></div>
   </div>
 
   <script is:inline>
