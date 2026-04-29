@@ -19,6 +19,8 @@ interface Props {
   modifiedAt?: Date;
   /** Optional pre-built JSON-LD (BlogPosting/BreadcrumbList) for posts. */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Optional hex post identifier (e.g. "0x03") rendered in meta + EOF. */
+  postId?: string;
 }
 
 const {
@@ -34,6 +36,7 @@ const {
   publishedAt,
   modifiedAt,
   jsonLd,
+  postId,
 } = Astro.props;
 ---
 <Base
@@ -64,8 +67,42 @@ const {
 
       <article class="prose">
         <slot />
+        {postId && (
+          <div class="post-eof" aria-hidden="true">[EOF — {postId}] <span class="ok">[exit 0]</span></div>
+        )}
         <slot name="footer" />
       </article>
     </div>
   </main>
+  <script is:inline>
+    (function () {
+      var COPY = '[copy]';
+      var OK = '[ok]';
+      var ERR = '[err]';
+      document.querySelectorAll('article.prose pre').forEach(function (pre) {
+        if (pre.querySelector('.copy-btn')) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = COPY;
+        btn.setAttribute('aria-label', 'copy code to clipboard');
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          var code = pre.querySelector('code');
+          var text = (code ? code.innerText : pre.innerText) || '';
+          var done = function (label, ok) {
+            btn.textContent = label;
+            if (ok) btn.classList.add('ok'); else btn.classList.remove('ok');
+            setTimeout(function () { btn.textContent = COPY; btn.classList.remove('ok'); }, 1200);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () { done(OK, true); }, function () { done(ERR, false); });
+          } else {
+            done(ERR, false);
+          }
+        });
+        pre.appendChild(btn);
+      });
+    })();
+  </script>
 </Base>

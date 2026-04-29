@@ -8,27 +8,35 @@ export async function getStaticPaths() {
     const bd = b.data.posted?.getTime() ?? 0;
     return bd - ad;
   });
-  return posts.map((post, i) => ({
-    params: { slug: post.slug },
-    props: {
-      post,
-      newer: i > 0 ? posts[i - 1] : null,
-      older: i < posts.length - 1 ? posts[i + 1] : null,
-    },
-  }));
+  return posts.map((post, i) => {
+    // Oldest gets 0x01 and the number grows as new posts ship — stable IDs
+    // (renaming or reordering doesn't shuffle them backward over time).
+    const postId = '0x' + (posts.length - i).toString(16).padStart(2, '0').toUpperCase();
+    return {
+      params: { slug: post.slug },
+      props: {
+        post,
+        postId,
+        newer: i > 0 ? posts[i - 1] : null,
+        older: i < posts.length - 1 ? posts[i + 1] : null,
+      },
+    };
+  });
 }
 
 interface Props {
   post: CollectionEntry<'posts'>;
+  postId: string;
   newer: CollectionEntry<'posts'> | null;
   older: CollectionEntry<'posts'> | null;
 }
 
-const { post, newer, older } = Astro.props;
+const { post, postId, newer, older } = Astro.props;
 const { data } = post;
 const { Content } = await post.render();
 
 const metaRow: { label: string; value: string }[] = [];
+metaRow.push({ label: 'id', value: postId });
 if (data.posted) metaRow.push({ label: 'posted', value: data.posted.toISOString().slice(0, 10) });
 else metaRow.push({ label: 'status', value: 'draft' });
 if (data.readTime) metaRow.push({ label: 'read', value: data.readTime });
@@ -87,6 +95,7 @@ const breadcrumb = {
   publishedAt={data.posted}
   modifiedAt={data.posted}
   jsonLd={[blogPosting, breadcrumb]}
+  postId={postId}
 >
   {data.image && (
     <figure class="cover">

@@ -213,8 +213,32 @@ nav.top .row{display:flex;align-items:center;justify-content:space-between;heigh
 .prose h2{font-family:var(--mono);font-size:22px;color:var(--ink);margin:36px 0 14px;font-weight:700}
 .prose h2::before{content:"> ";color:var(--green)}
 .prose h3{font-family:var(--mono);font-size:17px;color:var(--ink);margin:28px 0 10px;font-weight:600}
+.prose h3::before{content:">> ";color:var(--green-2)}
 .prose hr{border:0;border-top:1px solid var(--line);margin:36px 0}
 .prose img{max-width:100%;height:auto;border:1px solid var(--line)}
+
+/* code block with optional terminal-style filename header */
+.prose .codeblock{margin:0 0 22px}
+.prose .codeblock.has-bar{border:1px solid var(--line-2);background:#070a08}
+.prose .codeblock.has-bar pre{border:0;margin:0;background:transparent}
+.prose .codeblock-bar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);background:#0a0e0b;font-family:var(--mono)}
+.prose .cb-dot{width:9px;height:9px;display:block;border:1px solid rgba(0,0,0,0.4);flex:0 0 auto}
+.prose .cb-dot.r{background:#ff5f56}
+.prose .cb-dot.y{background:#ffbd2e}
+.prose .cb-dot.g{background:#27c93f;box-shadow:0 0 5px rgba(39,201,63,0.55)}
+.prose .cb-name{margin-left:8px;font-size:11.5px;color:var(--ink-dim);letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prose .cb-lang{margin-left:auto;font-size:11px;color:var(--ink-mute);letter-spacing:.04em}
+
+/* copy button injected by DocLayout client script */
+.prose pre{position:relative}
+.prose .copy-btn{position:absolute;top:6px;right:8px;font-family:var(--mono);font-size:11px;color:var(--ink-mute);background:transparent;border:1px solid var(--line);padding:2px 6px;cursor:pointer;letter-spacing:.04em;line-height:1.4;opacity:0;transition:opacity .12s ease, color .12s ease, border-color .12s ease}
+.prose pre:hover .copy-btn,.prose .copy-btn:focus-visible{opacity:1}
+.prose .copy-btn:hover{color:var(--green);border-color:var(--green-2)}
+.prose .copy-btn.ok{color:var(--green);border-color:var(--green-2);opacity:1}
+
+/* end-of-post marker */
+.post-eof{margin:36px 0 0;font-family:var(--mono);font-size:12px;color:var(--ink-mute);letter-spacing:.06em;text-align:center;border-top:1px dashed var(--line);padding-top:18px}
+.post-eof .ok{color:var(--green)}
 
 /* prev/next */
 .pn{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:48px;padding-top:24px;border-top:1px solid var(--line)}

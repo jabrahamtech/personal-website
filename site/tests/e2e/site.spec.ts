@@ -14,10 +14,11 @@ test.describe('home (posts list)', () => {
     await expect(page.locator('.links-row')).toHaveCount(0);
 
     const rows = page.locator('.post-list .post-row');
-    await expect(rows).toHaveCount(3);
+    await expect(rows).toHaveCount(4);
     const hrefs = await rows.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')));
     for (const href of hrefs) expect(href).toMatch(/^\/posts\//);
 
+    // Three drafts + one published example post (building-this-site-with-astro).
     await expect(page.locator('.post-list .draft')).toHaveCount(3);
   });
 

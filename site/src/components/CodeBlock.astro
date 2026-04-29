@@ -1,0 +1,19 @@
+---
+interface Props {
+  filename?: string;
+  lang?: string;
+}
+const { filename, lang } = Astro.props;
+---
+<figure class={`codeblock${filename ? ' has-bar' : ''}`} data-file={filename ?? undefined}>
+  {filename && (
+    <div class="codeblock-bar">
+      <span class="cb-dot r"></span>
+      <span class="cb-dot y"></span>
+      <span class="cb-dot g"></span>
+      <span class="cb-name">{filename}</span>
+      {lang && <span class="cb-lang">[{lang}]</span>}
+    </div>
+  )}
+  <slot />
+</figure>
