@@ -1,0 +1,32 @@
+---
+// Decorative market ticker. Static seed values — believable, not live.
+// Refresh manually when they drift far from reality.
+const quotes = [
+  { sym: 'AUD/USD',  px: '0.6517',   ch: '+0.13%', dir: 'up'   },
+  { sym: 'ASX200',   px: '8,214.40', ch: '-0.41%', dir: 'down' },
+  { sym: 'S&P500',   px: '5,824.10', ch: '+0.22%', dir: 'up'   },
+  { sym: 'NDX',      px: '20,512.6', ch: '+0.38%', dir: 'up'   },
+  { sym: 'BTC',      px: '$98,420',  ch: '+2.10%', dir: 'up'   },
+  { sym: 'ETH',      px: '$3,512',   ch: '-0.84%', dir: 'down' },
+  { sym: 'AAPL',     px: '234.12',   ch: '+0.81%', dir: 'up'   },
+  { sym: 'NVDA',     px: '142.66',   ch: '-1.20%', dir: 'down' },
+  { sym: 'AU 10Y',   px: '4.31%',    ch: '+0.02',  dir: 'up'   },
+  { sym: 'US 10Y',   px: '4.52%',    ch: '-0.01',  dir: 'down' },
+];
+---
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    {[0, 1].map(() => (
+      <div class="ticker-row">
+        {quotes.map((q) => (
+          <span class={`q ${q.dir}`}>
+            <b>{q.sym}</b>
+            <span class="px">{q.px}</span>
+            <span class="ch">{q.ch}</span>
+            <span class="arr">{q.dir === 'up' ? '▲' : '▼'}</span>
+          </span>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>

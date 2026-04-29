@@ -30,7 +30,7 @@
       <text x="22" y="-1">voice agents · intake automation · backend infrastructure</text>
 
       <rect x="0" y="35" width="7" height="7" fill="#6ee7ff"/>
-      <text x="22" y="47">founder · brokerloop · melbourne</text>
+      <text x="22" y="47">founder · brokerloop · melbourne · contracts au + us</text>
 
       <rect x="0" y="83" width="7" height="7" fill="#f5b860"/>
       <text x="22" y="95">writing on production-grade AI systems</text>
@@ -38,7 +38,7 @@
 
     <line x1="0" y1="510" x2="1040" y2="510" stroke="#1a2b1d" stroke-width="1" stroke-dasharray="2,6"/>
     <g transform="translate(0,510)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="14" fill="#5a6d5d">
-      <text x="0" y="32" letter-spacing="2">MEL · AEST · status: open_to_select_work · build a3f8c</text>
+      <text x="0" y="32" letter-spacing="2">REGIONS AU + US · STATUS open_to_select_work · BUILD a3f8c</text>
       <text x="1040" y="32" text-anchor="end" letter-spacing="2" fill="#7dff8a">▸ jonathanabraham.dev</text>
     </g>
   </g>

@@ -49,11 +49,13 @@ nav.top .row{display:flex;align-items:center;justify-content:space-between;heigh
 .nav-links{display:flex;gap:22px;font-family:var(--mono);font-size:13px;color:var(--ink-dim)}
 .nav-links a{position:relative;padding:6px 0}
 .nav-links a:hover,.nav-links a[aria-current="page"]{color:var(--green)}
-.nav-links a::before{content:"./";opacity:.4;margin-right:2px}
+.nav-links a::before{content:"[" attr(data-fkey) "]";color:var(--ink-mute);margin-right:6px;font-size:10.5px;letter-spacing:.06em;font-weight:500}
+.nav-links a:hover::before,.nav-links a[aria-current="page"]::before{color:var(--green-2)}
 @media (max-width:560px){.nav-links{gap:14px;font-size:12px}.brand{font-size:13px}}
 @media (max-width:480px){
   .brand{font-size:12px;letter-spacing:0}
   .nav-links{gap:12px;font-size:11.5px}
+  /* F-key prefix is decorative; drop it on narrow phones to keep nav on one line */
   .nav-links a::before{content:""}
   nav.top .row{gap:10px}
 }
@@ -202,6 +204,29 @@ footer{padding:36px 0 60px;border-top:1px solid var(--line);margin-top:60px;posi
 .term-foot .meter{display:inline-flex;gap:2px;margin-left:6px}
 .term-foot .meter i{width:6px;height:8px;background:var(--line-2);display:block}
 .term-foot .meter i.on{background:var(--green);box-shadow:0 0 4px var(--green)}
+
+/* market ticker (decorative; static seed values) */
+.ticker{border-bottom:1px solid var(--line);background:#070a08;overflow:hidden;position:relative;z-index:30}
+.ticker::before,.ticker::after{content:"";position:absolute;top:0;bottom:0;width:48px;z-index:2;pointer-events:none}
+.ticker::before{left:0;background:linear-gradient(to right, #070a08, rgba(7,10,8,0))}
+.ticker::after{right:0;background:linear-gradient(to left, #070a08, rgba(7,10,8,0))}
+.ticker-track{display:flex;width:max-content;animation:tickerSlide 95s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-row{display:inline-flex;align-items:center;gap:28px;padding:7px 28px 7px 0;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em;white-space:nowrap}
+.ticker .q{display:inline-flex;align-items:baseline;gap:6px}
+.ticker .q b{color:var(--ink-dim);font-weight:500}
+.ticker .q .px{color:#cfe9d3}
+.ticker .q.up .ch,.ticker .q.up .arr{color:var(--green)}
+.ticker .q.down .ch,.ticker .q.down .arr{color:var(--red)}
+.ticker .q .arr{font-size:9.5px}
+@keyframes tickerSlide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (max-width:720px){
+  .ticker-row{font-size:10.5px;gap:22px;padding:6px 22px 6px 0}
+  .ticker-track{animation-duration:75s}
+}
+@media (prefers-reduced-motion: reduce){
+  .ticker-track{animation:none}
+}
 
 /* status strip (Bloomberg-style system bar under nav) */
 .status-strip{border-bottom:1px solid var(--line);background:#070a08;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em;position:relative;z-index:40}

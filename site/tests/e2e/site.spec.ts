@@ -267,6 +267,36 @@ test.describe('mobile layout (iPhone-class viewport, 390x844)', () => {
   });
 });
 
+test.describe('home ticker (decorative market quotes)', () => {
+  test('renders the ticker with multiple symbols and up/down classes', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.ticker')).toBeVisible();
+    const symbols = await page.locator('.ticker .q b').allTextContents();
+    expect(symbols.length).toBeGreaterThanOrEqual(10); // 10 quotes × 2 duplicate rows = 20
+    expect(symbols).toEqual(expect.arrayContaining(['AUD/USD', 'BTC', 'S&P500', 'AU 10Y', 'US 10Y']));
+    expect(await page.locator('.ticker .q.up').count()).toBeGreaterThan(0);
+    expect(await page.locator('.ticker .q.down').count()).toBeGreaterThan(0);
+  });
+});
+
+test.describe('function-key style nav', () => {
+  test('every nav link declares an [F#] data-fkey', async ({ page }) => {
+    await page.goto('/');
+    const fkeys = await page.locator('nav.top .nav-links a').evaluateAll((els) =>
+      els.map((e) => (e as HTMLAnchorElement).getAttribute('data-fkey'))
+    );
+    expect(fkeys).toEqual(['F1', 'F2', 'F3']);
+  });
+
+  test('the F-key prefix renders as ::before content', async ({ page }) => {
+    await page.goto('/');
+    const before = await page.locator('nav.top .nav-links a').first().evaluate((el) =>
+      getComputedStyle(el, '::before').content
+    );
+    expect(before).toMatch(/F1/);
+  });
+});
+
 test.describe('status strip (Bloomberg-style)', () => {
   test('renders on every page with status, time placeholder, and build', async ({ page }) => {
     for (const path of ['/', '/about', '/terminal', '/posts/voice-ai-after-demo']) {
@@ -274,6 +304,8 @@ test.describe('status strip (Bloomberg-style)', () => {
       await expect(page.locator('.status-strip')).toBeVisible();
       await expect(page.locator('.status-strip')).toContainText('STATUS');
       await expect(page.locator('.status-strip')).toContainText('open_to_select_work');
+      await expect(page.locator('.status-strip')).toContainText('REGIONS');
+      await expect(page.locator('.status-strip')).toContainText('AU · US');
       await expect(page.locator('.status-strip')).toContainText('BUILD');
       // Local time hydrates client-side; just assert the slot exists with HH:MM shape eventually
       await expect(page.locator('#ss-time')).toHaveText(/^\d{2}:\d{2}$/);
@@ -288,6 +320,8 @@ test.describe('selected work on /about', () => {
     await expect(work).toBeVisible();
     await expect(work).toContainText('tier-one Australian bank');
     await expect(work).toContainText('Fraud detection AI');
+    await expect(work).toContainText('US engineering contract');
+    await expect(work).toContainText('Los Angeles');
     await expect(work).toContainText('Brokerloop');
     await expect(work).toContainText('Low-latency event-driven architecture');
     await expect(work).toContainText('nautilus_trader');

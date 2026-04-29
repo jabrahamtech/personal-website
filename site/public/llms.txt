@@ -17,6 +17,7 @@ Business-facing language for what Jonathan ships:
 - Intake automation and AI workflow design
 - Backend infrastructure for AI applications
 - AI advisory and engineering consulting (by referral)
+- Available for contract engagements across Australia and the United States. Prior US work includes a venture-funded company in Los Angeles (2024).
 
 Technical language for the same work:
 
