@@ -23,7 +23,7 @@
 
     <text x="-4" y="220" font-size="92" font-weight="700" fill="#e8efe9" letter-spacing="-2">jonathan_abraham<tspan fill="#7dff8a">.os</tspan></text>
 
-    <text x="0" y="288" font-size="28" fill="#9aa39a">shipping production AI for over 2 years</text>
+    <text x="0" y="288" font-size="28" fill="#9aa39a">building production-grade systems for over 5 years</text>
 
     <g transform="translate(0,386)" font-size="22" fill="#cfe9d3">
       <rect x="0" y="-13" width="7" height="7" fill="#7dff8a"/>
@@ -36,10 +36,15 @@
       <text x="22" y="95">writing on production-grade AI systems</text>
     </g>
 
-    <line x1="0" y1="510" x2="1040" y2="510" stroke="#1a2b1d" stroke-width="1" stroke-dasharray="2,6"/>
-    <g transform="translate(0,510)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="14" fill="#5a6d5d">
-      <text x="0" y="32" letter-spacing="2">REGIONS AU + US · STATUS open_to_select_work · BUILD a3f8c</text>
-      <text x="1040" y="32" text-anchor="end" letter-spacing="2" fill="#7dff8a">▸ jonathanabraham.dev</text>
+    <line x1="0" y1="500" x2="1040" y2="500" stroke="#1a2b1d" stroke-width="1" stroke-dasharray="2,6"/>
+    <g transform="translate(0,500)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="14" fill="#5a6d5d">
+      <text x="0" y="28" letter-spacing="2">REGIONS AU + US · STATUS open_to_select_work · BUILD a3f8c</text>
     </g>
+
+    <g transform="translate(0,438)">
+      <rect x="-2" y="0" width="358" height="44" fill="none" stroke="#7dff8a" stroke-width="1"/>
+      <text x="14" y="28" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="18" fill="#7dff8a" letter-spacing="2">▸ AVAILABLE — START A CONVERSATION</text>
+    </g>
+    <text x="1040" y="528" text-anchor="end" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="14" fill="#7dff8a" letter-spacing="2">jonathanabraham.dev →</text>
   </g>
 </svg>

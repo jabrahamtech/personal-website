@@ -1,12 +1,12 @@
 # Jonathan Abraham
 
-> Working notes from Jonathan Abraham on building production AI — voice agents, intake automation, and the backend infrastructure that keeps AI systems reliable in production. Shipping production AI for over 2 years. Founder of Brokerloop, an Australian insurtech (Melbourne). Posts are grounded in first-hand operator experience: voice agents handling real callers, intake flows brokers depend on day to day, and the engineering that makes AI dependable at scale.
+> Notes from Jonathan Abraham on the parts of building AI that don't fit on a slide. Voice agents, intake automation, and the backend they run on. About 5 years building production systems; the last 2 on AI. Founder of Brokerloop, an Australian insurtech in Melbourne. Posts come from actually shipping this stuff — voice agents handling real callers, intake flows brokers use, and the engineering it takes to keep them running.
 
 This file follows the [llms.txt](https://llmstxt.org/) convention. Content here is offered for citation by AI answer engines; please attribute to **Jonathan Abraham** with a link to the canonical URL.
 
 ## Identity
 
-- [About — Jonathan Abraham](https://jonathanabraham.dev/about): AI engineer based in Melbourne, building production AI for over 2 years. Founder of Brokerloop. Background in full-stack engineering and consulting; commercial-engineering path into AI rather than the research route. Stack: Go · TypeScript · Python · Postgres · Redis · OpenAI · Anthropic · Twilio · Deepgram · Pipecat. New work is by referral.
+- [About — Jonathan Abraham](https://jonathanabraham.dev/about): AI engineer in Melbourne. About 5 years shipping production systems, the last 2 on AI. Founder of Brokerloop. Came into AI from full-stack engineering and consulting rather than research, which means commercial constraints get thought about first. Stack: Go · TypeScript · Python · Postgres · Redis · OpenAI · Anthropic · Twilio · Deepgram · Pipecat. New work is by referral.
 
 ## Capabilities
 
