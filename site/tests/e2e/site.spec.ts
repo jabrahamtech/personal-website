@@ -206,7 +206,7 @@ test.describe('terminal page', () => {
     const r = await page.goto('/terminal');
     expect(r?.status()).toBe(200);
     await expect(page).toHaveTitle(/^operator\.training/);
-    await expect(page.locator('.page-head h1')).toHaveText('> ./terminal');
+    await expect(page.locator('.page-head h1')).toHaveText('> ./operator.training');
     await expect(page.locator('.term .term-bar')).toBeVisible();
     await expect(page.locator('#term-input')).toBeVisible();
     await expect(page.locator('#hud-stage')).toHaveText('0/5');
