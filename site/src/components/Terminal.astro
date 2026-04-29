@@ -8,6 +8,7 @@
   <div class="term-bar">
     <div class="lights"><i class="r"></i><i class="y"></i><i class="g"></i></div>
     <div class="title"><b>debug.console</b> — operator.training v0.1 · sim_session</div>
+    <button type="button" id="term-audio" class="audio" data-on="false" aria-pressed="false" aria-label="toggle terminal sound">SOUND OFF</button>
   </div>
   <div class="term-body" id="term-body">
     <div id="term-output"></div>
@@ -34,16 +35,72 @@
   const hudStage = document.getElementById('hud-stage');
   const hudScore = document.getElementById('hud-score');
   const hudMeter = document.getElementById('hud-meter');
+  const audioBtn = document.getElementById('term-audio');
   if (!input || !out || !body) return;
 
   body.addEventListener('click', (e) => { if (e.target && e.target.tagName !== 'A') input.focus(); });
 
+  /* -------------------------- audio (off by default) -------------------------- */
+  // Synthesised through WebAudio so there are no asset payloads. Off by default —
+  // toggled via the bar button. We unlock the AudioContext on the first user
+  // gesture (click/keypress) so chimes after the toggle play immediately.
+  let actx = null;
+  let soundOn = false;
+  function ensureCtx() {
+    if (actx) return actx;
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    if (!Ctor) return null;
+    try { actx = new Ctor(); } catch (_) { return null; }
+    return actx;
+  }
+  function blip(opts) {
+    if (!soundOn) return;
+    const ctx = ensureCtx();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = opts.type || 'square';
+    o.frequency.setValueAtTime(opts.freq || 880, t);
+    if (opts.slideTo) o.frequency.exponentialRampToValueAtTime(opts.slideTo, t + (opts.dur || 0.08));
+    const peak = (opts.gain != null ? opts.gain : 0.05);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + (opts.dur || 0.08));
+    o.connect(g).connect(ctx.destination);
+    o.start(t);
+    o.stop(t + (opts.dur || 0.08) + 0.02);
+  }
+  const sfx = {
+    key:    () => blip({ type: 'square',   freq: 1320 + Math.random() * 220, dur: 0.025, gain: 0.025 }),
+    enter:  () => blip({ type: 'triangle', freq: 660,  dur: 0.06,  gain: 0.04 }),
+    correct:() => { blip({ type: 'sine', freq: 880, dur: 0.08, gain: 0.05 }); setTimeout(() => blip({ type: 'sine', freq: 1320, dur: 0.12, gain: 0.05 }), 70); },
+    wrong:  () => blip({ type: 'sawtooth', freq: 200, slideTo: 110, dur: 0.18, gain: 0.045 }),
+    chime:  () => { blip({ type: 'sine', freq: 660, dur: 0.10, gain: 0.05 }); setTimeout(() => blip({ type: 'sine', freq: 990, dur: 0.10, gain: 0.05 }), 90); setTimeout(() => blip({ type: 'sine', freq: 1320, dur: 0.16, gain: 0.05 }), 180); },
+    print:  () => blip({ type: 'square', freq: 1100, dur: 0.012, gain: 0.012 })
+  };
+  if (audioBtn) {
+    audioBtn.addEventListener('click', () => {
+      soundOn = !soundOn;
+      audioBtn.dataset.on = String(soundOn);
+      audioBtn.setAttribute('aria-pressed', String(soundOn));
+      audioBtn.textContent = soundOn ? 'SOUND ON' : 'SOUND OFF';
+      if (soundOn) { ensureCtx(); sfx.chime(); }
+    });
+  }
+
+
   /* -------------------------- helpers -------------------------- */
+  // Soft-rate-limit the per-line "print" tick so a 12-line writeBlock isn't
+  // a 12-tone arpeggio. One tick per ~80ms is plenty to feel alive.
+  let lastPrintTick = 0;
   function write(html, cls) {
     const el = document.createElement('span');
     el.className = 'term-line ' + (cls || '');
     el.innerHTML = html;
     out.appendChild(el);
+    const now = performance.now();
+    if (soundOn && (now - lastPrintTick) > 80) { sfx.print(); lastPrintTick = now; }
   }
   function writeBlock(items) { items.forEach((l) => write(l.t, l.c || '')); }
   function scroll() { body.scrollTop = body.scrollHeight; }
@@ -473,6 +530,7 @@
     state.score = 0;
     state.attempts = 0;
     state.done = false;
+    sfx.chime();
     write('<span class="info">▸ session start.</span> scenario: <b style="color:var(--green)">' + scenarios[id].label + '</b>. good luck, operator.');
     write('');
     showStage();
@@ -491,6 +549,7 @@
   function endGame() {
     const stages = activeStages();
     state.done = true;
+    sfx.chime();
     write('');
     heading('▸ INCIDENT CLOSED');
     write('final score: <b style="color:var(--green)">' + state.score + '</b> / ' + stages.length, 'dim');
@@ -519,6 +578,7 @@
       return;
     }
     if (a.correct) {
+      sfx.correct();
       write('<span class="ok">' + a.response + '</span>');
       if (a.teach) teach(a.teach);
       const stageAttempts = state.attempts;
@@ -533,6 +593,7 @@
         showStage();
       }
     } else {
+      sfx.wrong();
       write('<span class="warn">' + a.response + '</span>');
       scroll();
     }
@@ -594,6 +655,11 @@
   /* -------------------------- input loop -------------------------- */
   const history = []; let hIdx = -1;
   input.addEventListener('keydown', (e) => {
+    // Click on every keystroke; Enter gets a slightly heavier "submit" tone.
+    if (soundOn) {
+      if (e.key === 'Enter') sfx.enter();
+      else if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Tab') sfx.key();
+    }
     if (e.key === 'Enter') {
       const raw = input.value;
       input.value = '';
