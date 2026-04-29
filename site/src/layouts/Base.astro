@@ -206,5 +206,74 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
   <StatusStrip />
   <slot />
   <Footer />
+
+  <div id="page-loader" class="page-loader" hidden aria-hidden="true">
+    <div class="pl-aura">
+      <span class="pl-ring r1"></span>
+      <span class="pl-ring r2"></span>
+      <span class="pl-ring r3"></span>
+      <span class="pl-arc a1">⚡</span>
+      <span class="pl-arc a2">⚡</span>
+      <span class="pl-arc a3">⚡</span>
+      <span class="pl-arc a4">⚡</span>
+      <pre class="pl-figure" aria-hidden="true">  \\\\|////
+  ( o o )
+   \\ ^ /
+   /(_)\\
+  / /|\\ \\
+ /_/ | \\_\\
+    /_\\</pre>
+    </div>
+    <div class="pl-label">▸ powering up<span class="pl-dots">...</span></div>
+  </div>
+
+  <script is:inline>
+    (function () {
+      const loader = document.getElementById('page-loader');
+      if (!loader) return;
+      function isInternalNavLink(a) {
+        if (!a || a.tagName !== 'A') return false;
+        const href = a.getAttribute('href');
+        if (!href) return false;
+        if (a.target === '_blank' || a.hasAttribute('download')) return false;
+        if (href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('#')) return false;
+        if (a.dataset.noLoader === 'true') return false;
+        try {
+          const url = new URL(href, location.href);
+          if (url.origin !== location.origin) return false;
+          if (url.pathname === location.pathname && url.hash) return false;
+          return true;
+        } catch (_) { return false; }
+      }
+      function show() {
+        loader.hidden = false;
+        loader.setAttribute('aria-hidden', 'false');
+        // Force a reflow so the entrance animation always plays from frame 0.
+        void loader.offsetWidth;
+        loader.classList.add('on');
+      }
+      function hide() {
+        loader.classList.remove('on');
+        loader.hidden = true;
+        loader.setAttribute('aria-hidden', 'true');
+      }
+      document.addEventListener('click', (e) => {
+        if (e.defaultPrevented) return;
+        if (e.button !== 0) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const a = e.target && e.target.closest && e.target.closest('a');
+        if (!isInternalNavLink(a)) return;
+        // Let the animation breathe before navigation. 380ms is long enough for
+        // the rings + figure to feel deliberate, short enough to stay snappy.
+        e.preventDefault();
+        show();
+        const href = a.href;
+        setTimeout(() => { window.location.href = href; }, 380);
+      });
+      // bfcache restore (back/forward) — page DOM is reused, so the loader
+      // would otherwise stay visible on return.
+      window.addEventListener('pageshow', (e) => { if (e.persisted) hide(); });
+    })();
+  </script>
 </body>
 </html>
