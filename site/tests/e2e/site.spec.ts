@@ -20,6 +20,21 @@ test.describe('home (posts list)', () => {
     await expect(page.locator('.post-list .draft')).toHaveCount(3);
   });
 
+  test('post-row meta sits AFTER the summary and includes word count', async ({ page }) => {
+    await page.goto('/');
+    const first = page.locator('.post-list .post-row').first();
+    // DOM order: h2 → p (summary) → .meta
+    const order = await first.evaluate((row) => {
+      const kids = Array.from(row.children).map((c) => c.tagName.toLowerCase() + (c.className ? '.' + c.className : ''));
+      return kids;
+    });
+    expect(order[0]).toMatch(/^h2/);
+    expect(order[1]).toMatch(/^p/);
+    expect(order[2]).toMatch(/^div\.meta/);
+    // Word count line: "<n> words" or "X.Yk words"
+    await expect(first.locator('.meta')).toContainText(/\d+(\.\d+k)? words/);
+  });
+
   test('the old "Notes / Working notes…" intro is gone', async ({ page }) => {
     await page.goto('/');
     // Check visible text only — JSON-LD/meta may legitimately use these phrases.

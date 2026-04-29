@@ -15,7 +15,24 @@ const sorted = all.sort((a, b) => {
 
 function fmt(p: Post) {
   if (p.data.posted) return p.data.posted.toISOString().slice(0, 10);
-  return 'draft';
+  return 'unpublished';
+}
+
+function wordCount(p: Post) {
+  // Strip frontmatter-passthrough markers, code fences, and HTML tags before
+  // counting words so the meta line reflects readable prose only.
+  const raw = (p.body || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[#>*_\-\[\]\(\)!|]/g, ' ');
+  const words = raw.trim().split(/\s+/).filter(Boolean);
+  return words.length;
+}
+
+function fmtWords(n: number) {
+  if (n < 1000) return `${n} words`;
+  return `${(n / 1000).toFixed(1)}k words`;
 }
 
 const siteOrigin = (Astro.site ?? new URL('https://jonathanabraham.dev')).toString().replace(/\/$/, '');
@@ -74,20 +91,24 @@ const description = 'Working notes from Jonathan Abraham on building production 
     </header>
 
     <ul class="post-list">
-      {sorted.map((post) => (
-        <li>
-          <a class="post-row" href={`/posts/${post.slug}`}>
-            <div class="meta">
-              <span>{fmt(post)}</span>
-              {post.data.draft && <span class="draft">draft</span>}
-              {post.data.readTime && <><span class="sep">·</span><span>{post.data.readTime}</span></>}
-              {post.data.tags.length > 0 && <><span class="sep">·</span><span class="tag">{post.data.tags.join(' · ')}</span></>}
-            </div>
-            <h2>{post.data.title}</h2>
-            <p>{post.data.summary}</p>
-          </a>
-        </li>
-      ))}
+      {sorted.map((post) => {
+        const wc = wordCount(post);
+        return (
+          <li>
+            <a class="post-row" href={`/posts/${post.slug}`}>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.summary}</p>
+              <div class="meta">
+                {post.data.draft && <><span class="draft">draft</span><span class="sep">·</span></>}
+                <span>{fmt(post)}</span>
+                <span class="sep">·</span><span>{fmtWords(wc)}</span>
+                {post.data.readTime && <><span class="sep">·</span><span>{post.data.readTime}</span></>}
+                {post.data.tags.length > 0 && <><span class="sep">·</span><span class="tag">{post.data.tags.join(' · ')}</span></>}
+              </div>
+            </a>
+          </li>
+        );
+      })}
     </ul>
   </main>
 </Base>
