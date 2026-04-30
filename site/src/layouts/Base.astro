@@ -187,7 +187,12 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
   <meta name="twitter:image" content={ogImage} />
   <meta name="twitter:image:alt" content={imageAlt} />
 
-  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230b0e0c'/><g fill='%237dff8a'><rect x='3' y='3' width='2' height='2'/><rect x='7' y='3' width='2' height='2'/><rect x='11' y='3' width='2' height='2'/><rect x='3' y='7' width='10' height='2'/><rect x='3' y='11' width='2' height='2'/><rect x='11' y='11' width='2' height='2'/></g></svg>" />
+  <!-- Favicon set: SVG for modern browsers, PNG for Google's search-result
+       crawler (which doesn't reliably handle data: URIs), Apple touch icon
+       for iOS home screen. -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="sitemap" href="/sitemap-index.xml" />
   <link rel="alternate" type="application/rss+xml" title="Jonathan Abraham — posts" href="/rss.xml" />
 
