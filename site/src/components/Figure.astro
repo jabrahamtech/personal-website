@@ -1,0 +1,22 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  /** Force a specific intrinsic width/height for layout stability. */
+  width?: number;
+  height?: number;
+}
+const { src, alt, caption, width, height } = Astro.props;
+const hasCaptionSlot = Astro.slots.has('caption');
+const showCaption = !!caption || hasCaptionSlot;
+---
+<figure class="post-figure">
+  <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+  {showCaption && (
+    <figcaption>
+      {caption}
+      <slot name="caption" />
+    </figcaption>
+  )}
+</figure>

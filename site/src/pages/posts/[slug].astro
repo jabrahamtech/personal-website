@@ -40,11 +40,27 @@ const { Content, headings } = await post.render();
 const sourcePath = `site/src/content/posts/${post.slug}.mdx`;
 const editUrl = `https://github.com/jabrahamtech/personal-website/edit/main/${sourcePath}`;
 
+// Auto-compute reading time from the raw MDX body when the post doesn't set
+// it explicitly. Strips fenced code blocks, inline code, JSX/HTML tags, and
+// link/image syntax before counting so prose length is what's measured.
+function computeReadTime(body: string): string {
+  const stripped = body
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`]+`/g, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  const words = stripped.split(/\s+/).filter(Boolean).length;
+  // 230 wpm matches Medium's published reading-speed assumption.
+  const minutes = Math.max(1, Math.round(words / 230));
+  return `~ ${minutes} min`;
+}
+
 const metaRow: { label: string; value: string }[] = [];
 metaRow.push({ label: 'id', value: postId });
 if (data.posted) metaRow.push({ label: 'posted', value: data.posted.toISOString().slice(0, 10) });
 else metaRow.push({ label: 'status', value: 'draft' });
-if (data.readTime) metaRow.push({ label: 'read', value: data.readTime });
+metaRow.push({ label: 'read', value: data.readTime ?? computeReadTime(post.body) });
 
 const siteOrigin = (Astro.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
 const url = `${siteOrigin}/posts/${post.slug}`;

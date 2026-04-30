@@ -4,15 +4,20 @@ summary: "Notes on the pipeline behind this site — Zod-typed frontmatter, MDX 
 posted: 2026-04-30
 draft: false
 tags: ['astro', 'mdx', 'meta']
-readTime: '~ 8 min'
 image:
   src: /posts/astro-cover.png
   alt: 'Workflow diagram: a single .mdx file flows through a Zod-validated frontmatter branch and an MDX body branch, into Astro static render, fanning out to HTML + TOC, JSON-LD metadata, and RSS / sitemap.'
 ---
 
 import CodeBlock from '../../components/CodeBlock.astro';
+import Callout from '../../components/Callout.astro';
+import Figure from '../../components/Figure.astro';
 
 This post is the test bed. If a heading anchor stops working or a code block loses its filename strip, it'll break here first. Treat it as the kitchen sink.
+
+<Callout type="tip">
+  Most of what's described below is live on this very page. Hover a heading for the `#` anchor, hover a `<pre>` for the `[copy]` button, or scroll to watch the right-rail TOC track your section.
+</Callout>
 
 ## Why Astro
 
@@ -140,6 +145,16 @@ const blogPosting = {
 </CodeBlock>
 
 Most templates skip the `@id` graph and ship three disconnected entities. It still works, but answer engines and Google's rich-results pipeline both treat the wired version as a stronger signal — "the same person" instead of three Jonathans on three pages.
+
+<Callout type="warn">
+  The `@id` strings have to be **stable across pages** and identical wherever the same entity is referenced. If `personId` is `https://jabrahamtech.com/#jonathan` on one page and `https://jabrahamtech.com/about/#jonathan` on another, the graph splits into two people and you lose the wiring.
+</Callout>
+
+<Figure
+  src="/posts/astro-cover.png"
+  alt="Same workflow diagram used as the cover, repeated inline for the figure example."
+  caption="Fig. 1 — the post pipeline at a glance. Same diagram, embedded as an inline figure to show the <Figure> component working."
+/>
 
 ## What's next
 

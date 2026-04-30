@@ -606,4 +606,28 @@ test.describe('post template — slice 2 (TOC, autolinks, edit-link, progress ba
     await expect(eof).toContainText(`[EOF — ${idText}]`);
     await expect(eof).toContainText('[exit 0]');
   });
+
+  test('readTime is auto-computed from the post body when frontmatter omits it', async ({ page }) => {
+    await page.goto(examplePost);
+    const readCell = page.locator('.meta-row span', { hasText: /^read\s+~\s+\d+\s+min$/ }).first();
+    await expect(readCell).toBeVisible();
+  });
+
+  test('Callout component renders with type-coloured header and accessible role', async ({ page }) => {
+    await page.goto(examplePost);
+    // Example post uses both "tip" and "warn".
+    await expect(page.locator('.callout.callout-tip')).toHaveCount(1);
+    const warn = page.locator('.callout.callout-warn');
+    await expect(warn).toHaveCount(1);
+    await expect(warn).toHaveAttribute('role', 'alert');
+    await expect(warn.locator('.callout-label')).toHaveText(/^WARN$/);
+  });
+
+  test('Figure component renders an <img> with a mono <figcaption>', async ({ page }) => {
+    await page.goto(examplePost);
+    const fig = page.locator('figure.post-figure');
+    await expect(fig).toHaveCount(1);
+    await expect(fig.locator('img')).toBeVisible();
+    await expect(fig.locator('figcaption')).toContainText(/Fig\.\s+1/);
+  });
 });
