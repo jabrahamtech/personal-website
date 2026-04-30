@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" width="1500" height="500" role="img" aria-label="X profile banner: jonathan_abraham.os terminal-style identity on the left, with a stylised silhouette of Sigiriya rock on the right and a green path of dots ascending to a summit flag.">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#070a08"/>
+      <stop offset="100%" stop-color="#0b0e0c"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#152017" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="rockFace" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#1a2421"/>
+      <stop offset="55%" stop-color="#22302a"/>
+      <stop offset="100%" stop-color="#0c110e"/>
+    </linearGradient>
+    <linearGradient id="rockGlow" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f5b860" stop-opacity="0"/>
+      <stop offset="55%" stop-color="#f5b860" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#f5b860" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="sky" cx="0.7" cy="0.2" r="0.6">
+      <stop offset="0%" stop-color="#1a2b1d" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#070a08" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1500" height="500" fill="url(#bg)"/>
+  <rect width="1500" height="500" fill="url(#sky)"/>
+  <rect width="1500" height="500" fill="url(#grid)" opacity="0.55"/>
+
+  <!-- horizon line -->
+  <line x1="0" y1="430" x2="1500" y2="430" stroke="#1a2b1d" stroke-width="1" stroke-dasharray="2,6"/>
+
+  <!-- distant ridges (water gardens / surrounding plain) -->
+  <g fill="#0e1612" opacity="0.85">
+    <path d="M 0 432 Q 200 412 400 426 Q 600 440 800 422 Q 1000 410 1200 428 Q 1350 438 1500 422 L 1500 500 L 0 500 Z"/>
+  </g>
+
+  <!-- Sigiriya rock silhouette (right-of-centre).
+       Wide steep base, gentle outward curve, narrowing to a flat-ish summit dome. -->
+  <g>
+    <path d="
+      M 880 430
+      Q 882 350 905 260
+      Q 925 170 985 115
+      Q 1080 78 1200 80
+      Q 1320 82 1395 130
+      Q 1455 175 1470 260
+      Q 1485 350 1488 430
+      L 1500 430
+      L 1500 432
+      L 880 432
+      Z
+    " fill="url(#rockFace)" stroke="#46c463" stroke-width="1.2"/>
+
+    <!-- amber fresco band hint -->
+    <path d="
+      M 905 220
+      Q 990 175 1200 168
+      Q 1395 175 1470 230
+      L 1470 295
+      Q 1395 270 1200 264
+      Q 990 270 905 295
+      Z
+    " fill="url(#rockGlow)"/>
+
+    <!-- horizontal strata lines on the rock -->
+    <g stroke="#1d2820" stroke-width="0.8" fill="none" opacity="0.85">
+      <path d="M 895 270 Q 1180 256 1480 270"/>
+      <path d="M 888 320 Q 1180 308 1485 320"/>
+      <path d="M 884 365 Q 1180 354 1488 365"/>
+      <path d="M 882 400 Q 1180 392 1490 400"/>
+    </g>
+
+    <!-- subtle vertical fissures -->
+    <g stroke="#0a0e0b" stroke-width="0.6" fill="none" opacity="0.7">
+      <path d="M 980 130 L 990 420"/>
+      <path d="M 1100 100 L 1110 420"/>
+      <path d="M 1220 95 L 1228 420"/>
+      <path d="M 1340 110 L 1346 420"/>
+    </g>
+  </g>
+
+  <!-- climbing path: zig-zag of dots up the rock face -->
+  <g fill="#7dff8a">
+    <circle cx="900" cy="420" r="3"/>
+    <circle cx="950" cy="395" r="3"/>
+    <circle cx="990" cy="370" r="3"/>
+    <circle cx="1035" cy="345" r="3"/>
+    <circle cx="1080" cy="318" r="3"/>
+    <circle cx="1125" cy="292" r="3"/>
+    <circle cx="1165" cy="266" r="3"/>
+    <circle cx="1198" cy="234" r="3"/>
+    <circle cx="1218" cy="198" r="3"/>
+    <circle cx="1212" cy="162" r="3"/>
+    <circle cx="1205" cy="128" r="3"/>
+    <circle cx="1200" cy="98" r="4">
+      <animate attributeName="opacity" values="1;0.35;1" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- summit flag -->
+  <g transform="translate(1200, 92)">
+    <line x1="0" y1="0" x2="0" y2="-34" stroke="#7dff8a" stroke-width="2"/>
+    <path d="M 0 -34 L 18 -26 L 0 -18 Z" fill="#7dff8a"/>
+    <text x="24" y="-22" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#7dff8a" letter-spacing="3">SUMMIT</text>
+  </g>
+
+  <!-- lion paws at the base of the stairway, flanking the path entrance -->
+  <g fill="#46c463" opacity="0.9">
+    <!-- left paw (~ x=850 base) -->
+    <g transform="translate(820,420)">
+      <ellipse cx="14" cy="10" rx="13" ry="9"/>
+      <ellipse cx="2" cy="-3" rx="3.2" ry="4.2"/>
+      <ellipse cx="9" cy="-7" rx="3.2" ry="4.2"/>
+      <ellipse cx="18" cy="-7" rx="3.2" ry="4.2"/>
+      <ellipse cx="26" cy="-3" rx="3.2" ry="4.2"/>
+    </g>
+    <!-- "lion gate" flank text under the paw -->
+    <text x="855" y="455" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="9" fill="#46c463" letter-spacing="3">LION GATE</text>
+  </g>
+
+  <!-- ascii cloud / dot constellation in the sky to the upper right -->
+  <g fill="#46c463" opacity="0.55" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11">
+    <text x="1380" y="80" letter-spacing="3">·  ·</text>
+    <text x="1410" y="135" letter-spacing="3">·</text>
+    <text x="1340" y="160" letter-spacing="3">·</text>
+  </g>
+
+  <!-- left-side identity block -->
+  <g transform="translate(72,86)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" fill="#cfe9d3">
+    <!-- top eyebrow -->
+    <g fill="#7dff8a">
+      <rect x="0" y="-12" width="11" height="11"/>
+      <rect x="18" y="-12" width="11" height="11"/>
+      <rect x="36" y="-12" width="11" height="11"/>
+    </g>
+    <text x="58" y="-2" font-size="13" fill="#9aa39a" letter-spacing="3">OPERATOR://NOTES</text>
+
+    <!-- prompt -->
+    <text x="0" y="38" font-size="14" fill="#7dff8a" letter-spacing="3">&gt; ./jonathan_abraham</text>
+
+    <!-- big name -->
+    <text x="-2" y="118" font-size="62" font-weight="700" fill="#ecebe4" letter-spacing="-1">jonathan_abraham<tspan fill="#7dff8a">.os</tspan></text>
+
+    <!-- subline -->
+    <text x="0" y="160" font-size="18" fill="#9aa39a">building production-grade AI · voice agents · backend that has to actually work</text>
+    <text x="0" y="190" font-size="14" fill="#8b9286" letter-spacing="2">· melbourne, au  ·  sometimes lion rock  ·  open to select work</text>
+
+    <!-- badges -->
+    <g transform="translate(0, 230)" font-size="11.5" letter-spacing="2.5">
+      <g>
+        <rect x="0" y="-15" width="86" height="22" fill="none" stroke="#2a3a2d"/>
+        <text x="9" y="0" fill="#9aa39a">[GITHUB]</text>
+      </g>
+      <g transform="translate(98, 0)">
+        <rect x="0" y="-15" width="98" height="22" fill="none" stroke="#2a3a2d"/>
+        <text x="9" y="0" fill="#9aa39a">[LINKEDIN]</text>
+      </g>
+      <g transform="translate(208, 0)">
+        <rect x="0" y="-15" width="68" height="22" fill="none" stroke="#2a3a2d"/>
+        <text x="9" y="0" fill="#9aa39a">[RSS]</text>
+      </g>
+      <g transform="translate(288, 0)">
+        <rect x="0" y="-15" width="118" height="22" fill="none" stroke="#7dff8a"/>
+        <rect x="9" y="-9" width="6" height="6" fill="#7dff8a">
+          <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+        </rect>
+        <text x="22" y="0" fill="#7dff8a">[ASCENDING]</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- bottom status strip (kept off the bottom-left so the avatar overlay doesn't eat it) -->
+  <g transform="translate(420, 472)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#5a6d5d">
+    <text letter-spacing="2.5">▸ ALT 180m  ·  ▸ GRADE 90°  ·  ▸ SUMMIT_ETA --:--  ·  ▸ STATUS open_to_select_work</text>
+  </g>
+  <g transform="translate(1428, 472)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#7dff8a" text-anchor="end">
+    <text letter-spacing="2.5">jabrahamtech.com →</text>
+  </g>
+</svg>

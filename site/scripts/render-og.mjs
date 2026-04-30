@@ -24,11 +24,15 @@ import { chromium } from 'playwright-core';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
 
-// Optional CLI args: `node render-og.mjs <input.svg> <output.png>`. Both
-// are resolved relative to site/. Defaults render the canonical OG card.
-const [argIn, argOut] = process.argv.slice(2);
+// Optional CLI args: `node render-og.mjs <input.svg> <output.png> [<w>] [<h>]`.
+// Paths resolve relative to site/. Defaults render the canonical OG card
+// at 1200x630. Override dimensions for non-OG assets (e.g. 1500x500 for an
+// X banner) without forking the script.
+const [argIn, argOut, argW, argH] = process.argv.slice(2);
 const SVG_IN = resolve(ROOT, argIn ?? 'public/og/default.svg');
 const PNG_OUT = resolve(ROOT, argOut ?? 'public/og/default.png');
+const WIDTH = argW ? parseInt(argW, 10) : 1200;
+const HEIGHT = argH ? parseInt(argH, 10) : 630;
 
 // Resolve the bundled chromium that Playwright already installed for tests.
 // Avoids forcing a separate `playwright install` step just for this script.
@@ -51,15 +55,15 @@ async function findChromium() {
 }
 
 const svg = await readFile(SVG_IN, 'utf8');
-const html = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;background:#0b0e0c;width:1200px;height:630px;overflow:hidden}svg{display:block}</style></head><body>${svg}</body></html>`;
+const html = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;background:#0b0e0c;width:${WIDTH}px;height:${HEIGHT}px;overflow:hidden}svg{display:block}</style></head><body>${svg}</body></html>`;
 
 const exec = await findChromium();
 const browser = await chromium.launch(exec ? { executablePath: exec } : {});
-const ctx = await browser.newContext({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
+const ctx = await browser.newContext({ viewport: { width: WIDTH, height: HEIGHT }, deviceScaleFactor: 1 });
 const page = await ctx.newPage();
 await page.setContent(html, { waitUntil: 'networkidle' });
 // Small settle so any web fonts (none currently, but be safe) finish layout.
 await page.waitForTimeout(200);
-await page.screenshot({ path: PNG_OUT, clip: { x: 0, y: 0, width: 1200, height: 630 }, omitBackground: false });
+await page.screenshot({ path: PNG_OUT, clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT }, omitBackground: false });
 await browser.close();
-console.log(`[og] rendered ${PNG_OUT} (1200x630) from ${SVG_IN}`);
+console.log(`[og] rendered ${PNG_OUT} (${WIDTH}x${HEIGHT}) from ${SVG_IN}`);
