@@ -143,13 +143,14 @@
 
   <!-- left-side identity block — terminal flourishes only, no bio -->
   <g transform="translate(72,118)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" fill="#cfe9d3">
-    <!-- top eyebrow -->
+    <!-- top eyebrow — three system-light squares + a tiny prompt that says
+         "this is jonathan's home directory" without spending pixels on a label -->
     <g fill="#7dff8a">
       <rect x="0" y="-12" width="11" height="11"/>
       <rect x="18" y="-12" width="11" height="11"/>
       <rect x="36" y="-12" width="11" height="11"/>
     </g>
-    <text x="58" y="-2" font-size="13" fill="#9aa39a" letter-spacing="3">OPERATOR://NOTES</text>
+    <text x="58" y="-2" font-size="13" fill="#9aa39a" letter-spacing="3">~/</text>
 
     <!-- prompt -->
     <text x="0" y="38" font-size="14" fill="#7dff8a" letter-spacing="3">&gt; whoami</text>
@@ -180,11 +181,9 @@
     </g>
   </g>
 
-  <!-- bottom trajectory strip: heritage + the cities that raised, hosted, and host me -->
-  <g transform="translate(340, 472)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#5a6d5d">
-    <text letter-spacing="2.5">▸ lk (heritage)  →  ▸ nz (raised)  →  ▸ us (la)  →  ▸ au (melbourne, now)</text>
-  </g>
-  <g transform="translate(1428, 472)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#7dff8a" text-anchor="end">
+  <!-- URL pulled in from the right edge so it clears X's mobile
+       Follow / Edit-profile button (~200x100 dead zone bottom-right) -->
+  <g transform="translate(1228, 472)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#7dff8a" text-anchor="end">
     <text letter-spacing="2.5">jabrahamtech.com →</text>
   </g>
 </svg>
