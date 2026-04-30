@@ -1,8 +1,6 @@
-# jonathan_abraham.dev
+# jabrahamtech.com
 
 Personal site / blog for **Jonathan Abraham** — founder, [Brokerloop](https://brokerloop.com.au) (insurtech, Melbourne AU); senior engineer working on production voice AI and backend AI infrastructure.
-
-This is a writing-first site, in the spirit of [smcleod.net](https://smcleod.net/). Notes on production AI, voice AI, backend systems in Go, and the operational shape of running an insurtech.
 
 ## Stack
 
