@@ -3,9 +3,49 @@ title: 'How I would actually design AI intake for insurance brokers'
 summary: "Without a clickable source for every field, brokers re-read the document anyway. That's the gap between automation and theatre."
 draft: true
 tags: ['ai-workflow', 'insurance']
-readTime: '~ 9 min'
 ---
 
-> **▸ status: drafting**
->
-> Still writing this one. Short version: without a clickable source for every field, brokers re-read the document anyway. That's the gap between automation and theatre.
+import Callout from '../../components/Callout.astro';
+
+I've watched insurance brokers use AI intake tools for two years. The pattern is the same every time: the broker reviews the AI's extraction, finds the field they care about, and re-reads the source document anyway. Then they paste the field they wanted into a different field the AI got wrong.
+
+## The trust-UI gap
+
+Every AI intake tool I've seen has the same shape: a form, pre-filled with extracted values. The broker scans the form, decides whether to trust it, and either submits or fixes it. The form gives the broker no help at the step that actually matters — deciding whether to trust each field.
+
+You can have 95% accuracy across the form, but if the broker has to re-read the document to verify any of it, you've saved them nothing. They were going to re-read the document anyway. The whole pitch was "you don't have to."
+
+## What works
+
+A clickable source citation for every field. Not a generic "we got this from page 4." A specific, highlighted quote on the source PDF, opened side by side, with the field's value circled in the original document.
+
+This is the difference between automation and theatre:
+
+- **Theatre**: the form looks like work was done. The broker still does the work.
+- **Automation**: the broker can verify each field in two seconds and move on.
+
+<Callout type="tip">
+  The metric to optimise isn't extraction accuracy. It's verification time per field. A 90%-accurate extraction with one-click verification beats a 99%-accurate extraction without it, every time.
+</Callout>
+
+## Why most teams skip this
+
+Building the citation layer is harder than the extraction itself. You need:
+
+- A PDF renderer that can highlight precise bounding boxes
+- A reliable mapping from each extracted field back to its source span
+- A model setup that returns spans, not just values
+- A UI that opens the source on the right side without losing the broker's place in the form
+
+Most teams treat extraction as the product and citations as a "v2" feature. By v2, the brokers have already concluded the tool doesn't save time and have stopped using it.
+
+## The order I'd ship in
+
+For a Brokerloop-style intake flow:
+
+1. **Citations from day one.** Don't ship extraction without them.
+2. **Side-by-side viewer.** PDF on the left, form on the right, click a field to jump to the highlight.
+3. **Confidence colour on each field.** Green = high, amber = needs verify. Calibrate the threshold against actual broker behaviour, not the model's self-reported confidence.
+4. **Then accuracy.** With citations and confidence working, the broker can absorb a less-than-perfect extraction. Without them, they can't absorb a perfect one.
+
+Still drafting — there's a longer section on the citation pipeline and the bounding-box reliability problems that I'll add when I have time to write it up properly.

@@ -3,12 +3,41 @@ title: 'Why production voice AI breaks once it leaves the demo'
 summary: "Most voice AI demos work. Most production deployments break, and usually not at the model. It's the state machine, the latency budget, or the barge-in handling — none of them designed for real callers."
 draft: true
 tags: ['voice-ai', 'production']
-readTime: '~ 7 min'
 image:
   src: /posts/voice-ai-cover.svg
   alt: 'Voice AI architecture diagram — caller, Twilio realtime, ASR/LLM, TTS, with memory and state branches.'
 ---
 
-> **▸ status: drafting**
->
-> Still writing this one. Short version: most voice AI demos work. Most production deployments break, and usually not at the model. It's the state machine, the latency budget, or the barge-in handling — none of them designed for real callers.
+import Callout from '../../components/Callout.astro';
+
+Every voice AI demo I've ever shipped has worked. Every voice AI deployment I've put into production has broken at least once in the first week. The interesting part is that the model isn't usually what broke.
+
+## What actually breaks
+
+Three things, in roughly this order of frequency:
+
+- **The state machine.** Demos are scripted: caller says hello, agent introduces itself, walks through three intents, hangs up. Production callers say nothing for six seconds, then ask three questions in one breath, then go silent again because they're driving. A state machine that assumes "user said something → agent responds" misses every one of those.
+- **The latency budget.** Demos run with 800ms end-to-end response time and that feels fine. Production runs through Twilio's media stream, an ASR provider, a model with a tool call, a TTS provider, and back through Twilio. The 800ms becomes 1800ms. Callers think the line dropped.
+- **Barge-in.** The agent is mid-sentence. The caller interrupts. Does the agent stop talking? Does it transcribe the interruption while still TTS'ing? Does it stop, listen, and resume? Demos punt on all of this because demo questions don't get interrupted.
+
+## "Just use a better model" doesn't help
+
+The model isn't where the latency lives. The model isn't what decides when to barge in. The model isn't what reconnects when the WebSocket drops. Switching from one frontier model to the next changes the words; it doesn't change any of the things that actually break in production.
+
+<Callout type="warn">
+  If your voice AI roadmap reads "swap to a better model when one ships," your roadmap is mostly aspirational. The work is in the parts that don't change when the model does.
+</Callout>
+
+## What I do instead
+
+For the intake calls I'm building at Brokerloop, the architecture I keep coming back to:
+
+- **Sub-300ms first-token TTS** as a non-negotiable. Streaming TTS provider, playback starts before the model finishes generating. If the provider can't do that, find a different one.
+- **An explicit barge-in policy.** Assume the caller can interrupt at any time, including mid-TTS. The state machine has a "speaking" state with a clear "user-interrupted" transition. Without that, you get either a parrot that won't shut up or an agent that drops half the user's input.
+- **Recovery paths for every WebSocket drop, ASR timeout, TTS stall, and tool call hang.** Every state has at least one "things went wrong" exit. Most demos have none.
+
+## The honest version
+
+Voice AI works. It works for the same reason any production system works: someone designed for the failure modes, not the happy path. The demos that go viral are happy-path showcases. The systems that survive a real caller volume are 90% failure-path engineering.
+
+Still drafting — the longer version of this post will have the actual state machine diagram and a code walkthrough of the barge-in handler. If you want to see it before it ships, the source is at [github.com/jabrahamtech/personal-website](https://github.com/jabrahamtech/personal-website).

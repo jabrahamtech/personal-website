@@ -35,6 +35,8 @@ test.describe('home (posts list)', () => {
     expect(order[2]).toMatch(/^div\.meta/);
     // Word count line: "<n> words" or "X.Yk words"
     await expect(first.locator('.meta')).toContainText(/\d+(\.\d+k)? words/);
+    // Computed read time appears alongside the word count: "~ N min"
+    await expect(first.locator('.meta')).toContainText(/~\s+\d+\s+min/);
   });
 
   test('the old "Notes / Working notes…" intro is gone', async ({ page }) => {
@@ -103,14 +105,14 @@ test.describe('about page', () => {
 
 test.describe('post pages', () => {
   for (const slug of ['voice-ai-after-demo', 'insurance-intake-design', 'ai-automation-operationalise']) {
-    test(`/posts/${slug} renders the WIP shell`, async ({ page }) => {
+    test(`/posts/${slug} renders the draft shell with H1, prompt path, and the draft meta`, async ({ page }) => {
       const response = await page.goto(`/posts/${slug}`);
       expect(response?.status()).toBe(200);
       await expect(page.locator('.doc h1')).toBeVisible();
       // Crumbs were removed in favour of the prompt-style path; just one path indicator now.
       await expect(page.locator('.doc .crumbs')).toHaveCount(0);
       await expect(page.locator('.doc .post-prompt')).toContainText(slug);
-      await expect(page.locator('.prose blockquote')).toContainText('status: drafting');
+      // Drafts surface "draft" in place of "posted" in the meta row.
       await expect(page.locator('.meta-row')).toContainText('draft');
     });
   }

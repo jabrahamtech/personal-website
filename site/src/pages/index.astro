@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { computeReadTime } from '../lib/readTime';
 
 type Post = CollectionEntry<'posts'>;
 
@@ -93,6 +94,7 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
     <ul class="post-list">
       {sorted.map((post) => {
         const wc = wordCount(post);
+        const rt = post.data.readTime ?? computeReadTime(post.body || '');
         return (
           <li>
             <a class="post-row" href={`/posts/${post.slug}`}>
@@ -102,7 +104,7 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
                 {post.data.draft && <><span class="draft">draft</span><span class="sep">·</span></>}
                 <span>{fmt(post)}</span>
                 <span class="sep">·</span><span>{fmtWords(wc)}</span>
-                {post.data.readTime && <><span class="sep">·</span><span>{post.data.readTime}</span></>}
+                <span class="sep">·</span><span>{rt}</span>
                 {post.data.tags.length > 0 && <><span class="sep">·</span><span class="tag">{post.data.tags.join(' · ')}</span></>}
               </div>
             </a>

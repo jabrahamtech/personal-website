@@ -1,6 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
 import DocLayout from '../../layouts/DocLayout.astro';
+import { computeReadTime } from '../../lib/readTime';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('posts')).sort((a, b) => {
@@ -39,22 +40,6 @@ const { Content, headings } = await post.render();
 // across versions, so we reconstruct from the slug.
 const sourcePath = `site/src/content/posts/${post.slug}.mdx`;
 const editUrl = `https://github.com/jabrahamtech/personal-website/edit/main/${sourcePath}`;
-
-// Auto-compute reading time from the raw MDX body when the post doesn't set
-// it explicitly. Strips fenced code blocks, inline code, JSX/HTML tags, and
-// link/image syntax before counting so prose length is what's measured.
-function computeReadTime(body: string): string {
-  const stripped = body
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/`[^`]+`/g, '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-  const words = stripped.split(/\s+/).filter(Boolean).length;
-  // 230 wpm matches Medium's published reading-speed assumption.
-  const minutes = Math.max(1, Math.round(words / 230));
-  return `~ ${minutes} min`;
-}
 
 const metaRow: { label: string; value: string }[] = [];
 metaRow.push({ label: 'id', value: postId });
