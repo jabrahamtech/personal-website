@@ -1,32 +1,34 @@
 ---
 title: 'Building this site with Astro (and the bits you actually need)'
-summary: "A walkthrough of how this site is built — Astro 4 + MDX, content collections with Zod schemas, JSON-LD baked into the layout, and the tiny terminal flourishes that make the post page feel like a shell session."
+summary: "Notes on the pipeline behind this site — Zod-typed frontmatter, MDX bodies, Astro static render, and the small terminal flourishes that make the post page feel like a shell session instead of a generic blog template."
 posted: 2026-04-30
 draft: false
 tags: ['astro', 'mdx', 'meta']
 readTime: '~ 8 min'
 image:
   src: /posts/astro-cover.png
-  alt: 'Terminal frame showing the Astro post pipeline: frontmatter → MDX body → render → static HTML, with a code preview from src/content/config.ts.'
+  alt: 'Workflow diagram: a single .mdx file flows through a Zod-validated frontmatter branch and an MDX body branch, into Astro static render, fanning out to HTML + TOC, JSON-LD metadata, and RSS / sitemap.'
 ---
 
 import CodeBlock from '../../components/CodeBlock.astro';
 
-This post is the example. Every feature added to the post template ships in this file, so if anything below renders weirdly the bug is on me, not Astro.
+This post is the test bed. If a heading anchor stops working or a code block loses its filename strip, it'll break here first. Treat it as the kitchen sink.
 
 ## Why Astro
 
-If the brief is "ship a fast, mostly-static site with a couple of interactive bits and ergonomic content authoring", Astro is the boring correct answer in 2026. It static-renders by default, lets me drop in MDX with no build gymnastics, and doesn't ship JavaScript I didn't ask for. The terminal page on this site is hand-written vanilla JS inside an Astro island, the rest is plain HTML/CSS rendered at build time.
+I wanted MDX with no build dance, static-by-default output, and the freedom to drop in vanilla JS when I needed it. Astro gives me all three. The terminal page on this site is hand-written JS inside an Astro island; everything else is plain HTML and CSS rendered at build time. Nothing ships to the browser unless a page asks for it.
 
-A few things I keep coming back to:
+Three things I keep coming back to:
 
-- **Content collections** with **Zod schemas** turn front-matter into a typed contract. Wrong field name? Build fails. No `any` anywhere in the post pipeline.
-- **`is:inline` scripts** for tiny client-side bits (page loader, copy button, `F1`/`F2`/`F3` nav) without dragging in a framework runtime.
-- **Per-route static + serverless** in the same project, so when I want a real endpoint I just add one — no rearchitecting.
+- **Content collections + Zod.** Frontmatter is a typed contract. Wrong tag name? Build fails. Saves a whole class of dumb prod bugs.
+- **`is:inline` scripts.** Page loader, copy button, F1/F2/F3 nav — small enough to live inline without dragging a framework runtime into the bundle.
+- **Per-route static or serverless.** I can ship one endpoint without rearchitecting the rest of the site.
 
-## The post pipeline, end to end
+## How a post gets built
 
-The whole pipeline lives in five files, none of them long:
+The pipeline is small. Five files, none of them long.
+
+The schema is the contract:
 
 <CodeBlock filename="src/content/config.ts" lang="ts">
 ```ts
@@ -41,12 +43,7 @@ const posts = defineCollection({
     draft: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
     readTime: z.string().optional(),
-    image: z
-      .object({
-        src: z.string(),
-        alt: z.string(),
-      })
-      .optional(),
+    image: z.object({ src: z.string(), alt: z.string() }).optional(),
   }),
 });
 
@@ -54,7 +51,7 @@ export const collections = { posts };
 ```
 </CodeBlock>
 
-`type: 'content'` is the bit that matters — it tells Astro this is markdown/MDX, not a JSON or YAML record. The Zod schema gives the editor (me) immediate red squiggles in the front-matter when a tag is misspelled or `posted` is the wrong shape. That single guarantee removes a whole class of "the post page crashed in prod" bugs.
+`type: 'content'` is the part that matters — it tells Astro this collection is markdown/MDX, not JSON. From there the schema does the rest. If I misspell a tag in the frontmatter, my editor lights up before I save.
 
 The dynamic route is just as small:
 
@@ -71,11 +68,13 @@ export async function getStaticPaths() {
 ```
 </CodeBlock>
 
-The `postId` calculation is the source of the `0x03` you see at the top of this post. Oldest post is `0x01`; the number grows as new posts ship, so reordering or renaming files later won't shuffle existing IDs backward.
+That `postId` is where the hex ID at the top of the meta-row comes from. Oldest post gets `0x01`, the number grows over time, and reordering files later doesn't shuffle existing IDs.
 
-## MDX is the actual feature
+## MDX is the part I actually rely on
 
-MDX is the reason I picked Astro over a pure-markdown setup. It lets a post compose its own components without me having to invent a templating layer. The filename header on the code blocks above is a 14-line Astro component the post imports directly:
+Plain markdown would have done the job, but MDX is what makes the post template feel composable. Every time I want a new bit of formatting, it's just a small Astro component the post imports.
+
+The filename header on the code blocks above is fourteen lines:
 
 <CodeBlock filename="src/components/CodeBlock.astro" lang="astro">
 ```astro
@@ -96,32 +95,34 @@ const { filename, lang } = Astro.props;
 ```
 </CodeBlock>
 
-Inside the post you wrap any fenced block:
+Inside a post, you wrap any fenced block:
 
 ```mdx
 <CodeBlock filename="foo.ts" lang="ts">
-  ...code goes here...
+  ...code...
 </CodeBlock>
 ```
 
-This is the small, invisible reason MDX wins for a personal site — every formatting tweak you decide you want next month is *just a component*. No plugin, no rehype config, no rebuild of a theme. A bare fenced block still works and just gets the standard `<pre>` treatment, so opting in is per-block.
+A bare fenced block still renders the original way. The component is opt-in per block, so older posts don't need touching when I add new chrome.
 
-## Inline bits worth showing
+## The terminal flourishes
 
-Inline `code` keeps the cyan bordered chip — useful for `npm` commands and short identifiers. *Italics* render as a soft cyan rather than an actual slant, which sits better with the terminal feel. **Bold** stays warm white so it actually pops against the dim body text. Links to [astro.build](https://astro.build) get a green underline that ramps up on hover.
+Most of what makes the post page feel different from a generic blog template is small CSS and a sprinkle of inline JS. Nothing fancy:
 
-> Quotes get a green left-bar and a mono face. They're the closest thing this layout has to a callout, and they read fine for "narrator stepping in" moments.
+- A green `> ` prefix on every H2 and `>> ` on every H3.
+- A traffic-light filename header on `<CodeBlock>` figures.
+- A `[copy]` button injected by an inline script after every `<pre>` — appears on hover, swaps to `[ok]` for a beat after a successful copy.
+- Hex post IDs (`0x01`, `0x02`, ...) computed at build from `getStaticPaths`, surfaced in the meta-row and the EOF marker.
+- An `[EOF — 0x04] [exit 0]` line after the article body. Pure flavour.
+- Right-rail sticky TOC on wide viewports; a collapsible bar pinned to the top on narrow ones. Both rails share the same `IntersectionObserver` for active-section highlighting.
+- A reading-progress bar pinned to the viewport top, bound to the article body's scroll progress so it hits 100% when the post ends, not when the page footer ends.
+- An "edit on GitHub" link rendered as `$ git blame ./src/content/posts/<slug>.mdx`.
 
-Lists work the obvious way:
-
-1. Frontmatter validates against the Zod schema at build time.
-2. The route reads the collection, sorts by `posted`, computes the hex ID.
-3. `DocLayout` renders the chrome, and the article body is just whatever the MDX file rendered.
-4. A small inline script walks every `<pre>` and adds the `[copy]` button you see top-right of each block.
+None of those needed a framework runtime. They're CSS rules, an Astro component, or twenty lines of inline JS.
 
 ## SEO, AEO, the JSON-LD spine
 
-Every page emits a `Person` + `WebSite` JSON-LD pair from `Base.astro`, and post pages add a `BlogPosting` + `BreadcrumbList` on top. The graph is wired by `@id` so the post points back to the same author and site identity on every URL — answer engines and Google's rich-results pipeline both treat that as a strong signal.
+Every page emits a `Person` plus `WebSite` JSON-LD pair from `Base.astro`. Post pages stack a `BlogPosting` plus `BreadcrumbList` on top. The bits that actually matter are the `@id` references — they wire all four entities into one graph, so a crawler reads "this person wrote this post, owns this site, runs this blog" instead of guessing.
 
 <CodeBlock filename="excerpt — src/pages/posts/[slug].astro" lang="ts">
 ```ts
@@ -134,15 +135,14 @@ const blogPosting = {
   publisher: { '@id': personId },
   isPartOf: { '@id': siteId },
   datePublished: data.posted?.toISOString(),
-  // ...
 };
 ```
 </CodeBlock>
 
-The `@id` references are the part most blog templates skip. Without them you end up with three disconnected entities and the crawler has to guess which `Person` named "Jonathan Abraham" wrote which post.
+Most templates skip the `@id` graph and ship three disconnected entities. It still works, but answer engines and Google's rich-results pipeline both treat the wired version as a stronger signal — "the same person" instead of three Jonathans on three pages.
 
-## What I'd add next
+## What's next
 
-There's a short list still open: a sticky right-rail TOC generated from `post.render().headings`, autolinked headings via `rehype-autolink-headings`, an "edit on GitHub" link styled as `$ git blame ./posts/<slug>.mdx`, and a thin reading-progress bar at the top of the viewport. None of them need new dependencies beyond a single rehype plugin, and all of them slot into the existing terminal aesthetic.
+The next round is content, not chrome. Per-tag pages so the existing pills click through. A `<Callout>` component for warnings and asides. A `<Figure>` component with mono captions. After that I'm probably out of layout work to do and the time goes back into actually writing posts.
 
-If you want to look at the source for any of this, the whole site is at [github.com/jabrahamtech/personal-website](https://github.com/jabrahamtech/personal-website). The post pipeline is small enough to read in one sitting.
+The whole site is at [github.com/jabrahamtech/personal-website](https://github.com/jabrahamtech/personal-website) if you want to pick through the source.
