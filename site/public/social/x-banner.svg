@@ -127,8 +127,8 @@
     <text x="1340" y="160" letter-spacing="3">·</text>
   </g>
 
-  <!-- left-side identity block -->
-  <g transform="translate(72,86)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" fill="#cfe9d3">
+  <!-- left-side identity block — terminal flourishes only, no bio -->
+  <g transform="translate(72,118)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" fill="#cfe9d3">
     <!-- top eyebrow -->
     <g fill="#7dff8a">
       <rect x="0" y="-12" width="11" height="11"/>
@@ -138,42 +138,24 @@
     <text x="58" y="-2" font-size="13" fill="#9aa39a" letter-spacing="3">OPERATOR://NOTES</text>
 
     <!-- prompt -->
-    <text x="0" y="38" font-size="14" fill="#7dff8a" letter-spacing="3">&gt; ./jonathan_abraham</text>
+    <text x="0" y="38" font-size="14" fill="#7dff8a" letter-spacing="3">&gt; ./climb --target sigiriya</text>
 
     <!-- big name -->
-    <text x="-2" y="118" font-size="62" font-weight="700" fill="#ecebe4" letter-spacing="-1">jonathan_abraham<tspan fill="#7dff8a">.os</tspan></text>
+    <text x="-2" y="118" font-size="64" font-weight="700" fill="#ecebe4" letter-spacing="-1">jonathan_abraham<tspan fill="#7dff8a">.os</tspan></text>
 
-    <!-- subline -->
-    <text x="0" y="160" font-size="18" fill="#9aa39a">building production-grade AI · voice agents · backend that has to actually work</text>
-    <text x="0" y="190" font-size="14" fill="#8b9286" letter-spacing="2">· melbourne, au  ·  sometimes lion rock  ·  open to select work</text>
-
-    <!-- badges -->
-    <g transform="translate(0, 230)" font-size="11.5" letter-spacing="2.5">
-      <g>
-        <rect x="0" y="-15" width="86" height="22" fill="none" stroke="#2a3a2d"/>
-        <text x="9" y="0" fill="#9aa39a">[GITHUB]</text>
-      </g>
-      <g transform="translate(98, 0)">
-        <rect x="0" y="-15" width="98" height="22" fill="none" stroke="#2a3a2d"/>
-        <text x="9" y="0" fill="#9aa39a">[LINKEDIN]</text>
-      </g>
-      <g transform="translate(208, 0)">
-        <rect x="0" y="-15" width="68" height="22" fill="none" stroke="#2a3a2d"/>
-        <text x="9" y="0" fill="#9aa39a">[RSS]</text>
-      </g>
-      <g transform="translate(288, 0)">
-        <rect x="0" y="-15" width="118" height="22" fill="none" stroke="#7dff8a"/>
-        <rect x="9" y="-9" width="6" height="6" fill="#7dff8a">
-          <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
-        </rect>
-        <text x="22" y="0" fill="#7dff8a">[ASCENDING]</text>
-      </g>
+    <!-- single playful badge -->
+    <g transform="translate(0, 168)" font-size="11.5" letter-spacing="2.5">
+      <rect x="0" y="-15" width="118" height="22" fill="none" stroke="#7dff8a"/>
+      <rect x="9" y="-9" width="6" height="6" fill="#7dff8a">
+        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <text x="22" y="0" fill="#7dff8a">[ASCENDING]</text>
     </g>
   </g>
 
   <!-- bottom status strip (kept off the bottom-left so the avatar overlay doesn't eat it) -->
   <g transform="translate(420, 472)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#5a6d5d">
-    <text letter-spacing="2.5">▸ ALT 180m  ·  ▸ GRADE 90°  ·  ▸ SUMMIT_ETA --:--  ·  ▸ STATUS open_to_select_work</text>
+    <text letter-spacing="2.5">▸ ALT 180m  ·  ▸ GRADE 90°  ·  ▸ SUMMIT_ETA --:--  ·  ▸ HEART 142bpm</text>
   </g>
   <g transform="translate(1428, 472)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#7dff8a" text-anchor="end">
     <text letter-spacing="2.5">jabrahamtech.com →</text>
