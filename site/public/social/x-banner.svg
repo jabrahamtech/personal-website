@@ -81,50 +81,64 @@
     </g>
   </g>
 
-  <!-- climbing path: zig-zag of dots up the rock face -->
-  <g fill="#7dff8a">
-    <circle cx="900" cy="420" r="3"/>
-    <circle cx="950" cy="395" r="3"/>
-    <circle cx="990" cy="370" r="3"/>
-    <circle cx="1035" cy="345" r="3"/>
-    <circle cx="1080" cy="318" r="3"/>
-    <circle cx="1125" cy="292" r="3"/>
-    <circle cx="1165" cy="266" r="3"/>
-    <circle cx="1198" cy="234" r="3"/>
-    <circle cx="1218" cy="198" r="3"/>
-    <circle cx="1212" cy="162" r="3"/>
-    <circle cx="1205" cy="128" r="3"/>
-    <circle cx="1200" cy="98" r="4">
-      <animate attributeName="opacity" values="1;0.35;1" dur="2.4s" repeatCount="indefinite"/>
-    </circle>
+  <!-- water gardens at the base — Sigiriya's iconic moats, drawn as
+       calm horizontal ripples in front of the rock. -->
+  <g stroke="#46c463" stroke-width="0.7" fill="none" opacity="0.35">
+    <path d="M 700 444 Q 850 442 1000 444 T 1300 444 T 1500 444"/>
+    <path d="M 720 451 Q 870 449 1020 451 T 1320 451 T 1500 451"/>
+    <path d="M 740 458 Q 890 456 1040 458 T 1340 458 T 1500 458"/>
   </g>
 
-  <!-- summit flag -->
-  <g transform="translate(1200, 92)">
-    <line x1="0" y1="0" x2="0" y2="-34" stroke="#7dff8a" stroke-width="2"/>
-    <path d="M 0 -34 L 18 -26 L 0 -18 Z" fill="#7dff8a"/>
-    <text x="24" y="-22" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#7dff8a" letter-spacing="3">SUMMIT</text>
+  <!-- palm tree silhouettes flanking the rock base -->
+  <g fill="#46c463" opacity="0.7">
+    <!-- left palm -->
+    <g transform="translate(795, 430)">
+      <line x1="0" y1="0" x2="0" y2="-46" stroke="#46c463" stroke-width="2"/>
+      <path d="M 0 -46 Q -16 -56 -28 -50"/>
+      <path d="M 0 -46 Q 16 -56 28 -50"/>
+      <path d="M 0 -46 Q -10 -62 -20 -64"/>
+      <path d="M 0 -46 Q 10 -62 20 -64"/>
+      <path d="M 0 -46 Q -2 -64 0 -68"/>
+    </g>
+    <!-- right palm -->
+    <g transform="translate(1408, 430)">
+      <line x1="0" y1="0" x2="0" y2="-40" stroke="#46c463" stroke-width="2"/>
+      <path d="M 0 -40 Q -14 -50 -24 -44"/>
+      <path d="M 0 -40 Q 14 -50 24 -44"/>
+      <path d="M 0 -40 Q -8 -56 -18 -58"/>
+      <path d="M 0 -40 Q 8 -56 18 -58"/>
+    </g>
   </g>
 
-  <!-- lion paws at the base of the stairway, flanking the path entrance -->
+  <!-- lion paws at the base, marking the gate entrance -->
   <g fill="#46c463" opacity="0.9">
-    <!-- left paw (~ x=850 base) -->
-    <g transform="translate(820,420)">
+    <!-- left paw -->
+    <g transform="translate(900,420)">
       <ellipse cx="14" cy="10" rx="13" ry="9"/>
       <ellipse cx="2" cy="-3" rx="3.2" ry="4.2"/>
       <ellipse cx="9" cy="-7" rx="3.2" ry="4.2"/>
       <ellipse cx="18" cy="-7" rx="3.2" ry="4.2"/>
       <ellipse cx="26" cy="-3" rx="3.2" ry="4.2"/>
     </g>
-    <!-- "lion gate" flank text under the paw -->
-    <text x="855" y="455" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="9" fill="#46c463" letter-spacing="3">LION GATE</text>
+    <!-- right paw -->
+    <g transform="translate(1320,420)">
+      <ellipse cx="-14" cy="10" rx="13" ry="9"/>
+      <ellipse cx="-2" cy="-3" rx="3.2" ry="4.2"/>
+      <ellipse cx="-9" cy="-7" rx="3.2" ry="4.2"/>
+      <ellipse cx="-18" cy="-7" rx="3.2" ry="4.2"/>
+      <ellipse cx="-26" cy="-3" rx="3.2" ry="4.2"/>
+    </g>
+    <text x="1110" y="455" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="9" fill="#46c463" letter-spacing="3" text-anchor="middle">LION GATE</text>
   </g>
 
-  <!-- ascii cloud / dot constellation in the sky to the upper right -->
-  <g fill="#46c463" opacity="0.55" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11">
-    <text x="1380" y="80" letter-spacing="3">·  ·</text>
-    <text x="1410" y="135" letter-spacing="3">·</text>
-    <text x="1340" y="160" letter-spacing="3">·</text>
+  <!-- distant stars / dots in the sky -->
+  <g fill="#46c463" opacity="0.55">
+    <circle cx="1380" cy="80" r="1.5"/>
+    <circle cx="1410" cy="125" r="1.2"/>
+    <circle cx="1340" cy="155" r="1.2"/>
+    <circle cx="1450" cy="60" r="1.2"/>
+    <circle cx="780" cy="105" r="1.5"/>
+    <circle cx="720" cy="160" r="1.2"/>
   </g>
 
   <!-- left-side identity block — terminal flourishes only, no bio -->
@@ -138,24 +152,22 @@
     <text x="58" y="-2" font-size="13" fill="#9aa39a" letter-spacing="3">OPERATOR://NOTES</text>
 
     <!-- prompt -->
-    <text x="0" y="38" font-size="14" fill="#7dff8a" letter-spacing="3">&gt; ./climb --target sigiriya</text>
+    <text x="0" y="38" font-size="14" fill="#7dff8a" letter-spacing="3">&gt; whoami</text>
 
     <!-- big name -->
     <text x="-2" y="118" font-size="64" font-weight="700" fill="#ecebe4" letter-spacing="-1">jonathan_abraham<tspan fill="#7dff8a">.os</tspan></text>
 
-    <!-- single playful badge -->
+    <!-- origin badge — Sri Lanka country code, with a steady green pip -->
     <g transform="translate(0, 168)" font-size="11.5" letter-spacing="2.5">
-      <rect x="0" y="-15" width="118" height="22" fill="none" stroke="#7dff8a"/>
-      <rect x="9" y="-9" width="6" height="6" fill="#7dff8a">
-        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
-      </rect>
-      <text x="22" y="0" fill="#7dff8a">[ASCENDING]</text>
+      <rect x="0" y="-15" width="62" height="22" fill="none" stroke="#7dff8a"/>
+      <rect x="9" y="-9" width="6" height="6" fill="#7dff8a"/>
+      <text x="22" y="0" fill="#7dff8a">[LK]</text>
     </g>
   </g>
 
-  <!-- bottom status strip (kept off the bottom-left so the avatar overlay doesn't eat it) -->
-  <g transform="translate(420, 472)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#5a6d5d">
-    <text letter-spacing="2.5">▸ ALT 180m  ·  ▸ GRADE 90°  ·  ▸ SUMMIT_ETA --:--  ·  ▸ HEART 142bpm</text>
+  <!-- bottom heritage strip: Sigiriya's coordinates + place name + URL -->
+  <g transform="translate(360, 472)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#5a6d5d">
+    <text letter-spacing="2.5">▸ 7°57'27"N 80°45'34"E  ·  ▸ lion rock, central province  ·  ▸ sri lanka</text>
   </g>
   <g transform="translate(1428, 472)" font-family="ui-monospace, Menlo, Consolas, 'JetBrains Mono', monospace" font-size="11" fill="#7dff8a" text-anchor="end">
     <text letter-spacing="2.5">jabrahamtech.com →</text>
