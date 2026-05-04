@@ -11,7 +11,10 @@
     if (!boot || !inner || !skipBtn) return;
     const seen = sessionStorage.getItem('boot_seen');
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (seen || reduce) { boot.remove(); return; }
+    // Boot sequence is part of the engineer aesthetic — skip entirely in
+    // paper mode. The mode is set pre-paint on <html data-mode>.
+    const mode = (document.documentElement.dataset.mode) || 'paper';
+    if (seen || reduce || mode !== 'eng') { boot.remove(); return; }
 
     const lines = [
       { t: 'OPERATOR BIOS v2.6.04 — © j.abraham systems', d: 60 },

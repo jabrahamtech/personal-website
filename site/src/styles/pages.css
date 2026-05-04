@@ -1,0 +1,99 @@
+/* page header */
+.page-head{padding:48px 0 20px}
+.page-head .prompt{font-family:var(--mono);color:var(--green);font-size:clamp(15px,1.8vw,18px);font-weight:500;line-height:1.2;letter-spacing:0;display:flex;align-items:center;gap:9px;margin:0 0 12px}
+.page-head .prompt::before{content:"";width:7px;height:7px;background:var(--green);box-shadow:0 0 8px var(--green);flex:0 0 auto;animation:phblink 1.4s ease-in-out infinite}
+@keyframes phblink{0%,100%{opacity:1}50%{opacity:.35}}
+.page-head h1.prompt{
+  font-size:clamp(16px,2vw,20px);font-weight:600;letter-spacing:0;
+  /* tight inline layout so prefix sits next to the page name with no flex gap */
+  gap:0;
+}
+.page-head h1.prompt::before{margin-right:9px}
+.page-head h1.prompt .ph-prefix{color:var(--green-2);font-weight:500;margin-right:1px}
+.page-head h1{font-family:var(--mono);font-size:clamp(28px,3.6vw,40px);line-height:1.1;letter-spacing:-0.01em;font-weight:700;margin:0 0 14px}
+.page-head p.intro{color:var(--ink-dim);font-size:16px;margin:0;max-width:620px}
+.page-head h1.brandline{font-size:clamp(24px,3.2vw,32px);margin:0 0 6px}
+.page-head .tagline{font-family:var(--mono);font-size:13px;color:var(--ink-mute);margin:0 0 14px}
+.page-head .tagline a{color:var(--ink-dim);border-bottom:1px dashed var(--line-2)}
+.page-head .tagline a:hover{color:var(--green);border-color:var(--green-2)}
+.links-row{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:13px}
+.links-row li{display:inline-flex;align-items:center}
+.links-row li:not(:last-child)::after{content:"·";color:var(--line-2);margin-left:14px}
+.links-row a{color:var(--ink-dim)}
+.links-row a:hover{color:var(--green)}
+
+/* post filters — chip row above the list. JS in index.astro toggles
+   .is-active and persists the selection in localStorage. */
+.post-filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0 14px;font-family:var(--mono)}
+.post-filters .chip{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.04em;
+  padding:6px 11px;background:transparent;color:var(--ink-dim);
+  border:1px solid var(--line-2);cursor:pointer;line-height:1.2;
+  transition:color .12s ease, border-color .12s ease, background .12s ease;
+}
+.post-filters .chip:hover{color:var(--green);border-color:var(--green-2)}
+.post-filters .chip.is-active{color:#0a0d0a;background:var(--green);border-color:var(--green);font-weight:600}
+.post-filters .chip-count{
+  font-size:11px;color:var(--ink-mute);
+  border:1px solid var(--line-2);padding:0 5px;line-height:1.4;
+}
+.post-filters .chip.is-active .chip-count{color:rgba(10,13,10,0.7);border-color:rgba(10,13,10,0.25)}
+.post-filters .chip-hint{margin-left:auto;font-size:11.5px;color:var(--ink-mute);font-style:italic}
+@media (max-width:560px){
+  .post-filters{gap:6px}
+  .post-filters .chip{padding:8px 12px;font-size:12.5px;min-height:36px}
+  .post-filters .chip-hint{display:none}
+}
+
+.post-empty{font-family:var(--mono);font-size:13px;color:var(--ink-mute);padding:18px 0;border-top:1px dashed var(--line)}
+
+/* posts list */
+.post-list{list-style:none;margin:0 0 64px;padding:0;display:flex;flex-direction:column;gap:0}
+.post-row{display:block;padding:22px 0;border-top:1px solid var(--line);transition:background .12s ease}
+.post-row:last-child{border-bottom:1px solid var(--line)}
+.post-row:hover{background:rgba(125,255,138,0.025)}
+.post-row .meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px;row-gap:4px;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.03em;margin:10px 0 0}
+.post-row .meta .draft{color:var(--amber);border:1px solid var(--line-2);padding:1px 6px;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}
+.post-row .meta .tag{color:var(--ink-mute)}
+.post-row .meta .sep{color:var(--line-2)}
+.post-row h2{font-family:var(--mono);font-size:18px;line-height:1.3;font-weight:600;margin:0 0 8px;color:var(--ink)}
+.post-row:hover h2{color:var(--green)}
+.post-row p{margin:0;color:var(--ink-dim);font-size:14.5px;line-height:1.55}
+
+/* selected work list */
+.work-frame{font-family:var(--mono);font-size:13px;color:var(--ink-mute);margin:-4px 0 14px;letter-spacing:.02em}
+.work-list{list-style:none;padding:0;margin:0 0 24px}
+.work-list li{padding:14px 0;border-top:1px dashed var(--line);font-size:15.5px;line-height:1.6}
+.work-list li:last-child{border-bottom:1px dashed var(--line)}
+.work-list strong{color:var(--ink);display:block;margin-bottom:4px;font-family:var(--mono);font-size:14.5px;letter-spacing:.01em}
+
+/* 404 */
+.panic{min-height:60vh;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:60px 32px;font-family:var(--mono);font-size:14px;color:#cfe9d3;line-height:1.7;max-width:760px;margin:0 auto}
+.panic h1{font-family:var(--mono);font-size:clamp(40px,7vw,72px);color:var(--green);margin:0 0 8px;letter-spacing:-0.02em}
+.panic .err{color:var(--red);font-size:14px;margin-bottom:18px;letter-spacing:.04em}
+.panic .stack{color:var(--ink-mute);font-size:13px;margin:18px 0;border-left:2px solid var(--line-2);padding-left:14px;white-space:pre-wrap}
+.panic .stack b{color:var(--ink-dim);font-weight:500}
+.panic .actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:24px}
+.panic .blink{animation:pblink 1s steps(2,start) infinite;color:var(--green)}
+@keyframes pblink{to{opacity:0}}
+.panic .ascii{color:var(--line-2);margin:8px 0 0;font-size:12px;letter-spacing:.4em}
+.panic .btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;font-weight:600;padding:10px 14px;cursor:pointer;border:1px solid var(--line-2);color:var(--ink)}
+.panic .btn-primary{color:#0a0d0a;background:var(--green);border-color:var(--green)}
+.panic .btn:hover{border-color:var(--green-2);color:var(--green)}
+.panic .btn-primary:hover{color:#0a0d0a;background:var(--green-2)}
+
+/* mobile pages */
+@media (max-width:720px){
+  .page-head{padding:32px 0 14px}
+  .page-head h1{font-size:clamp(24px,7vw,32px);margin:0 0 10px}
+  .post-row{padding:18px 0}
+  .post-row h2{font-size:16.5px;line-height:1.35}
+  .post-row p{font-size:14.5px;line-height:1.55}
+  .post-row .meta{flex-wrap:wrap;row-gap:6px;font-size:11px}
+  .post-empty{font-size:12.5px;padding:14px 0}
+}
+@media (max-width:480px){
+  .post-row .meta .tag,.post-row .meta .tag-cat{font-size:10.5px;padding:1px 5px}
+  .post-row .meta .sep{margin:0}
+}

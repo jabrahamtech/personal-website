@@ -203,8 +203,40 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
   {allJsonLd.map((node) => (
     <script type="application/ld+json" set:html={JSON.stringify(node)}></script>
   ))}
+
+  <!-- Pre-paint mode resolver: paper is default; /terminal forces eng,
+       #eng URL hash forces eng, otherwise localStorage decides. Sets
+       data-mode on <html> synchronously in <head>. -->
+  <script is:inline>
+    (function () {
+      try {
+        var stored = localStorage.getItem('ja_mode');
+        var path = (location.pathname.replace(/\/$/, '') || '/');
+        var hash = location.hash || '';
+        var mode = 'paper';
+        if (path === '/terminal') mode = 'eng';
+        else if (hash === '#eng') { mode = 'eng'; localStorage.setItem('ja_mode', 'eng'); }
+        else if (stored === 'eng' || stored === 'paper') mode = stored;
+        document.documentElement.dataset.mode = mode;
+      } catch (_) {}
+    })();
+  </script>
 </head>
-<body>
+<body class="mode-paper">
+  <!-- Synchronous mode swap. Body is server-rendered with mode-paper so the
+       default visitor never sees a flash; this script runs before any
+       visible child paints, so eng-mode users also avoid the flash. -->
+  <script is:inline>
+    (function () {
+      try {
+        var mode = document.documentElement.dataset.mode;
+        if (mode === 'eng') {
+          document.body.classList.remove('mode-paper');
+          document.body.classList.add('mode-eng');
+        }
+      } catch (_) {}
+    })();
+  </script>
   <a class="skip-link" href="#content">skip to content</a>
   <BootSequence />
   <Nav />
@@ -212,7 +244,9 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
   <slot />
   <Footer />
 
-  <div id="page-loader" class="page-loader" hidden aria-hidden="true">
+  <!-- Engineer-only page loader. Paper mode skips the click intercept
+       entirely (see Base.astro inline script below). -->
+  <div id="page-loader" class="page-loader eng-only" hidden aria-hidden="true">
     <div class="pl-term">
       <div class="pl-term-bar">
         <span class="pl-light r"></span>
@@ -264,6 +298,9 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
         const a = e.target && e.target.closest && e.target.closest('a');
         if (!isInternalNavLink(a)) return;
+        // Paper mode skips the loader entirely — the terminal-frame overlay
+        // reads as a flash to non-technical readers. Native navigation only.
+        if (document.body.classList.contains('mode-paper')) return;
         // Let the animation breathe before navigation. 380ms is long enough for
         // the rings + figure to feel deliberate, short enough to stay snappy.
         e.preventDefault();

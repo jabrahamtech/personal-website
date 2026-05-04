@@ -50,7 +50,12 @@ const {
 } = Astro.props;
 
 // Right-rail TOC: only H2/H3 (H1 is the page title; H4+ is too noisy).
-const tocItems = headings.filter((h) => h.depth === 2 || h.depth === 3);
+// rehype-autolink-headings appends a "#" anchor inside each heading, which
+// Astro's heading-text extraction concatenates. Strip it so the TOC reads
+// clean ("Why Astro" not "Why Astro#").
+const tocItems = headings
+  .filter((h) => h.depth === 2 || h.depth === 3)
+  .map((h) => ({ ...h, text: h.text.replace(/\s*#\s*$/, '').trim() }));
 const showToc = tocItems.length >= 2;
 ---
 <Base
@@ -70,8 +75,9 @@ const showToc = tocItems.length >= 2;
       {showToc && (
         <details class="toc toc-mobile" id="toc-mobile" aria-label="table of contents">
           <summary>
-            <span class="toc-prompt">&gt; ./contents</span>
-            <span class="toc-count">[{tocItems.length}]</span>
+            <span class="toc-prompt eng-only">&gt; ./contents</span>
+            <span class="toc-prompt paper-only">Contents</span>
+            <span class="toc-count">{tocItems.length}</span>
             <span class="toc-caret" aria-hidden="true">▾</span>
           </summary>
           <ul>
@@ -100,11 +106,17 @@ const showToc = tocItems.length >= 2;
           <article class="prose" id="post-body">
             <slot />
             {postId && (
-              <div class="post-eof" aria-hidden="true">[EOF — {postId}] <span class="ok">[exit 0]</span></div>
+              <div class="post-eof" aria-hidden="true">
+                <span class="eng-only">[EOF — {postId}] <span class="ok">[exit 0]</span></span>
+                <span class="paper-only">End of article</span>
+              </div>
             )}
             {editUrl && (
               <p class="edit-link">
-                <a href={editUrl} target="_blank" rel="noopener">$ git blame ./{sourcePath}</a>
+                <a href={editUrl} target="_blank" rel="noopener">
+                  <span class="eng-only">$ git blame ./{sourcePath}</span>
+                  <span class="paper-only">Suggest an edit on GitHub</span>
+                </a>
               </p>
             )}
             <slot name="footer" />
@@ -112,7 +124,7 @@ const showToc = tocItems.length >= 2;
         </div>
         {showToc && (
           <aside class="toc toc-desktop" aria-label="table of contents">
-            <div class="toc-head">&gt; ./contents</div>
+            <div class="toc-head"><span class="eng-only">&gt; ./contents</span><span class="paper-only">Contents</span></div>
             <ul>
               {tocItems.map((h) => (
                 <li class={`d${h.depth}`}>

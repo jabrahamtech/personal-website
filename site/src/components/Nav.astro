@@ -1,34 +1,55 @@
 ---
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const links = [
-  { href: '/',         label: 'posts',    fkey: 'F1', match: (p: string) => p === '/' || p.startsWith('/posts') },
-  { href: '/terminal', label: 'terminal', fkey: 'F2', match: (p: string) => p === '/terminal' },
-  { href: '/about',    label: 'about',    fkey: 'F3', match: (p: string) => p === '/about' },
+type Link = { href: string; label: string; fkey: string; match: (p: string) => boolean; engOnly?: boolean };
+const links: Link[] = [
+  { href: '/',         label: 'posts',    fkey: 'F1', match: (p) => p === '/' || p.startsWith('/posts') },
+  { href: '/terminal', label: 'terminal', fkey: 'F2', match: (p) => p === '/terminal', engOnly: true },
+  { href: '/about',    label: 'about',    fkey: 'F3', match: (p) => p === '/about' },
 ];
 ---
 <nav class="top">
   <div class="wrap row">
-    <a class="brand" href="/">jonathan_abraham<span class="accent">.os</span></a>
+    <a class="brand" href="/" aria-label="Jonathan Abraham — home">
+      <span class="brand-eng eng-only">jonathan_abraham<span class="accent">.os</span></span>
+      <span class="brand-paper paper-only">Jonathan Abraham</span>
+    </a>
     <div class="nav-links" id="nav-links-desktop">
       {links.map((l) => (
-        <a href={l.href} data-fkey={l.fkey} aria-current={l.match(path) ? 'page' : undefined}>{l.label}</a>
+        <a href={l.href} data-fkey={l.fkey} class={l.engOnly ? 'eng-only' : undefined} aria-current={l.match(path) ? 'page' : undefined}>{l.label}</a>
       ))}
     </div>
-    <button type="button" class="nav-kebab" id="nav-kebab" aria-label="open menu" aria-haspopup="dialog" aria-controls="nav-sheet" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="nav-actions">
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="toggle engineer mode" aria-pressed="false" title="engineer mode">
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <rect x="0.5" y="1.5" width="15" height="13" fill="none" stroke="currentColor"/>
+          <path d="M3 5l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 11h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button type="button" class="nav-kebab" id="nav-kebab" aria-label="open menu" aria-haspopup="dialog" aria-controls="nav-sheet" aria-expanded="false">
+        <span class="nav-kebab-bar"></span>
+        <span class="nav-kebab-bar"></span>
+        <span class="nav-kebab-bar"></span>
+      </button>
+    </div>
   </div>
 </nav>
 
 <dialog id="nav-sheet" class="nav-sheet" aria-label="site menu">
   <div class="nav-sheet-inner">
     <div class="nav-sheet-head">
-      <span class="nav-sheet-title">&gt; ./menu</span>
-      <button type="button" class="nav-sheet-close" id="nav-sheet-close" aria-label="close menu">[esc]</button>
+      <span class="nav-sheet-title">
+        <span class="eng-only">&gt; ./menu</span>
+        <span class="paper-only">Menu</span>
+      </span>
+      <button type="button" class="nav-sheet-close" id="nav-sheet-close" aria-label="close menu">
+        <span class="eng-only">[esc]</span>
+        <span class="paper-only" aria-hidden="true">×</span>
+      </button>
     </div>
     <ul class="nav-sheet-list">
       {links.map((l) => (
-        <li>
+        <li class={l.engOnly ? 'eng-only' : undefined}>
           <a href={l.href} aria-current={l.match(path) ? 'page' : undefined}>
             <span class="fkey">[{l.fkey}]</span>
             <span class="label">{l.label}</span>
@@ -57,10 +78,70 @@ const links = [
     }
     btn.addEventListener('click', open);
     close && close.addEventListener('click', shut);
+
+    // Theme toggle — paper (default, soft cream/sage) ↔ eng (dark/green/mono).
+    // The pre-paint script in Base.astro sets the initial body class so we
+    // never see a wrong-theme flash. Here we just react to user input.
+    const themeBtn = document.getElementById('theme-toggle');
+    function syncTogglePressed() {
+      if (!themeBtn) return;
+      const isEng = document.body.classList.contains('mode-eng');
+      themeBtn.setAttribute('aria-pressed', isEng ? 'true' : 'false');
+    }
+    function setMode(mode) {
+      const m = mode === 'eng' ? 'eng' : 'paper';
+      const body = document.body;
+      body.classList.remove('mode-paper', 'mode-eng');
+      body.classList.add('mode-' + m);
+      // Keep <html data-mode> in sync — the paper cursor override hangs off it.
+      document.documentElement.dataset.mode = m;
+      try { localStorage.setItem('ja_mode', m); } catch (_) {}
+      syncTogglePressed();
+    }
+    syncTogglePressed();
+    themeBtn && themeBtn.addEventListener('click', () => {
+      const isEng = document.body.classList.contains('mode-eng');
+      // /terminal forces eng — don't let users toggle into paper there.
+      if ((location.pathname.replace(/\/$/, '') || '/') === '/terminal' && isEng) return;
+      setMode(isEng ? 'paper' : 'eng');
+    });
     // Click on backdrop (the dialog itself) — anything inside .nav-sheet-inner stops propagation.
     sheet.addEventListener('click', (e) => { if (e.target === sheet) shut(); });
-    // Any link tap closes the sheet so navigation feels instant.
-    sheet.querySelectorAll('a').forEach((a) => a.addEventListener('click', shut));
+    // Mobile-sheet UX rule:
+    //   * Paper mode → keep the sheet open during navigation. The open dialog
+    //     covers the source page so the user never sees a flash of "where
+    //     they came from" between closing the sheet and the browser starting
+    //     the next page. The sheet is torn down naturally when the new DOM
+    //     replaces the current one.
+    //   * Engineer mode → close the sheet so the terminal-frame page-loader
+    //     overlay (z-index 1000) becomes visible. Without closing, the
+    //     dialog's top-layer rendering would cover the loader.
+    //   * Same-page click → just close the sheet (no navigation will fire).
+    //   * Tapping the active link triggers a soft "press" affordance so the
+    //     user gets feedback even though the sheet stays put.
+    sheet.querySelectorAll('a').forEach((a) => {
+      a.addEventListener('click', () => {
+        const href = a.getAttribute('href') || '';
+        const cur = (location.pathname.replace(/\/$/, '') || '/');
+        const target = (href.replace(/\/$/, '') || '/');
+        if (cur === target) { shut(); return; }
+        if (document.body.classList.contains('mode-eng')) { shut(); return; }
+        // Paper: dim the rest of the sheet so the tapped link visually
+        // "wins" while the new page is being fetched. CSS animates the rest.
+        sheet.classList.add('is-navigating');
+        a.classList.add('is-target');
+      });
+    });
+
+    // bfcache restore — if the user navigates Back to a page where the sheet
+    // was left open as a paper-mode cover, the dialog and its dim state get
+    // restored too. Reset on pageshow so they see a fresh top-of-page nav.
+    window.addEventListener('pageshow', (e) => {
+      if (!e.persisted) return;
+      sheet.classList.remove('is-navigating');
+      sheet.querySelectorAll('a.is-target').forEach((a) => a.classList.remove('is-target'));
+      if (sheet.hasAttribute('open') || sheet.open) shut();
+    });
 
     // F1 / F2 / F3 → navigate to the corresponding nav target. Browsers
     // reserve F1 (help), so we preventDefault aggressively. F-key labels

@@ -88,15 +88,29 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
 >
   <main id="content" class="wrap">
     <header class="page-head">
-      <h1 class="prompt">&gt; ./posts</h1>
+      <h1 class="prompt"><span class="ph-prefix eng-only">./</span>posts</h1>
     </header>
 
-    <ul class="post-list">
+    {(() => {
+      const total = sorted.length;
+      const outcomes = sorted.filter((p) => p.data.category === 'outcomes').length;
+      const technical = sorted.filter((p) => p.data.category === 'technical').length;
+      return (
+        <div class="post-filters" id="post-filters" role="tablist" aria-label="filter posts by category">
+          <button type="button" class="chip is-active" role="tab" aria-selected="true" data-filter="all">all <span class="chip-count">{total}</span></button>
+          <button type="button" class="chip" role="tab" aria-selected="false" data-filter="outcomes">outcomes <span class="chip-count">{outcomes}</span></button>
+          <button type="button" class="chip" role="tab" aria-selected="false" data-filter="technical">technical <span class="chip-count">{technical}</span></button>
+          <span class="chip-hint">filter posts by what you're here for</span>
+        </div>
+      );
+    })()}
+
+    <ul class="post-list" id="post-list">
       {sorted.map((post) => {
         const wc = wordCount(post);
         const rt = post.data.readTime ?? computeReadTime(post.body || '');
         return (
-          <li>
+          <li data-cat={post.data.category}>
             <a class="post-row" href={`/posts/${post.slug}`}>
               <h2>{post.data.title}</h2>
               <p>{post.data.summary}</p>
@@ -105,6 +119,7 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
                 <span>{fmt(post)}</span>
                 <span class="sep">·</span><span>{fmtWords(wc)}</span>
                 <span class="sep">·</span><span>{rt}</span>
+                <span class="sep">·</span><span class="tag tag-cat">{post.data.category}</span>
                 {post.data.tags.length > 0 && <><span class="sep">·</span><span class="tag">{post.data.tags.join(' · ')}</span></>}
               </div>
             </a>
@@ -112,5 +127,46 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
         );
       })}
     </ul>
+
+    <p class="post-empty" id="post-empty" hidden>nothing here in this filter — try another.</p>
   </main>
+
+  <script is:inline>
+    (function () {
+      const root = document.getElementById('post-filters');
+      const list = document.getElementById('post-list');
+      const empty = document.getElementById('post-empty');
+      if (!root || !list) return;
+      const items = Array.from(list.querySelectorAll('li'));
+      const chips = Array.from(root.querySelectorAll('.chip'));
+
+      function apply(filter) {
+        let shown = 0;
+        items.forEach((li) => {
+          const cat = li.getAttribute('data-cat') || '';
+          const match = filter === 'all' || cat === filter;
+          li.hidden = !match;
+          if (match) shown++;
+        });
+        chips.forEach((c) => {
+          const active = c.getAttribute('data-filter') === filter;
+          c.classList.toggle('is-active', active);
+          c.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        if (empty) empty.hidden = shown !== 0;
+        try { localStorage.setItem('ja_post_filter', filter); } catch (_) {}
+      }
+
+      let initial = 'all';
+      try {
+        const saved = localStorage.getItem('ja_post_filter');
+        if (saved === 'outcomes' || saved === 'technical' || saved === 'all') initial = saved;
+      } catch (_) {}
+      apply(initial);
+
+      chips.forEach((c) => {
+        c.addEventListener('click', () => apply(c.getAttribute('data-filter') || 'all'));
+      });
+    })();
+  </script>
 </Base>

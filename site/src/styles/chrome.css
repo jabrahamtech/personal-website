@@ -1,0 +1,183 @@
+/* page transition loader — fullscreen overlay, mini terminal frame
+   matching the /terminal page aesthetic. Triggered on internal link
+   clicks. ~380ms display before the next page swaps in. */
+.page-loader{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:radial-gradient(circle at center, rgba(7,12,8,0.94) 0%, rgba(5,8,6,0.98) 70%), var(--bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity 120ms ease-out;pointer-events:none}
+.page-loader.on{opacity:1;pointer-events:auto}
+
+/* terminal frame — re-uses the visual language of the /terminal page
+   so the loader feels like the rest of the site, not a foreign overlay. */
+.pl-term{width:min(320px, calc(100vw - 48px));background:var(--bg);border:1px solid var(--line);box-shadow:0 12px 32px rgba(0,0,0,0.6),inset 0 0 0 1px rgba(125,255,138,0.05)}
+.pl-term-bar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);background:#0a0e0b}
+.pl-light{width:9px;height:9px;display:block;border:1px solid rgba(0,0,0,0.4)}
+.pl-light.r{background:#ff5f56}
+.pl-light.y{background:#ffbd2e}
+.pl-light.g{background:#27c93f;animation:plPulse 2.2s ease-in-out infinite;box-shadow:0 0 6px rgba(39,201,63,0.55)}
+.pl-term-title{margin-left:8px;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em}
+.pl-term-body{padding:14px 14px 16px;font-family:var(--mono);font-size:12.5px;color:#cfe9d3;line-height:1.7;min-height:90px}
+.pl-line{display:block;opacity:0;transform:translateY(-2px);animation:plLineIn 200ms ease-out forwards}
+.pl-line:nth-child(1){animation-delay:0ms}
+.pl-line:nth-child(2){animation-delay:130ms}
+.pl-line:nth-child(3){animation-delay:260ms}
+.pl-arrow{color:var(--green);margin-right:6px}
+.pl-ok{color:var(--green);margin-left:8px}
+.pl-cursor{display:inline-block;width:7px;height:13px;background:var(--green);box-shadow:0 0 8px var(--green);margin-left:3px;vertical-align:text-bottom;animation:plCursor 0.85s steps(2,start) infinite}
+
+.pl-label{font-family:var(--mono);font-size:13px;color:var(--ink-dim);letter-spacing:.02em;text-align:center}
+.pl-dots{display:inline-block;min-width:24px;text-align:left;color:var(--green);position:relative;line-height:1;vertical-align:baseline}
+.pl-dots::after{content:"...";display:inline-block;clip-path:inset(0 100% 0 0);animation:plDots 1.4s steps(4,jump-none) infinite;letter-spacing:1px}
+
+@keyframes plLineIn{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:none}}
+@keyframes plCursor{0%,50%{opacity:1}50.01%,100%{opacity:0.15}}
+@keyframes plPulse{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes plDots{
+  0%   {clip-path:inset(0 100% 0 0)}
+  33%  {clip-path:inset(0 66% 0 0)}
+  66%  {clip-path:inset(0 33% 0 0)}
+  100% {clip-path:inset(0 0 0 0)}
+}
+@media (prefers-reduced-motion: reduce){
+  .page-loader{transition:opacity 60ms ease-out}
+  .pl-line,.pl-cursor,.pl-light.g,.pl-dots::after{animation:none;opacity:1;transform:none}
+  .pl-dots::after{clip-path:inset(0 0 0 0)}
+}
+
+/* nav */
+nav.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:linear-gradient(180deg, rgba(11,14,12,0.92), rgba(11,14,12,0.78));border-bottom:1px solid var(--line)}
+/* 3-col grid: brand | centred links | actions cluster.
+   Centred links sit balanced regardless of brand/action widths. On mobile
+   the kebab takes the action slot and nav-links hide entirely. */
+nav.top .row{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  height:58px;
+  gap:24px;
+}
+nav.top .brand{justify-self:start;grid-column:1}
+nav.top .nav-links{justify-self:center;grid-column:2}
+nav.top .nav-actions{
+  justify-self:end;grid-column:3;
+  display:inline-flex;align-items:center;gap:10px;
+}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:0.02em;color:var(--ink)}
+.brand .accent{color:var(--green)}
+.nav-links{display:flex;gap:22px;font-family:var(--mono);font-size:13px;color:var(--ink-dim)}
+.nav-links a{position:relative;padding:6px 0}
+.nav-links a:hover,.nav-links a[aria-current="page"]{color:var(--green)}
+.nav-links a::before{content:"[" attr(data-fkey) "]";color:var(--ink-mute);margin-right:6px;font-size:10.5px;letter-spacing:.06em;font-weight:500}
+.nav-links a:hover::before,.nav-links a[aria-current="page"]::before{color:var(--green-2)}
+
+/* mobile kebab — hidden on desktop, takes over the nav slot on mobile */
+.nav-kebab{display:none;background:transparent;border:1px solid var(--line-2);padding:8px 10px;width:42px;height:40px;flex-direction:column;justify-content:space-between;align-items:center;gap:0}
+.nav-kebab span{display:block;width:4px;height:4px;background:var(--green);box-shadow:0 0 4px rgba(125,255,138,0.5)}
+.nav-kebab[aria-expanded="true"]{border-color:var(--green-2);box-shadow:0 0 8px rgba(125,255,138,0.18) inset}
+.nav-kebab:hover{border-color:var(--green-2)}
+
+/* fullscreen dialog menu (mobile only — desktop never shows it) */
+.nav-sheet{padding:0;border:0;background:transparent;color:var(--ink);max-width:none;width:100%;height:100%;max-height:100%}
+.nav-sheet::backdrop{background:rgba(7,10,8,0.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.nav-sheet-inner{width:100%;height:100%;display:flex;flex-direction:column;padding:18px 24px 32px;background:var(--bg);border-bottom:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,0.5)}
+.nav-sheet-head{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);padding:6px 0 18px;border-bottom:1px solid var(--line)}
+.nav-sheet-title{font-size:13px;color:var(--green);display:inline-flex;align-items:center;gap:8px}
+.nav-sheet-title::before{content:"";width:7px;height:7px;background:var(--green);box-shadow:0 0 8px var(--green);animation:phblink 1.4s ease-in-out infinite}
+.nav-sheet-close{font-family:var(--mono);font-size:12px;color:var(--ink-mute);background:transparent;border:1px solid var(--line-2);padding:5px 10px}
+.nav-sheet-close:hover{color:var(--green);border-color:var(--green-2)}
+.nav-sheet-list{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:0}
+.nav-sheet-list li{border-bottom:1px solid var(--line)}
+.nav-sheet-list a{display:flex;align-items:baseline;gap:14px;padding:18px 4px;font-family:var(--mono);font-size:18px;color:var(--ink);text-decoration:none}
+.nav-sheet-list a .fkey{color:var(--ink-mute);font-size:12px;letter-spacing:.06em;width:38px;flex:0 0 auto}
+.nav-sheet-list a[aria-current="page"]{color:var(--green)}
+.nav-sheet-list a[aria-current="page"] .fkey{color:var(--green-2)}
+
+@media (max-width:560px){
+  /* collapse to 2-col so brand and actions sit edge-to-edge — no
+     wasted centre slot when nav-links are hidden behind the kebab. */
+  nav.top .row{grid-template-columns:auto auto;justify-content:space-between;gap:12px}
+  nav.top .nav-links{display:none}
+  nav.top .nav-actions{justify-self:end;grid-column:2}
+  .nav-kebab{display:inline-flex}
+  .brand{font-size:13px}
+}
+@media (max-width:480px){
+  .brand{font-size:12px;letter-spacing:0}
+  .nav-links{gap:12px;font-size:11.5px}
+  /* F-key prefix is decorative; drop it on narrow phones to keep nav on one line */
+  .nav-links a::before{content:""}
+  nav.top .row{gap:10px}
+}
+
+/* status strip (Bloomberg-style system bar under nav) */
+.status-strip{border-bottom:1px solid var(--line);background:#070a08;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em;position:relative;z-index:40}
+.status-strip .row{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:7px 0;flex-wrap:wrap}
+.status-strip .cell{white-space:nowrap;display:inline-flex;align-items:baseline;gap:6px}
+.status-strip b{color:var(--ink-dim);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+.status-strip .suf{color:var(--line-2);margin-left:4px;font-size:10.5px;letter-spacing:.05em}
+.status-strip .dot{width:6px;height:6px;background:var(--green);box-shadow:0 0 6px var(--green);display:inline-block;align-self:center;animation:ssblink 2.4s ease-in-out infinite;flex:0 0 auto;margin-right:6px}
+@keyframes ssblink{0%,100%{opacity:1}50%{opacity:.45}}
+@media (max-width:720px){
+  .status-strip{font-size:10.5px}
+  /* Drop the no-wrap so the row collapses to one tight line. The mob-hide
+     cells (REGIONS, BUILD) are removed entirely on mobile — low signal at
+     that size, and the wrap-to-second-row was the source of the clutter. */
+  .status-strip .row{justify-content:flex-start;gap:18px;flex-wrap:nowrap;padding-left:6px}
+  .status-strip .mob-hide{display:none}
+  /* Tighter time cell — drop the AEST suffix; MEL implies it. */
+  .status-strip .live .suf{display:none}
+}
+
+/* market ticker (decorative; static seed values) */
+.ticker{border-bottom:1px solid var(--line);background:#070a08;overflow:hidden;position:relative;z-index:30}
+.ticker::before,.ticker::after{content:"";position:absolute;top:0;bottom:0;width:48px;z-index:2;pointer-events:none}
+.ticker::before{left:0;background:linear-gradient(to right, #070a08, rgba(7,10,8,0))}
+.ticker::after{right:0;background:linear-gradient(to left, #070a08, rgba(7,10,8,0))}
+.ticker-track{display:flex;width:max-content;animation:tickerSlide 95s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-row{display:inline-flex;align-items:center;gap:28px;padding:7px 28px 7px 0;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em;white-space:nowrap}
+.ticker .q{display:inline-flex;align-items:baseline;gap:6px}
+.ticker .q b{color:var(--ink-dim);font-weight:500}
+.ticker .q .px{color:#cfe9d3}
+.ticker .q.up .ch,.ticker .q.up .arr{color:var(--green)}
+.ticker .q.down .ch,.ticker .q.down .arr{color:var(--red)}
+.ticker .q .arr{font-size:9.5px}
+@keyframes tickerSlide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (max-width:720px){
+  .ticker-row{font-size:10.5px;gap:22px;padding:6px 22px 6px 0}
+  .ticker-track{animation-duration:75s}
+}
+@media (prefers-reduced-motion: reduce){
+  .ticker-track{animation:none}
+}
+
+/* footer */
+footer{padding:36px 0 60px;border-top:1px solid var(--line);margin-top:60px;position:relative;z-index:2}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--ink-mute)}
+.foot a{color:var(--ink-dim)}
+.foot a:hover{color:var(--green)}
+.foot .l{color:var(--ink-dim)}
+.foot .links{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.foot .links .sep{color:var(--line-2)}
+
+/* divider */
+.ascii-div{font-family:var(--mono);color:var(--line-2);font-size:13px;letter-spacing:0.4em;text-align:center;margin:48px 0 0;user-select:none;overflow:hidden;white-space:nowrap}
+
+/* boot sequence (first visit) */
+#boot{position:fixed;inset:0;z-index:200;background:#070a08;display:flex;align-items:flex-start;justify-content:center;padding:120px 28px 48px;font-family:var(--mono);font-size:14px;color:#cfe9d3;line-height:1.65}
+#boot.gone{opacity:0;pointer-events:none;transition:opacity .35s ease}
+#boot::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom, rgba(125,255,138,0.04) 0 1px, transparent 1px 3px)}
+#boot::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%)}
+#boot .boot-inner{position:relative;z-index:2;max-width:780px;width:100%;margin:0 auto}
+#boot .boot-line{display:block;white-space:pre-wrap;opacity:0}
+#boot .boot-line.show{opacity:1}
+#boot .skip{position:absolute;bottom:24px;right:32px;z-index:3;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);border:1px solid var(--line-2);background:transparent;padding:6px 10px;cursor:pointer}
+#boot .skip:hover{color:var(--green);border-color:var(--green-2)}
+.boot-flash{animation:bootFlash .35s ease-out}
+@keyframes bootFlash{0%{opacity:0;transform:scale(1.02)}40%{opacity:.4}100%{opacity:1;transform:none}}
+@media (max-width:560px){#boot{padding:90px 18px 32px;font-size:12.5px}}
+
+/* mobile chrome */
+@media (max-width:720px){
+  nav.top .row{height:52px;gap:14px}
+  .ascii-div{letter-spacing:.25em;font-size:11px;margin:36px 0 0}
+  footer{padding:28px 0 48px;margin-top:44px}
+  .foot{font-size:11.5px;gap:12px}
+}

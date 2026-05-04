@@ -1,54 +1,57 @@
 ---
-import '../styles/global.css';
-const title = '404 — segmentation fault';
+import Base from '../layouts/Base.astro';
+const title = '404 — page not found';
 ---
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{title}</title>
-  <meta name="theme-color" content="#0b0e0c" />
-  <meta name="robots" content="noindex" />
-  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230b0e0c'/><g fill='%237dff8a'><rect x='3' y='3' width='2' height='2'/><rect x='7' y='3' width='2' height='2'/><rect x='11' y='3' width='2' height='2'/><rect x='3' y='7' width='10' height='2'/><rect x='3' y='11' width='2' height='2'/><rect x='11' y='11' width='2' height='2'/></g></svg>" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-</head>
-<body>
-  <a class="skip-link" href="#content">skip to content</a>
+<Base title={title} description="The page you're looking for doesn't exist." noindex>
   <main id="content" class="panic">
-    <div class="err">⚠ kernel: SIGNAL_NOT_FOUND · path resolves to /dev/null</div>
-    <h1>404</h1>
-    <p style="color:var(--ink-dim);max-width:560px;font-size:15px">
-      the route you requested doesn't exist on this operator. could be a stale link, a moved page, or a typo in the address bar.
-    </p>
+    <!-- engineer variant: original terminal-styled segfault. -->
+    <div class="panic-eng eng-only">
+      <div class="err">⚠ kernel: SIGNAL_NOT_FOUND · path resolves to /dev/null</div>
+      <h1>404</h1>
+      <p style="color:var(--ink-dim);max-width:560px;font-size:15px">
+        the route you requested doesn't exist on this operator. could be a stale link, a moved page, or a typo in the address bar.
+      </p>
 
-    <div class="stack">
-      <b>$ trace --route</b>
-      ↳ requested:   <span style="color:var(--amber)" id="req-path">/unknown</span>
-      ↳ resolver:    no_match
-      ↳ index_db:    cold
-      ↳ suggestion:  return_to_root
-      ↳ status:      <span style="color:var(--red)">404</span> &nbsp; <span class="blink">█</span>
+      <div class="stack">
+        <b>$ trace --route</b>
+        ↳ requested:   <span style="color:var(--amber)" id="req-path">/unknown</span>
+        ↳ resolver:    no_match
+        ↳ index_db:    cold
+        ↳ suggestion:  return_to_root
+        ↳ status:      <span style="color:var(--red)">404</span> &nbsp; <span class="blink">█</span>
+      </div>
+
+      <div class="ascii" aria-hidden="true">▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒</div>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="/">▸ return_to_root</a>
+        <a class="btn" href="/about">about</a>
+      </div>
+
+      <div style="margin-top:36px;font-size:12px;color:var(--ink-mute)">
+        // session continues. nothing was lost. press <b style="color:var(--green)">[esc]</b> or use the buttons above.
+      </div>
     </div>
 
-    <div class="ascii" aria-hidden="true">▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒</div>
-
-    <div class="actions">
-      <a class="btn btn-primary" href="/">▸ return_to_root</a>
-      <a class="btn" href="/about">about</a>
-    </div>
-
-    <div style="margin-top:36px;font-size:12px;color:var(--ink-mute)">
-      // session continues. nothing was lost. press <b style="color:var(--green)">[esc]</b> or use the buttons above.
+    <!-- paper variant: clean editorial 404. -->
+    <div class="panic-paper paper-only">
+      <p class="panic-eyebrow">404</p>
+      <h1>This page doesn't exist.</h1>
+      <p class="panic-lede">The link may be stale, the page may have moved, or there's a typo in the address. Press <kbd>esc</kbd> or use the links below to head back.</p>
+      <p class="panic-meta">You requested: <span id="req-path-paper">/unknown</span></p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/">Back to posts</a>
+        <a class="btn" href="/about">About</a>
+      </div>
     </div>
   </main>
 
   <script is:inline>
-    const el = document.getElementById('req-path');
-    if (el) el.textContent = location.pathname || '/unknown';
+    const eng = document.getElementById('req-path');
+    const paper = document.getElementById('req-path-paper');
+    const path = location.pathname || '/unknown';
+    if (eng) eng.textContent = path;
+    if (paper) paper.textContent = path;
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') location.href = '/'; });
   </script>
-</body>
-</html>
+</Base>

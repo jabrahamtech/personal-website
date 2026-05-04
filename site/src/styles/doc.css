@@ -1,0 +1,195 @@
+/* article (post detail) */
+.doc{padding:48px 0 32px;position:relative;z-index:2}
+.doc .crumbs{font-family:var(--mono);font-size:12px;color:var(--ink-mute);margin-bottom:18px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.doc .crumbs a{color:var(--ink-dim)}
+.doc .crumbs a:hover{color:var(--green)}
+.doc .crumbs .sep{color:var(--line-2)}
+.doc .post-prompt{font-family:var(--mono);color:var(--green);font-size:13px;margin-bottom:10px}
+.doc h1{font-family:var(--mono);font-size:clamp(28px,3.4vw,38px);line-height:1.12;letter-spacing:-0.01em;font-weight:700;margin:0 0 14px}
+.doc .meta-row{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:12px;color:var(--ink-mute);margin:0 0 28px}
+.doc .meta-row span b{color:var(--ink-dim);font-weight:500;margin-right:6px}
+.doc .tag{font-family:var(--mono);font-size:11px;color:var(--ink-mute);padding:3px 7px;border:1px solid var(--line-2);margin-right:6px;display:inline-block}
+
+.cover{display:block;margin:0 0 28px;border:1px solid var(--line-2);background:#070a08;box-shadow:4px 4px 0 0 rgba(0,0,0,0.4), 4px 4px 0 1px var(--line)}
+.cover img,.cover svg{display:block;width:100%;height:auto}
+
+.avatar{
+  float:right;margin:4px 0 18px 22px;
+  width:160px;height:160px;
+  border:1px solid var(--line-2);background:#070a08;
+  box-shadow:4px 4px 0 0 rgba(0,0,0,0.45), 4px 4px 0 1px var(--line);
+}
+.avatar img{display:block;width:100%;height:100%;object-fit:cover}
+@media (max-width:720px){
+  .avatar{float:none;margin:0 0 22px;width:150px;height:150px}
+}
+@media (max-width:560px){
+  .avatar{width:130px;height:130px}
+}
+
+.prose{font-family:var(--sans);font-size:16px;line-height:1.7;color:var(--ink-dim)}
+.prose p{margin:0 0 18px}
+.prose strong{color:var(--ink)}
+.prose em{color:var(--cyan);font-style:normal}
+.prose a{color:var(--green);text-decoration:underline;text-decoration-color:rgba(125,255,138,0.35)}
+.prose ul,.prose ol{margin:0 0 18px;padding-left:22px}
+.prose li{margin:6px 0}
+.prose blockquote{margin:18px 0;padding:14px 18px;border-left:2px solid var(--green-2);background:rgba(125,255,138,0.04);font-family:var(--mono);font-size:14px;color:var(--ink-dim)}
+.prose code{font-family:var(--mono);font-size:13.5px;background:#0a0e0b;border:1px solid var(--line);padding:1px 6px;color:var(--cyan)}
+.prose pre{font-family:var(--mono);font-size:13px;background:#070a08;border:1px solid var(--line-2);padding:16px 18px;overflow-x:auto;color:#cfe9d3;margin:0 0 22px}
+.prose pre code{background:transparent;border:0;padding:0;color:inherit}
+.prose h2{font-family:var(--mono);font-size:22px;color:var(--ink);margin:36px 0 14px;font-weight:700}
+.prose h2::before{content:"> ";color:var(--green)}
+.prose h3{font-family:var(--mono);font-size:17px;color:var(--ink);margin:28px 0 10px;font-weight:600}
+.prose h3::before{content:">> ";color:var(--green-2)}
+.prose hr{border:0;border-top:1px solid var(--line);margin:36px 0}
+.prose img{max-width:100%;height:auto;border:1px solid var(--line)}
+
+/* code block with optional terminal-style filename header */
+.prose .codeblock{margin:0 0 22px}
+.prose .codeblock.has-bar{border:1px solid var(--line-2);background:#070a08}
+.prose .codeblock.has-bar pre{border:0;margin:0;background:transparent}
+.prose .codeblock-bar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);background:#0a0e0b;font-family:var(--mono)}
+.prose .cb-dot{width:9px;height:9px;display:block;border:1px solid rgba(0,0,0,0.4);flex:0 0 auto}
+.prose .cb-dot.r{background:#ff5f56}
+.prose .cb-dot.y{background:#ffbd2e}
+.prose .cb-dot.g{background:#27c93f;box-shadow:0 0 5px rgba(39,201,63,0.55)}
+.prose .cb-name{margin-left:8px;font-size:11.5px;color:var(--ink-dim);letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prose .cb-lang{margin-left:auto;font-size:11px;color:var(--ink-mute);letter-spacing:.04em}
+
+/* copy button injected by DocLayout client script */
+.prose pre{position:relative}
+.prose .copy-btn{position:absolute;top:6px;right:8px;font-family:var(--mono);font-size:11px;color:var(--ink-mute);background:transparent;border:1px solid var(--line);padding:2px 6px;cursor:pointer;letter-spacing:.04em;line-height:1.4;opacity:0;transition:opacity .12s ease, color .12s ease, border-color .12s ease}
+.prose pre:hover .copy-btn,.prose .copy-btn:focus-visible{opacity:1}
+.prose .copy-btn:hover{color:var(--green);border-color:var(--green-2)}
+.prose .copy-btn.ok{color:var(--green);border-color:var(--green-2);opacity:1}
+
+/* end-of-post marker */
+.post-eof{margin:36px 0 0;font-family:var(--mono);font-size:12px;color:var(--ink-mute);letter-spacing:.06em;text-align:center;border-top:1px dashed var(--line);padding-top:18px}
+.post-eof .ok{color:var(--green)}
+
+/* callouts — terminal-styled NOTE / WARN / TIP / INFO boxes */
+.prose .callout{margin:22px 0;border:1px solid var(--line-2);border-left-width:3px;background:rgba(255,255,255,0.012);padding:14px 18px;font-family:var(--sans)}
+.prose .callout-head{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;margin:0 0 6px;color:var(--ink-mute)}
+.prose .callout-bracket{color:var(--ink-mute)}
+.prose .callout-label{color:var(--ink-dim)}
+.prose .callout-body{font-size:14.5px;line-height:1.65;color:var(--ink-dim)}
+.prose .callout-body p{margin:6px 0}
+.prose .callout-body p:first-child{margin-top:0}
+.prose .callout-body p:last-child{margin-bottom:0}
+.prose .callout-body code{font-size:13px}
+.prose .callout-note{border-left-color:var(--cyan)}
+.prose .callout-note .callout-bracket,.prose .callout-note .callout-label{color:var(--cyan)}
+.prose .callout-tip{border-left-color:var(--green-2)}
+.prose .callout-tip .callout-bracket,.prose .callout-tip .callout-label{color:var(--green)}
+.prose .callout-warn{border-left-color:#f5b860}
+.prose .callout-warn .callout-bracket,.prose .callout-warn .callout-label{color:#f5b860}
+.prose .callout-info{border-left-color:#8b9286}
+.prose .callout-info .callout-bracket,.prose .callout-info .callout-label{color:var(--ink-dim)}
+
+/* inline figures with mono captions */
+.prose .post-figure{margin:22px 0;display:block}
+.prose .post-figure img{display:block;width:100%;height:auto;border:1px solid var(--line-2);background:#070a08}
+.prose .post-figure figcaption{margin:8px 0 0;font-family:var(--mono);font-size:12px;color:var(--ink-mute);letter-spacing:.02em;text-align:center}
+
+/* edit-on-github link rendered as a shell prompt under the EOF marker */
+.edit-link{margin:18px 0 0;font-family:var(--mono);font-size:12px;color:var(--ink-mute);text-align:center}
+.edit-link a{color:var(--ink-mute);text-decoration:none;border-bottom:1px dashed var(--line-2)}
+.edit-link a:hover{color:var(--green);border-color:var(--green-2)}
+
+/* autolinked-heading anchor — show on hover so the heading itself stays clean */
+.prose h2,.prose h3{position:relative;scroll-margin-top:96px}
+.prose .heading-anchor{margin-left:8px;font-family:var(--mono);color:var(--ink-mute);text-decoration:none;opacity:0;transition:opacity .12s ease, color .12s ease;font-size:0.85em}
+.prose h2:hover .heading-anchor,.prose h3:hover .heading-anchor,.prose .heading-anchor:focus-visible{opacity:1}
+.prose .heading-anchor:hover{color:var(--green)}
+
+/* reading progress bar pinned to the top of the viewport */
+.reading-progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:50;background:transparent;pointer-events:none}
+.reading-progress span{display:block;height:100%;width:0;background:var(--green);box-shadow:0 0 8px rgba(125,255,138,0.6);transition:width 80ms linear}
+@media (prefers-reduced-motion: reduce){.reading-progress span{transition:none}}
+
+/* doc-grid: full-width by default; widens for posts with a TOC at desktop sizes */
+.doc-grid{display:block}
+.doc-main{min-width:0}
+.doc-spacer{display:none}
+
+/* Desktop (>=1320px): widen the wrap so the article stays dead-centred
+   (mirrored spacer | article | TOC). TOC sits in the right gutter, the
+   article column itself is unchanged from the no-TOC layout. */
+@media (min-width: 1320px){
+  .doc.has-toc .wrap{max-width:1356px}
+  .doc.has-toc .doc-grid{display:grid;grid-template-columns:220px minmax(0, 780px) 220px;column-gap:48px;align-items:start;justify-content:center}
+  .doc.has-toc .doc-spacer{display:block;grid-column:1}
+  .doc.has-toc .doc-main{grid-column:2}
+  .doc.has-toc .toc-desktop{grid-column:3}
+}
+
+/* Right-rail TOC (desktop only) */
+.toc-desktop{display:none}
+@media (min-width: 1320px){
+  .doc.has-toc .toc-desktop{display:block;position:sticky;top:80px;font-family:var(--mono);font-size:12px;color:var(--ink-mute);max-height:calc(100vh - 120px);overflow:auto;padding-left:16px;border-left:1px solid var(--line)}
+}
+.toc-desktop .toc-head{color:var(--green);letter-spacing:.04em;margin-bottom:10px;font-size:12px}
+.toc-desktop ul{list-style:none;margin:0;padding:0}
+.toc-desktop li{margin:0;line-height:1.5}
+.toc-desktop a{display:flex;gap:6px;color:var(--ink-mute);padding:3px 0 3px 6px;text-decoration:none;border-left:2px solid transparent;transition:color .12s ease, border-color .12s ease}
+.toc-desktop a:hover{color:var(--ink-dim)}
+.toc-desktop a.active{color:var(--green);border-left-color:var(--green-2)}
+.toc-desktop .text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc-desktop li.d3 a{padding-left:14px;font-size:11.5px}
+
+/* Mobile / tablet TOC: sticky collapsible bar pinned just below the nav.
+   Active for everything below the desktop right-rail breakpoint (1320px). */
+.toc-mobile{display:none}
+@media (max-width: 1319.98px){
+  .doc.has-toc .toc-mobile{display:block;margin:0 0 22px;font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--line-2);position:sticky;top:58px;z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
+}
+@media (max-width: 560px){
+  .doc.has-toc .toc-mobile{top:52px}
+}
+.toc-mobile summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--ink-mute);user-select:none}
+.toc-mobile summary::-webkit-details-marker{display:none}
+.toc-mobile .toc-prompt{color:var(--green);letter-spacing:.04em}
+.toc-mobile .toc-count{color:var(--ink-mute);font-size:11px}
+.toc-mobile .toc-count::before{content:"["}
+.toc-mobile .toc-count::after{content:"]"}
+.toc-mobile .toc-caret{margin-left:auto;color:var(--ink-mute);transition:transform .15s ease;font-size:10px}
+.toc-mobile[open] .toc-caret{transform:rotate(180deg)}
+.toc-mobile ul{list-style:none;margin:0;padding:6px 14px 12px;border-top:1px solid var(--line);max-height:50vh;overflow:auto}
+.toc-mobile li{margin:0;line-height:1.7}
+.toc-mobile a{color:var(--ink-dim);text-decoration:none;display:block;padding:3px 0}
+.toc-mobile a:hover,.toc-mobile a:focus-visible{color:var(--green)}
+.toc-mobile a.active{color:var(--green)}
+.toc-mobile li.d3 a{padding-left:14px;font-size:11.5px;color:var(--ink-mute)}
+.toc-mobile li.d3 a.active{color:var(--green)}
+
+/* prev/next */
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:48px;padding-top:24px;border-top:1px solid var(--line)}
+@media (max-width:560px){.pn{grid-template-columns:1fr}}
+.pn a{display:flex;flex-direction:column;gap:4px;font-family:var(--mono);padding:14px 16px;border:1px solid var(--line-2);transition:border-color .12s ease, background .12s ease}
+.pn a:hover{border-color:var(--green-2);background:rgba(125,255,138,0.03)}
+.pn a small{font-size:11px;color:var(--ink-mute);letter-spacing:.05em;text-transform:uppercase}
+.pn a span{font-size:13.5px;color:var(--ink);line-height:1.35}
+.pn a.next{text-align:right;align-items:flex-end}
+
+/* mobile doc */
+@media (max-width:720px){
+  .doc{padding:32px 0 24px}
+  .doc .crumbs{font-size:11.5px;margin-bottom:14px}
+  .doc h1{font-size:clamp(24px,7vw,32px);line-height:1.18}
+  .doc .meta-row{font-size:11.5px;gap:10px}
+  .prose{font-size:16px;line-height:1.7}
+  .prose p{margin:0 0 16px}
+  .prose h2{font-size:19px;margin:28px 0 12px}
+  .prose h3{font-size:16.5px;margin:22px 0 8px}
+  .prose pre{padding:12px 14px;font-size:12.5px}
+  .prose code{font-size:13px}
+  figure.cover{margin:14px 0 22px}
+  .pn{margin-top:32px;padding-top:18px;gap:10px}
+  .pn a{padding:12px 14px}
+}
+@media (max-width:480px){
+  .prose .codeblock-bar{padding:6px 8px}
+  .prose .cb-name{font-size:10.5px}
+  .prose .cb-lang{display:none}
+}

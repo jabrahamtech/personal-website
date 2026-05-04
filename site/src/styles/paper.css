@@ -1,0 +1,518 @@
+/* paper theme — non-technical reading surface, default mode.
+   loaded after components so it wins on cascade. only overrides what
+   genuinely differs from engineer mode; everything else inherits. */
+
+body.mode-paper{
+  /* palette — overrides tokens.css */
+  --bg:#f4ede0;
+  --bg-2:#efe6d4;
+  --panel:#ffffff;
+  --line:#d8cdb8;
+  --line-2:#b8a98c;
+  --ink:#1a1612;
+  --ink-dim:#3a342c;
+  --ink-mute:#8a7d68;
+  --green:#5b6e3f;
+  --green-2:#3f5028;
+  --cyan:#4a5d3a;
+  --amber:#8a6d2c;
+  --red:#a04030;
+
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.65;
+  background:
+    radial-gradient(1100px 600px at 88% -8%, rgba(91,110,63,0.06), transparent 62%),
+    radial-gradient(900px 500px at -8% 32%, rgba(184,169,140,0.16), transparent 60%),
+    var(--bg);
+}
+
+/* hide engineer-only elements; engineer mode hides paper-only elements */
+body.mode-paper .eng-only{display:none !important}
+body.mode-eng .paper-only,body:not(.mode-paper):not(.mode-eng) .paper-only{display:none !important}
+
+/* drop the CRT scanline overlay entirely */
+body.mode-paper::before{content:none}
+
+/* cursor — paper uses native pointers, no terminal crosshair.
+   set on <html data-mode> because base.css attaches the SVG cursor at the
+   <html> level; only an html-level rule can override it. */
+html[data-mode="paper"]{cursor:default}
+html[data-mode="paper"] a,
+html[data-mode="paper"] button,
+html[data-mode="paper"] [role="button"],
+html[data-mode="paper"] summary,
+html[data-mode="paper"] label[for]{cursor:pointer}
+html[data-mode="paper"] input,
+html[data-mode="paper"] textarea{cursor:text}
+
+/* selection */
+body.mode-paper ::selection{background:rgba(91,110,63,0.22);color:var(--ink)}
+body.mode-paper :focus-visible{outline-color:var(--green)}
+
+/* skip link */
+body.mode-paper .skip-link{background:var(--green);color:#fff8e8;font-family:var(--sans);font-weight:600}
+
+/* nav */
+body.mode-paper nav.top{
+  background:linear-gradient(180deg, rgba(244,237,224,0.92), rgba(244,237,224,0.78));
+  border-bottom:1px solid var(--line);
+}
+body.mode-paper nav.top .row{height:64px}
+body.mode-paper .brand{font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:0;color:var(--ink)}
+body.mode-paper .brand .accent{color:var(--green)}
+body.mode-paper .nav-links{font-family:var(--sans);font-size:15px;color:var(--ink-dim);gap:26px}
+body.mode-paper .nav-links a{padding:6px 0;text-transform:capitalize;letter-spacing:0}
+body.mode-paper .nav-links a::before{content:""}
+body.mode-paper .nav-links a:hover{color:var(--ink)}
+body.mode-paper .nav-links a[aria-current="page"]{color:var(--ink);position:relative}
+body.mode-paper .nav-links a[aria-current="page"]::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--green);
+}
+
+/* engineer toggle — outlined icon button, lights sage when on */
+.theme-toggle{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:32px;flex:0 0 auto;
+  background:transparent;border:1px solid var(--line-2);
+  color:var(--ink-mute);
+  padding:0;
+  transition:color .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+@media (max-width:560px){
+  .theme-toggle{width:42px;height:40px}
+}
+.theme-toggle:hover{color:var(--green);border-color:var(--green)}
+.theme-toggle[aria-pressed="true"]{color:var(--green);border-color:var(--green);box-shadow:0 0 8px rgba(125,255,138,0.18) inset}
+body.mode-paper .theme-toggle{border-color:var(--line-2);color:var(--ink-mute)}
+body.mode-paper .theme-toggle:hover{color:var(--green);border-color:var(--green)}
+
+/* mobile kebab — clean hamburger lines, ink-dim, no green glow */
+body.mode-paper .nav-kebab{
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:4px;
+  padding:0;
+  border:1px solid var(--line-2);
+  border-radius:4px;
+  background:transparent;
+  box-shadow:none;
+}
+body.mode-paper .nav-kebab span{
+  width:18px;height:1.5px;
+  background:var(--ink-dim);
+  box-shadow:none;
+}
+body.mode-paper .nav-kebab:hover{border-color:var(--ink);box-shadow:none}
+body.mode-paper .nav-kebab:hover span{background:var(--ink)}
+body.mode-paper .nav-kebab[aria-expanded="true"]{border-color:var(--ink);box-shadow:none}
+body.mode-paper .nav-kebab[aria-expanded="true"] span{background:var(--ink)}
+
+/* mobile sheet menu — editorial dialog */
+body.mode-paper .nav-sheet::backdrop{background:rgba(26,22,18,0.55)}
+body.mode-paper .nav-sheet-inner{background:var(--bg);border-bottom:1px solid var(--line);box-shadow:0 24px 60px rgba(26,22,18,0.18)}
+body.mode-paper .nav-sheet-head{font-family:var(--sans);border-bottom:1px solid var(--line);padding:12px 0 18px}
+body.mode-paper .nav-sheet-title{color:var(--ink);font-weight:600;font-size:14.5px;letter-spacing:0;text-transform:none}
+body.mode-paper .nav-sheet-title::before{display:none}
+body.mode-paper .nav-sheet-close{
+  font-family:var(--sans);font-size:22px;line-height:1;
+  color:var(--ink-mute);border:1px solid var(--line-2);
+  width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;
+  padding:0;border-radius:4px;background:transparent;
+}
+body.mode-paper .nav-sheet-close:hover{color:var(--ink);border-color:var(--ink-dim);background:rgba(184,169,140,0.10)}
+body.mode-paper .nav-sheet-list{margin:18px 0 0}
+body.mode-paper .nav-sheet-list li{border-bottom:1px solid var(--line)}
+body.mode-paper .nav-sheet-list a{font-family:var(--sans);font-size:18px;color:var(--ink);text-transform:capitalize;padding:18px 4px}
+body.mode-paper .nav-sheet-list a .fkey{display:none}
+body.mode-paper .nav-sheet-list a .label{letter-spacing:0}
+body.mode-paper .nav-sheet-list a[aria-current="page"]{color:var(--green-2)}
+body.mode-paper .nav-sheet-list a[aria-current="page"]::after{
+  content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--green);margin-left:auto;align-self:center;flex:0 0 auto;
+}
+
+/* While a paper-mode tap is fetching the next page, dim non-target links
+   and bring the tapped link forward. Sheet stays open as a visual cover
+   so the user never sees a flash of the page they came from. */
+body.mode-paper .nav-sheet.is-navigating .nav-sheet-list a:not(.is-target){
+  opacity:0.32;
+  transition:opacity .14s ease-out;
+}
+body.mode-paper .nav-sheet.is-navigating .nav-sheet-list a.is-target{
+  color:var(--green-2);
+}
+body.mode-paper .nav-sheet.is-navigating .nav-sheet-list a.is-target::after{
+  content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--green);margin-left:auto;align-self:center;flex:0 0 auto;
+  animation:navTargetPulse 0.9s ease-in-out infinite;
+}
+@keyframes navTargetPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.45;transform:scale(0.85)}}
+@media (prefers-reduced-motion: reduce){
+  body.mode-paper .nav-sheet.is-navigating .nav-sheet-list a.is-target::after{animation:none}
+}
+body.mode-paper .nav-sheet-list a[aria-current="page"]{color:var(--green)}
+
+/* page-loader is engineer-only. The Base.astro click intercept early-returns
+   in paper mode, so the loader never opens; the .page-loader element itself
+   is .eng-only too. No paper-mode overrides needed. */
+
+/* page header — consulting masthead. Sentence case, generous breathing
+   room, weight 500 keeps it confident without shouting. */
+body.mode-paper .page-head{padding:72px 0 18px}
+body.mode-paper .page-head h1{
+  font-family:var(--sans);
+  font-size:clamp(36px,5.2vw,52px);
+  font-weight:500;
+  letter-spacing:-0.025em;
+  color:var(--ink);
+  line-height:1.08;
+  margin:0 0 16px;
+  text-wrap:balance;
+  text-transform:capitalize;
+}
+body.mode-paper .page-head h1.brandline{font-size:clamp(28px,4vw,38px);text-transform:none}
+body.mode-paper .page-head .prompt{display:none}
+body.mode-paper .page-head h1.prompt{
+  display:block;
+  font-size:clamp(36px,5.2vw,52px);
+  font-weight:500;
+  letter-spacing:-0.025em;
+  color:var(--ink);
+  text-transform:capitalize;
+}
+body.mode-paper .page-head h1.prompt::before{display:none}
+body.mode-paper .page-head p.intro{font-size:18px;color:var(--ink-dim);max-width:640px;line-height:1.65}
+body.mode-paper .page-head .tagline{font-family:var(--sans);font-size:15px;color:var(--ink-mute)}
+body.mode-paper .page-head .tagline a{color:var(--ink-dim);border-bottom:1px solid var(--line-2)}
+body.mode-paper .page-head .tagline a:hover{color:var(--green);border-color:var(--green)}
+body.mode-paper .links-row{font-family:var(--sans);font-size:14.5px;gap:16px}
+body.mode-paper .links-row a{color:var(--ink-dim)}
+body.mode-paper .links-row a:hover{color:var(--green)}
+body.mode-paper .links-row li:not(:last-child)::after{color:var(--line-2)}
+
+/* post filters — editorial pills, ink-fill on active */
+body.mode-paper .post-filters{font-family:var(--sans);gap:8px;margin:8px 0 18px}
+body.mode-paper .post-filters .chip{
+  font-family:var(--sans);font-size:13px;letter-spacing:0;
+  padding:6px 13px;border-radius:999px;
+  border:1px solid var(--line-2);background:transparent;color:var(--ink-dim);
+  font-weight:400;
+}
+body.mode-paper .post-filters .chip:hover{color:var(--ink);border-color:var(--ink-dim);background:rgba(184,169,140,0.10)}
+body.mode-paper .post-filters .chip.is-active{
+  background:var(--ink);color:#fff8e8;border-color:var(--ink);font-weight:500;
+}
+body.mode-paper .post-filters .chip-count{
+  font-size:11.5px;color:var(--ink-mute);
+  border:0;padding:0 0 0 1px;
+  background:transparent;
+}
+body.mode-paper .post-filters .chip.is-active .chip-count{color:rgba(255,248,232,0.65)}
+body.mode-paper .post-filters .chip-hint{font-family:var(--sans);font-size:13px;color:var(--ink-mute);font-style:italic}
+body.mode-paper .post-empty{font-family:var(--sans);color:var(--ink-mute);border-top:1px solid var(--line)}
+
+/* category tag in post-row meta — soft sage tint, no border */
+body.mode-paper .post-row .meta .tag-cat{
+  font-family:var(--sans);font-size:12.5px;color:var(--green-2);
+  background:rgba(91,110,63,0.10);
+  border:0;padding:1px 7px;border-radius:2px;letter-spacing:0;
+}
+
+/* posts list — editorial, hairline rules, sage hover */
+body.mode-paper .post-row{padding:24px 0;border-top:1px solid var(--line)}
+body.mode-paper .post-row:last-child{border-bottom:1px solid var(--line)}
+body.mode-paper .post-row:hover{background:transparent}
+body.mode-paper .post-row h2{
+  font-family:var(--sans);font-size:19px;font-weight:500;line-height:1.35;color:var(--ink);
+  margin:0 0 8px;
+}
+body.mode-paper .post-row:hover h2{color:var(--green)}
+body.mode-paper .post-row p{color:var(--ink-dim);font-size:15.5px;line-height:1.55}
+body.mode-paper .post-row .meta{font-family:var(--sans);font-size:13px;color:var(--ink-mute);letter-spacing:0;text-transform:none}
+body.mode-paper .post-row .meta .draft{color:#8a6d2c;border-color:var(--line-2);text-transform:uppercase;letter-spacing:.05em}
+body.mode-paper .post-row .meta .sep{color:var(--line-2)}
+
+/* selected work — editorial cards. Hairline divider only (no em-dash bullet),
+   semibold title with mid-dot qualifier, body in dim ink. Reads as a clean
+   credentials list, not a portfolio. */
+body.mode-paper .work-frame{
+  font-family:var(--sans);font-size:16.5px;color:var(--ink-mute);
+  line-height:1.6;font-style:italic;margin:-2px 0 8px;letter-spacing:0;
+}
+body.mode-paper .prose ul.work-list{margin:8px 0 36px;padding:0;list-style:none}
+body.mode-paper .prose ul.work-list li{
+  list-style:none;
+  padding:24px 0 26px;
+  margin:0;
+  border-top:1px solid var(--line);
+  font-size:16.5px;line-height:1.7;color:var(--ink-dim);
+  /* override the generic .prose ul li padding-left + em-dash */
+  padding-left:0;
+}
+body.mode-paper .prose ul.work-list li::before{content:none}
+body.mode-paper .prose ul.work-list li:last-child{border-bottom:1px solid var(--line)}
+body.mode-paper .work-list strong{
+  display:block;
+  font-family:var(--sans);
+  font-size:17.5px;
+  font-weight:600;
+  color:var(--ink);
+  letter-spacing:-0.005em;
+  margin:0 0 10px;
+  line-height:1.35;
+}
+
+/* article doc */
+body.mode-paper .doc{padding:56px 0 32px}
+body.mode-paper .doc .crumbs{font-family:var(--sans);font-size:13px;color:var(--ink-mute)}
+body.mode-paper .doc .crumbs a{color:var(--ink-dim)}
+body.mode-paper .doc .crumbs a:hover{color:var(--green)}
+body.mode-paper .doc .crumbs .sep{color:var(--line-2)}
+body.mode-paper .doc .post-prompt{display:none}
+body.mode-paper .doc h1{
+  font-family:var(--sans);font-size:clamp(30px,4vw,40px);
+  font-weight:600;letter-spacing:-0.02em;line-height:1.18;color:var(--ink);
+  margin:0 0 14px;
+  text-wrap:pretty;
+}
+body.mode-paper .doc .meta-row{font-family:var(--sans);font-size:13.5px;color:var(--ink-mute);gap:18px;letter-spacing:0}
+body.mode-paper .doc .meta-row span b{color:var(--ink-dim);text-transform:capitalize;letter-spacing:0;font-weight:500;margin-right:6px}
+/* Hex post-id (Id 0x04) is engineer-only cataloguing — drop it in paper.
+   The slug page emits id as the first meta cell, so :first-child is stable. */
+body.mode-paper .doc .meta-row span:first-child{display:none}
+body.mode-paper .doc .tag{font-family:var(--sans);font-size:12px;color:var(--ink-mute);border:1px solid var(--line-2);padding:2px 8px;border-radius:2px;letter-spacing:0;text-transform:capitalize}
+
+body.mode-paper .cover{
+  border:1px solid var(--line-2);background:#fff8e8;
+  box-shadow:none;
+}
+
+/* avatar — round photo, no hard shadow */
+body.mode-paper .avatar{
+  width:120px;height:120px;border-radius:50%;overflow:hidden;
+  border:1px solid var(--line-2);background:#fff8e8;
+  box-shadow:none;
+}
+@media (max-width:720px){
+  body.mode-paper .avatar{width:108px;height:108px}
+}
+
+/* prose — Inter throughout, no mono prefixes, highlighter links */
+body.mode-paper .prose{font-family:var(--sans);font-size:18px;line-height:1.75;color:var(--ink-dim)}
+body.mode-paper .prose p{margin:0 0 18px;text-wrap:pretty}
+body.mode-paper .prose strong{color:var(--ink)}
+body.mode-paper .prose em{color:var(--ink-dim);font-style:italic}
+body.mode-paper .prose a{
+  color:var(--ink);text-decoration:none;
+  background:linear-gradient(180deg, transparent 64%, rgba(91,110,63,0.28) 64%, rgba(91,110,63,0.28) 92%, transparent 92%);
+  padding:0 1px;
+  transition:background .12s ease;
+}
+body.mode-paper .prose a:hover{
+  background:linear-gradient(180deg, transparent 50%, rgba(91,110,63,0.45) 50%, rgba(91,110,63,0.45) 96%, transparent 96%);
+}
+body.mode-paper .prose ul{padding-left:0;list-style:none}
+body.mode-paper .prose ul li{position:relative;padding-left:22px;margin:8px 0}
+body.mode-paper .prose ul li::before{content:"—";position:absolute;left:0;top:0;color:var(--green);font-weight:600}
+body.mode-paper .prose ol{padding-left:24px}
+body.mode-paper .prose blockquote{
+  font-family:var(--sans);font-style:italic;color:var(--ink-dim);
+  border-left:2px solid var(--green);background:transparent;
+  padding:8px 0 8px 18px;margin:22px 0;
+}
+body.mode-paper .prose code{
+  font-family:var(--mono);font-size:0.92em;
+  background:rgba(184,169,140,0.18);border:0;
+  padding:1px 5px;border-radius:2px;color:var(--ink);
+}
+body.mode-paper .prose pre{
+  font-family:var(--mono);font-size:13.5px;line-height:1.6;
+  background:#fff8e8;border:1px solid var(--line-2);
+  color:var(--ink);
+  padding:16px 18px;
+}
+body.mode-paper .prose pre code{background:transparent;color:inherit}
+body.mode-paper .prose h2{
+  font-family:var(--sans);font-size:28px;font-weight:500;color:var(--ink);
+  margin:48px 0 18px;padding-top:36px;border-top:1px solid var(--line);
+  letter-spacing:-0.018em;line-height:1.2;
+  text-wrap:balance;
+}
+body.mode-paper .prose h2::before{content:""}
+body.mode-paper .prose h3{
+  font-family:var(--sans);font-size:19px;font-weight:600;color:var(--ink);
+  margin:32px 0 10px;letter-spacing:-0.008em;line-height:1.3;
+}
+body.mode-paper .prose h3::before{content:""}
+body.mode-paper .prose hr{border-top:1px solid var(--line)}
+body.mode-paper .prose img{border:1px solid var(--line-2)}
+
+/* code block bar — soft paper version */
+body.mode-paper .prose .codeblock.has-bar{background:#fff8e8;border:1px solid var(--line-2)}
+body.mode-paper .prose .codeblock-bar{background:#efe6d4;border-bottom:1px solid var(--line);font-family:var(--mono)}
+body.mode-paper .prose .cb-name{color:var(--ink-dim)}
+body.mode-paper .prose .cb-lang{color:var(--ink-mute)}
+body.mode-paper .prose .copy-btn{font-family:var(--sans);color:var(--ink-mute);border:1px solid var(--line-2);background:rgba(255,248,232,0.85)}
+body.mode-paper .prose .copy-btn:hover{color:var(--green);border-color:var(--green)}
+body.mode-paper .prose .copy-btn.ok{color:var(--green);border-color:var(--green)}
+
+/* eof + edit link — italic editorial closer instead of mono "[EOF]" */
+body.mode-paper .post-eof{
+  font-family:var(--sans);font-style:italic;color:var(--ink-mute);
+  border-top:1px solid var(--line);padding-top:22px;margin-top:44px;
+  font-size:14px;letter-spacing:0;
+}
+body.mode-paper .post-eof .ok{color:var(--green)}
+body.mode-paper .edit-link{font-family:var(--sans);color:var(--ink-mute);font-size:14px}
+body.mode-paper .edit-link a{color:var(--ink-mute);border-bottom:1px solid var(--line-2);font-style:italic}
+body.mode-paper .edit-link a:hover{color:var(--green);border-color:var(--green)}
+
+/* callouts — soft sage / stone instead of neon */
+body.mode-paper .prose .callout{font-family:var(--sans);background:rgba(184,169,140,0.10);border:1px solid var(--line-2);border-left-width:3px}
+body.mode-paper .prose .callout-head{font-family:var(--sans);color:var(--ink-mute);font-size:12.5px;letter-spacing:.04em;text-transform:uppercase}
+body.mode-paper .prose .callout-bracket{color:var(--ink-mute)}
+body.mode-paper .prose .callout-label{color:var(--ink-dim)}
+body.mode-paper .prose .callout-body{color:var(--ink-dim);font-size:16px;line-height:1.65}
+body.mode-paper .prose .callout-note{border-left-color:var(--green)}
+body.mode-paper .prose .callout-note .callout-bracket,body.mode-paper .prose .callout-note .callout-label{color:var(--green)}
+body.mode-paper .prose .callout-tip{border-left-color:var(--green)}
+body.mode-paper .prose .callout-tip .callout-bracket,body.mode-paper .prose .callout-tip .callout-label{color:var(--green)}
+body.mode-paper .prose .callout-warn{border-left-color:#a07a2a}
+body.mode-paper .prose .callout-warn .callout-bracket,body.mode-paper .prose .callout-warn .callout-label{color:#8a6d2c}
+body.mode-paper .prose .callout-info{border-left-color:var(--ink-mute)}
+
+/* figures */
+body.mode-paper .prose .post-figure img{border:1px solid var(--line-2);background:#fff8e8}
+body.mode-paper .prose .post-figure figcaption{font-family:var(--sans);font-style:italic;color:var(--ink-mute);font-size:13.5px;letter-spacing:0}
+
+/* heading anchor */
+body.mode-paper .prose .heading-anchor{font-family:var(--sans);color:var(--ink-mute)}
+body.mode-paper .prose .heading-anchor:hover{color:var(--green)}
+
+/* reading progress */
+body.mode-paper .reading-progress span{background:var(--green);box-shadow:none}
+
+/* TOC desktop + mobile */
+body.mode-paper .doc.has-toc .toc-desktop{font-family:var(--sans);font-size:13px;color:var(--ink-mute);border-left:1px solid var(--line)}
+body.mode-paper .toc-desktop .toc-head{color:var(--ink);font-weight:600;letter-spacing:0;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+body.mode-paper .toc-desktop a{color:var(--ink-mute)}
+body.mode-paper .toc-desktop a:hover{color:var(--ink-dim)}
+body.mode-paper .toc-desktop a.active{color:var(--green);border-left-color:var(--green)}
+body.mode-paper .doc.has-toc .toc-mobile{font-family:var(--sans);background:var(--bg);border:1px solid var(--line);box-shadow:none}
+body.mode-paper .toc-mobile summary{color:var(--ink-dim)}
+body.mode-paper .toc-mobile .toc-prompt{color:var(--ink);font-weight:600;letter-spacing:0;text-transform:uppercase;font-size:11.5px;letter-spacing:.06em}
+body.mode-paper .toc-mobile .toc-count{color:var(--ink-mute)}
+body.mode-paper .toc-mobile .toc-count::before{content:"("}
+body.mode-paper .toc-mobile .toc-count::after{content:")"}
+body.mode-paper .toc-mobile a{color:var(--ink-dim)}
+body.mode-paper .toc-mobile a:hover,body.mode-paper .toc-mobile a:focus-visible{color:var(--green)}
+body.mode-paper .toc-mobile a.active{color:var(--green)}
+
+/* prev/next */
+body.mode-paper .pn{border-top:1px solid var(--line)}
+body.mode-paper .pn a{font-family:var(--sans);border:1px solid var(--line-2);background:transparent}
+body.mode-paper .pn a:hover{border-color:var(--green);background:rgba(91,110,63,0.04)}
+body.mode-paper .pn a small{color:var(--ink-mute);letter-spacing:.05em}
+body.mode-paper .pn a span{color:var(--ink);font-size:15px}
+
+/* footer */
+body.mode-paper footer{border-top:1px solid var(--line);margin-top:72px;padding:36px 0 60px}
+body.mode-paper .foot{font-family:var(--sans);font-size:14px;color:var(--ink-mute)}
+body.mode-paper .foot .l{color:var(--ink-dim)}
+body.mode-paper .foot a{color:var(--ink-dim)}
+body.mode-paper .foot a:hover{color:var(--green)}
+body.mode-paper .foot .links .sep{color:var(--line-2)}
+/* drop the `// ` prefix-feel by overriding the literal text via CSS isn't
+   reliable — Footer.astro hardcodes it. Leaving it as is; reads fine
+   in paper mode as a stylistic flourish. */
+
+/* ascii-div is engineer-only visual chrome — collapse in paper mode */
+body.mode-paper .ascii-div{display:none}
+
+/* 404 — clean editorial layout instead of segfault terminal */
+body.mode-paper .panic{
+  font-family:var(--sans);
+  padding:72px 32px;
+  color:var(--ink-dim);
+  align-items:center;justify-content:center;
+}
+body.mode-paper .panic-paper{display:block;max-width:620px;width:100%}
+body.mode-paper .panic-eyebrow{
+  font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--green);margin:0 0 14px;
+}
+body.mode-paper .panic h1{
+  font-family:var(--sans);font-size:clamp(34px,5vw,48px);
+  font-weight:500;letter-spacing:-0.025em;line-height:1.12;
+  color:var(--ink);margin:0 0 16px;text-wrap:balance;
+}
+body.mode-paper .panic-lede{
+  font-size:17px;line-height:1.65;color:var(--ink-dim);margin:0 0 20px;max-width:520px;
+}
+body.mode-paper .panic-lede kbd{
+  font-family:var(--mono);font-size:13px;
+  background:rgba(184,169,140,0.18);border:1px solid var(--line-2);
+  padding:1px 6px;border-radius:2px;color:var(--ink);
+}
+body.mode-paper .panic-meta{
+  font-family:var(--sans);font-size:13.5px;color:var(--ink-mute);
+  margin:0 0 28px;font-style:italic;
+}
+body.mode-paper .panic-meta span{
+  font-family:var(--mono);font-style:normal;color:var(--ink-dim);
+  background:rgba(184,169,140,0.12);padding:1px 6px;border-radius:2px;
+}
+body.mode-paper .panic .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+body.mode-paper .panic .btn{
+  font-family:var(--sans);font-size:14.5px;font-weight:500;
+  padding:11px 18px;border:1px solid var(--ink-dim);
+  color:var(--ink);background:transparent;letter-spacing:0;
+}
+body.mode-paper .panic .btn:hover{background:rgba(91,110,63,0.06);color:var(--ink);border-color:var(--ink)}
+body.mode-paper .panic .btn-primary{background:var(--ink);color:#fff8e8;border-color:var(--ink)}
+body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e8;border-color:var(--green-2)}
+@media (max-width:560px){
+  body.mode-paper .panic{padding:48px 24px}
+  body.mode-paper .panic h1{font-size:clamp(28px,9vw,38px)}
+  body.mode-paper .panic-lede{font-size:16px}
+}
+
+/* mobile paper tweaks — tighter rhythm, comfortable reading scale,
+   hairlines and rules narrower so the column doesn't feel boxed in. */
+@media (max-width:720px){
+  body.mode-paper{font-size:16.5px}
+  body.mode-paper nav.top .row{height:56px}
+  body.mode-paper .page-head{padding:44px 0 12px}
+  body.mode-paper .page-head h1{font-size:clamp(30px,8.5vw,40px);line-height:1.1}
+  body.mode-paper .page-head h1.prompt{font-size:clamp(30px,8.5vw,40px)}
+  body.mode-paper .page-head p.intro{font-size:16.5px}
+  body.mode-paper .doc{padding:36px 0 24px}
+  body.mode-paper .doc h1{font-size:clamp(26px,7.5vw,34px);line-height:1.18}
+  body.mode-paper .prose{font-size:17px;line-height:1.7}
+  body.mode-paper .prose p{margin:0 0 16px}
+  body.mode-paper .prose h2{font-size:22px;margin:32px 0 12px;padding-top:24px}
+  body.mode-paper .prose h3{font-size:17.5px;margin:22px 0 8px}
+  body.mode-paper .prose blockquote{padding:6px 0 6px 14px;margin:18px 0}
+  body.mode-paper .prose ul.work-list li{padding:18px 0 20px}
+  body.mode-paper .prose ul.work-list strong{font-size:16.5px;margin:0 0 8px}
+  body.mode-paper .post-row{padding:18px 0}
+  body.mode-paper .post-row h2{font-size:17px}
+  body.mode-paper .post-row p{font-size:15px}
+  body.mode-paper .post-row .meta{font-size:12.5px;gap:8px;row-gap:5px}
+  body.mode-paper .post-row .meta .tag,body.mode-paper .post-row .meta .tag-cat{font-size:11.5px}
+  body.mode-paper footer{padding:28px 0 44px;margin-top:48px}
+  body.mode-paper .foot{font-size:13px;gap:10px}
+  body.mode-paper .work-frame{font-size:15.5px}
+}
+@media (max-width:480px){
+  body.mode-paper .page-head{padding:36px 0 10px}
+  body.mode-paper .page-head h1{font-size:clamp(28px,9vw,34px)}
+  body.mode-paper .doc h1{font-size:clamp(24px,8vw,30px)}
+  body.mode-paper .prose{font-size:16.5px}
+  body.mode-paper .prose h2{font-size:20px;margin:28px 0 10px;padding-top:20px}
+  body.mode-paper .pn{margin-top:28px;padding-top:18px}
+  body.mode-paper .pn a{padding:11px 13px}
+  body.mode-paper .pn a span{font-size:14px}
+}
