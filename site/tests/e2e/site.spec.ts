@@ -36,18 +36,22 @@ test.describe('home (posts list)', () => {
   test('filters upcoming drafts by content type and cluster', async ({ page }) => {
     await page.goto('/');
 
-    await page.locator('#post-filters .chip[data-filter-kind="type"][data-filter-value="Learning Journey Guide"]').click();
+    await expect(page.locator('#post-filters .filter-select')).toHaveCount(2);
+    await expect(page.locator('#post-filters .chip')).toHaveCount(0);
+
+    await page.locator('#filter-type').selectOption('Learning Journey Guide');
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(2);
     await expect(page.locator('.post-list li:not([hidden]) h2')).toHaveText([
       'Why AI Is Starting to Sound Like You',
       'Polymarket Bot and What I Learned About EDA',
     ]);
 
-    await page.locator('#post-filters .chip[data-filter-kind="cluster"][data-filter-value="Recruitment Automation"]').click();
+    await page.locator('#filter-cluster').selectOption('Recruitment Automation');
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(1);
     await expect(page.locator('.post-list li:not([hidden]) h2')).toHaveText("How I Cut 80% of a Recruitment Agency's Work Week in a 2-Hour AI Call");
+    await expect(page.locator('#filter-type')).toHaveValue('all');
 
-    await page.locator('#post-filters .chip[data-filter-kind="all"][data-filter-value="all"]').click();
+    await page.locator('#filter-cluster').selectOption('all');
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(5);
   });
 

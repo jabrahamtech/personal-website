@@ -123,22 +123,27 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
       const total = sorted.length;
       return (
         <div class="post-filters" id="post-filters" aria-label="filter upcoming drafts">
-          <div class="filter-group">
+          <label class="filter-field" for="filter-type">
             <span class="filter-label">type</span>
-            <button type="button" class="chip is-active" aria-pressed="true" data-filter-kind="all" data-filter-value="all">all <span class="chip-count">{total}</span></button>
-            {contentTypeFilters.map((filter) => (
-              <button type="button" class="chip" aria-pressed="false" data-filter-kind={filter.kind} data-filter-value={filter.value}>{filter.value} <span class="chip-count">{filter.count}</span></button>
-            ))}
-          </div>
-          {clusterFilters.length > 1 && (
-            <div class="filter-group">
-              <span class="filter-label">cluster</span>
-              {clusterFilters.map((filter) => (
-                <button type="button" class="chip" aria-pressed="false" data-filter-kind={filter.kind} data-filter-value={filter.value}>{filter.value} <span class="chip-count">{filter.count}</span></button>
+            <select class="filter-select" id="filter-type" data-filter-kind="type">
+              <option value="all">all content types ({total})</option>
+              {contentTypeFilters.map((filter) => (
+                <option value={filter.value}>{filter.value} ({filter.count})</option>
               ))}
-              <span class="chip-hint">filter by release angle</span>
-            </div>
+            </select>
+          </label>
+          {clusterFilters.length > 1 && (
+            <label class="filter-field" for="filter-cluster">
+              <span class="filter-label">cluster</span>
+              <select class="filter-select" id="filter-cluster" data-filter-kind="cluster">
+                <option value="all">all clusters ({total})</option>
+                {clusterFilters.map((filter) => (
+                  <option value={filter.value}>{filter.value} ({filter.count})</option>
+                ))}
+              </select>
+            </label>
           )}
+          <span class="filter-hint">filter by release angle</span>
         </div>
       );
     })()}
@@ -183,7 +188,7 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
       const empty = document.getElementById('post-empty');
       if (!root || !list) return;
       const items = Array.from(list.querySelectorAll('li'));
-      const chips = Array.from(root.querySelectorAll('.chip'));
+      const selects = Array.from(root.querySelectorAll('.filter-select'));
       const storageKey = 'ja_post_filter_v2';
 
       function apply(kind, value) {
@@ -197,10 +202,9 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
           li.hidden = !match;
           if (match) shown++;
         });
-        chips.forEach((c) => {
-          const active = c.getAttribute('data-filter-kind') === kind && c.getAttribute('data-filter-value') === value;
-          c.classList.toggle('is-active', active);
-          c.setAttribute('aria-pressed', active ? 'true' : 'false');
+        selects.forEach((select) => {
+          const selectKind = select.getAttribute('data-filter-kind') || '';
+          select.value = selectKind === kind ? value : 'all';
         });
         if (empty) empty.hidden = shown !== 0;
         try { localStorage.setItem(storageKey, JSON.stringify({ kind, value })); } catch (_) {}
@@ -213,15 +217,21 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
           saved
           && typeof saved.kind === 'string'
           && typeof saved.value === 'string'
-          && chips.some((c) => c.getAttribute('data-filter-kind') === saved.kind && c.getAttribute('data-filter-value') === saved.value)
+          && (
+            saved.kind === 'all'
+            || selects.some((select) => select.getAttribute('data-filter-kind') === saved.kind && Array.from(select.options).some((option) => option.value === saved.value))
+          )
         ) {
           initial = saved;
         }
       } catch (_) {}
       apply(initial.kind, initial.value);
 
-      chips.forEach((c) => {
-        c.addEventListener('click', () => apply(c.getAttribute('data-filter-kind') || 'all', c.getAttribute('data-filter-value') || 'all'));
+      selects.forEach((select) => {
+        select.addEventListener('change', () => {
+          const value = select.value || 'all';
+          apply(value === 'all' ? 'all' : select.getAttribute('data-filter-kind') || 'all', value);
+        });
       });
     })();
   </script>
