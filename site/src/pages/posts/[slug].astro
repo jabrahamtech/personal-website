@@ -114,16 +114,16 @@ const breadcrumb = {
   <Content />
   {(newer || older) && (
     <div class="pn" slot="footer">
-      {newer ? (
-        <a href={`/posts/${newer.id}`}>
-          <small>← newer</small>
-          <span>{newer.data.title}</span>
+      {older ? (
+        <a href={`/posts/${older.id}`}>
+          <small>← older</small>
+          <span>{older.data.title}</span>
         </a>
       ) : <span></span>}
-      {older ? (
-        <a class="next" href={`/posts/${older.id}`}>
-          <small>older →</small>
-          <span>{older.data.title}</span>
+      {newer ? (
+        <a class="next" href={`/posts/${newer.id}`}>
+          <small>newer →</small>
+          <span>{newer.data.title}</span>
         </a>
       ) : <span></span>}
     </div>

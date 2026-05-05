@@ -30,11 +30,22 @@ const description = "Jonathan Abraham — about 5 years building production syst
     </header>
 
     <article class="prose">
-      <figure class="avatar" aria-hidden="false">
-        <img src="/about/avatar.jpeg" alt="Jonathan Abraham" width="200" height="200" loading="eager" />
-      </figure>
+      <header class="bio-head" aria-hidden="false">
+        <figure class="avatar">
+          <img src="/about/avatar.jpeg" alt="Jonathan Abraham" width="200" height="200" loading="eager" />
+        </figure>
+        <div class="bio-head-text paper-only">
+          <p class="bio-name">Jonathan Abraham</p>
+          <p class="bio-role">AI engineer · founder of Brokerloop · Melbourne, AU</p>
+          <ul class="bio-contact">
+            <li><a href="mailto:jabrahamtech@gmail.com">Email</a></li>
+            <li><a href="https://github.com/jabrahamtech" rel="me">GitHub</a></li>
+            <li><a href="https://www.linkedin.com/in/jabrahamtech" rel="me">LinkedIn</a></li>
+          </ul>
+        </div>
+      </header>
 
-      <p>I'm Jonathan. I've been building production systems for about 5 years, the last two on AI. Voice agents, intake automation, and the Go services they sit on. I run <strong>Brokerloop</strong>, an Australian insurtech based in Melbourne. Most of what I ship there ends up as voice intake, long-form workflows, and the kind of integrations brokers actually use, not the kind that sit in a deck.</p>
+      <p class="lede">I'm Jonathan. I've been building production systems for about 5 years, the last two on AI. Voice agents, intake automation, and the Go services they sit on. I run <strong>Brokerloop</strong>, an Australian insurtech based in Melbourne. Most of what I ship there ends up as voice intake, long-form workflows, and the kind of integrations brokers actually use, not the kind that sit in a deck.</p>
 
       <p>I came into AI from full-stack engineering and consulting, which isn't the usual route — most come through research. Most of the work has been greenfield, from small startup builds through to larger production systems. That's where the commercial-first instinct comes from: what does it cost, what's the scope, what happens when it breaks. The model is one piece of the system, not the system.</p>
 
@@ -72,16 +83,16 @@ const description = "Jonathan Abraham — about 5 years building production syst
       </ul>
 
       <h2>Stack</h2>
-      <ul>
-        <li><strong>runtime:</strong> go · typescript · python · react · postgres · redis</li>
-        <li><strong>ai:</strong> openai · anthropic · groq · langgraph · agent skills + plugins · mcps</li>
-        <li><strong>voice:</strong> twilio · deepgram · retell.ai · elevenlabs</li>
-        <li><strong>ops:</strong> aws · railway · vps · cloudflare · sentry · posthog</li>
-        <li><strong>onchain:</strong> base · solidity contracts · ponder.sh</li>
-      </ul>
+      <dl class="stack-list">
+        <div><dt>Runtime</dt><dd>Go · TypeScript · Python · React · Postgres · Redis</dd></div>
+        <div><dt>AI</dt><dd>OpenAI · Anthropic · Groq · LangGraph · agent skills &amp; plugins · MCPs</dd></div>
+        <div><dt>Voice</dt><dd>Twilio · Deepgram · Retell.ai · ElevenLabs</dd></div>
+        <div><dt>Ops</dt><dd>AWS · Railway · VPS · Cloudflare · Sentry · PostHog</dd></div>
+        <div><dt>Onchain</dt><dd>Base · Solidity contracts · Ponder.sh</dd></div>
+      </dl>
 
       <h2>Elsewhere</h2>
-      <ul>
+      <ul class="elsewhere-list">
         <li><strong>email</strong> — <a href="mailto:jabrahamtech@gmail.com">jabrahamtech@gmail.com</a></li>
         <li><strong>github</strong> — <a href="https://github.com/jabrahamtech" rel="me">/jabrahamtech</a></li>
         <li><strong>linkedin</strong> — <a href="https://www.linkedin.com/in/jabrahamtech" rel="me">/in/jabrahamtech</a></li>

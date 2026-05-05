@@ -158,134 +158,283 @@ body.mode-paper .nav-sheet-list a[aria-current="page"]{color:var(--green)}
    in paper mode, so the loader never opens; the .page-loader element itself
    is .eng-only too. No paper-mode overrides needed. */
 
-/* page header — consulting masthead. Sentence case, generous breathing
-   room, weight 500 keeps it confident without shouting. */
-body.mode-paper .page-head{padding:72px 0 18px}
+/* page header — editorial masthead with eyebrow rule, generous breathing
+   room. Weight 500 keeps it confident without shouting. */
+body.mode-paper .page-head{
+  padding:88px 0 28px;
+  margin:0 0 8px;
+  border-bottom:1px solid var(--line);
+  position:relative;
+}
+body.mode-paper .page-head::before{
+  content:"";position:absolute;left:0;top:64px;
+  width:28px;height:2px;background:var(--green);
+}
 body.mode-paper .page-head h1{
   font-family:var(--sans);
-  font-size:clamp(36px,5.2vw,52px);
+  font-size:clamp(36px,5.2vw,54px);
   font-weight:500;
-  letter-spacing:-0.025em;
+  letter-spacing:-0.028em;
   color:var(--ink);
-  line-height:1.08;
-  margin:0 0 16px;
+  line-height:1.05;
+  margin:0 0 14px;
   text-wrap:balance;
   text-transform:capitalize;
 }
-body.mode-paper .page-head h1.brandline{font-size:clamp(28px,4vw,38px);text-transform:none}
 body.mode-paper .page-head .prompt{display:none}
 body.mode-paper .page-head h1.prompt{
   display:block;
-  font-size:clamp(36px,5.2vw,52px);
+  font-size:clamp(36px,5.2vw,54px);
   font-weight:500;
-  letter-spacing:-0.025em;
+  letter-spacing:-0.028em;
   color:var(--ink);
   text-transform:capitalize;
 }
 body.mode-paper .page-head h1.prompt::before{display:none}
-body.mode-paper .page-head p.intro{font-size:18px;color:var(--ink-dim);max-width:640px;line-height:1.65}
-body.mode-paper .page-head .tagline{font-family:var(--sans);font-size:15px;color:var(--ink-mute)}
-body.mode-paper .page-head .tagline a{color:var(--ink-dim);border-bottom:1px solid var(--line-2)}
-body.mode-paper .page-head .tagline a:hover{color:var(--green);border-color:var(--green)}
-body.mode-paper .links-row{font-family:var(--sans);font-size:14.5px;gap:16px}
-body.mode-paper .links-row a{color:var(--ink-dim)}
-body.mode-paper .links-row a:hover{color:var(--green)}
-body.mode-paper .links-row li:not(:last-child)::after{color:var(--line-2)}
+@media (max-width:720px){
+  body.mode-paper .page-head{padding:56px 0 18px}
+  body.mode-paper .page-head::before{top:38px;width:22px}
+}
 
-/* post filters - editorial dropdowns */
-body.mode-paper .post-filters{font-family:var(--sans);gap:12px 14px;margin:8px 0 22px;padding:0 0 22px;border-bottom:1px solid var(--line)}
-body.mode-paper .post-filters .filter-field{gap:7px;min-width:min(100%,205px)}
-body.mode-paper .post-filters .filter-field-order{min-width:min(100%,245px)}
+/* post filters — editorial filter bar.
+   - Soft cream chip surface, hairline rule above the list.
+   - Custom chevron via background-image so the select still hosts native
+     keyboard a11y; appearance:none kills the system glyph. */
+body.mode-paper .post-filters{
+  font-family:var(--sans);
+  display:flex;flex-wrap:wrap;align-items:flex-end;
+  gap:14px 18px;margin:24px 0 0;padding:0 0 26px;
+  border-bottom:1px solid var(--line);
+}
+body.mode-paper .post-filters .filter-field{gap:8px;min-width:min(100%,220px);flex:1 1 220px}
+body.mode-paper .post-filters .filter-field-order{min-width:min(100%,200px);flex:1 1 200px}
 body.mode-paper .post-filters .filter-label{
   color:var(--ink-mute);
   font-family:var(--sans);
-  font-size:11px;
-  letter-spacing:.07em;
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:.12em;
   text-transform:uppercase;
 }
 body.mode-paper .post-filters .filter-select{
-  font-family:var(--sans);font-size:14px;letter-spacing:0;
-  min-height:40px;color:var(--ink-dim);background:#fff8e8;
-  border:1px solid var(--line-2);border-radius:4px;
-  box-shadow:0 1px 0 rgba(26,22,18,0.04), inset 0 1px 0 rgba(255,255,255,0.42);
-  padding:9px 36px 9px 12px;
-}
-body.mode-paper .post-filters .filter-select:hover,body.mode-paper .post-filters .filter-select:focus{
-  color:var(--ink);
-  border-color:var(--green-2);
+  font-family:var(--sans);font-size:14.5px;letter-spacing:0;
+  min-height:42px;color:var(--ink);
   background-color:#fffaf0;
-  box-shadow:0 0 0 3px rgba(91,110,63,0.09), inset 0 1px 0 rgba(255,255,255,0.42);
+  background-image:linear-gradient(45deg, transparent 50%, var(--ink-mute) 50%),linear-gradient(135deg, var(--ink-mute) 50%, transparent 50%);
+  background-position:calc(100% - 18px) 18px, calc(100% - 13px) 18px;
+  background-size:5px 5px, 5px 5px;
+  background-repeat:no-repeat;
+  border:1px solid var(--line-2);border-radius:6px;
+  box-shadow:0 1px 0 rgba(26,22,18,0.03);
+  padding:10px 38px 10px 14px;
+  appearance:none;-webkit-appearance:none;
+  transition:border-color .14s ease, box-shadow .14s ease, background-color .14s ease;
 }
-body.mode-paper .post-empty{font-family:var(--sans);color:var(--ink-mute);border-top:1px solid var(--line)}
-
-/* content-type tag in post-row meta - soft sage tint, no border */
-body.mode-paper .post-row .meta .tag-cat{
-  font-family:var(--sans);font-size:12.5px;color:var(--green-2);
-  background:rgba(91,110,63,0.10);
-  border:0;padding:1px 7px;border-radius:2px;letter-spacing:0;
+body.mode-paper .post-filters .filter-select:hover{
+  border-color:var(--ink-dim);
+  background-color:#fff8e8;
 }
-body.mode-paper .post-row .meta .tag-cluster{color:var(--ink-dim)}
+body.mode-paper .post-filters .filter-select:focus{
+  outline:none;
+  border-color:var(--green-2);
+  background-color:#fff8e8;
+  box-shadow:0 0 0 3px rgba(91,110,63,0.14);
+}
+body.mode-paper .post-empty{
+  font-family:var(--sans);font-style:italic;
+  color:var(--ink-mute);font-size:15px;
+  padding:32px 0;border-top:0;text-align:center;
+}
+@media (max-width:560px){
+  body.mode-paper .post-filters{gap:12px}
+  body.mode-paper .post-filters .filter-field,
+  body.mode-paper .post-filters .filter-field-order{flex:1 1 100%;min-width:100%}
+}
 
-/* posts list — editorial, hairline rules, sage hover */
-body.mode-paper .post-row{padding:24px 0;border-top:0}
+/* posts list — editorial, hairline rules, restrained hover.
+   Reads as a curated index, not a feed. */
+body.mode-paper .post-list{margin:0 0 80px}
+body.mode-paper .post-row{
+  padding:28px 0 30px;border-top:0;
+  display:block;position:relative;
+  transition:transform .14s ease;
+}
 body.mode-paper .post-list li + li .post-row{border-top:1px solid var(--line)}
 body.mode-paper .post-list li:last-child .post-row{border-bottom:1px solid var(--line)}
 body.mode-paper .post-row:hover{background:transparent}
 body.mode-paper .post-row h2{
-  font-family:var(--sans);font-size:19px;font-weight:500;line-height:1.35;color:var(--ink);
-  margin:0 0 8px;
+  font-family:var(--sans);
+  font-size:21px;font-weight:600;line-height:1.3;
+  color:var(--ink);letter-spacing:-0.012em;
+  margin:0 0 10px;
+  text-wrap:balance;
 }
-body.mode-paper .post-row:hover h2{color:var(--green)}
-body.mode-paper .post-row p{color:var(--ink-dim);font-size:15.5px;line-height:1.55}
-body.mode-paper .post-row .meta{font-family:var(--sans);font-size:13px;color:var(--ink-mute);letter-spacing:0;text-transform:none}
-body.mode-paper .post-row .meta .draft{color:#8a6d2c;border-color:var(--line-2);text-transform:uppercase;letter-spacing:.05em}
-body.mode-paper .post-row .meta .sep{color:var(--line-2)}
+body.mode-paper .post-row:hover h2{color:var(--green-2)}
+body.mode-paper .post-row p{
+  color:var(--ink-dim);font-size:16px;line-height:1.6;
+  margin:0 0 14px;max-width:64ch;text-wrap:pretty;
+}
+body.mode-paper .post-row .meta{
+  font-family:var(--sans);font-size:13px;color:var(--ink-mute);
+  letter-spacing:0;text-transform:none;
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;row-gap:6px;
+  margin:0;
+}
+body.mode-paper .post-row .meta > span:not(.tag):not(.draft){
+  position:relative;padding-right:14px;
+}
+body.mode-paper .post-row .meta > span:not(.tag):not(.draft) + span:not(.tag):not(.draft)::before{
+  content:"·";position:absolute;left:-12px;top:0;color:var(--line-2);
+}
+body.mode-paper .post-row .meta .draft{
+  color:#8a6d2c;
+  background:rgba(138,109,44,0.08);
+  border:1px solid rgba(138,109,44,0.28);
+  padding:1.5px 8px;border-radius:2px;
+  font-size:10.5px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;
+}
+body.mode-paper .post-row .meta .sep{display:none}
 
-/* selected work — editorial cards. Hairline divider only (no em-dash bullet),
-   semibold title with mid-dot qualifier, body in dim ink. Reads as a clean
-   credentials list, not a portfolio. */
+/* content-type tag in post-row meta — soft sage tint, no border */
+body.mode-paper .post-row .meta .tag-cat{
+  font-family:var(--sans);
+  font-size:12px;font-weight:500;
+  color:var(--green-2);
+  background:rgba(91,110,63,0.10);
+  border:0;padding:2.5px 8px;border-radius:3px;
+  letter-spacing:0;text-transform:none;
+}
+body.mode-paper .post-row .meta .tag-cluster{
+  color:var(--ink-dim);
+  font-size:12px;font-weight:500;
+  background:rgba(184,169,140,0.18);
+  padding:2.5px 8px;border-radius:3px;border:0;
+}
+
+/* selected work — editorial credential cards.
+   CSS Grid lays each item as [accent-rule | content], hairline rule
+   between rows. Reads as a clean credentials list, not a portfolio. */
 body.mode-paper .work-frame{
   font-family:var(--sans);font-size:16.5px;color:var(--ink-mute);
-  line-height:1.6;font-style:italic;margin:-2px 0 8px;letter-spacing:0;
+  line-height:1.6;font-style:italic;margin:-2px 0 14px;letter-spacing:0;
 }
-body.mode-paper .prose ul.work-list{margin:8px 0 36px;padding:0;list-style:none}
+body.mode-paper .prose ul.work-list{
+  display:grid;grid-template-columns:1fr;gap:0;
+  list-style:none;margin:8px 0 44px;padding:0;
+}
 body.mode-paper .prose ul.work-list li{
-  list-style:none;
-  padding:24px 0 26px;
-  margin:0;
+  display:grid;grid-template-columns:auto 1fr;column-gap:18px;
+  padding:24px 0 26px;margin:0;
   border-top:1px solid var(--line);
   font-size:16.5px;line-height:1.7;color:var(--ink-dim);
-  /* override the generic .prose ul li padding-left + em-dash */
   padding-left:0;
 }
-body.mode-paper .prose ul.work-list li::before{content:none}
+body.mode-paper .prose ul.work-list li::before{
+  content:"";grid-column:1;
+  width:2px;align-self:stretch;background:var(--line);
+  border-radius:1px;
+  transition:background .14s ease;
+  position:static;color:transparent;
+}
+body.mode-paper .prose ul.work-list li:hover::before{background:var(--green)}
+body.mode-paper .prose ul.work-list li > *{grid-column:2}
 body.mode-paper .prose ul.work-list li:last-child{border-bottom:1px solid var(--line)}
 body.mode-paper .work-list strong{
   display:block;
   font-family:var(--sans);
-  font-size:17.5px;
-  font-weight:600;
-  color:var(--ink);
-  letter-spacing:-0.005em;
-  margin:0 0 10px;
-  line-height:1.35;
+  font-size:17.5px;font-weight:600;
+  color:var(--ink);letter-spacing:-0.005em;
+  margin:0 0 10px;line-height:1.35;
+}
+@media (max-width:560px){
+  body.mode-paper .prose ul.work-list li{column-gap:14px;padding:20px 0 22px}
+  body.mode-paper .work-list strong{font-size:16.5px}
 }
 
-/* article doc */
-body.mode-paper .doc{padding:56px 0 32px}
+/* stack — definition grid. Two-column on desktop (label | value),
+   stacked on mobile. Reads cleanly as "what I work with." */
+body.mode-paper .prose dl.stack-list{
+  display:grid;grid-template-columns:1fr;gap:0;
+  margin:14px 0 36px;padding:0;
+}
+body.mode-paper .prose dl.stack-list > div{
+  display:grid;
+  grid-template-columns:minmax(110px, 140px) 1fr;
+  column-gap:24px;align-items:baseline;
+  padding:14px 0;border-top:1px solid var(--line);
+}
+body.mode-paper .prose dl.stack-list > div:last-child{border-bottom:1px solid var(--line)}
+body.mode-paper .prose dl.stack-list dt{
+  font-family:var(--sans);font-size:11.5px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-mute);margin:0;
+}
+body.mode-paper .prose dl.stack-list dd{
+  font-family:var(--sans);font-size:16px;line-height:1.6;
+  color:var(--ink-dim);margin:0;
+}
+@media (max-width:560px){
+  body.mode-paper .prose dl.stack-list > div{
+    grid-template-columns:1fr;row-gap:4px;padding:12px 0;
+  }
+}
+
+/* elsewhere — flex row of inline label/link pairs */
+body.mode-paper .prose ul.elsewhere-list{
+  display:flex;flex-direction:column;gap:0;
+  list-style:none;padding:0;margin:14px 0 32px;
+}
+body.mode-paper .prose ul.elsewhere-list li{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;
+  padding:12px 0;margin:0;
+  border-top:1px solid var(--line);
+  font-size:16px;line-height:1.5;
+  position:static;
+}
+body.mode-paper .prose ul.elsewhere-list li::before{display:none}
+body.mode-paper .prose ul.elsewhere-list li:last-child{border-bottom:1px solid var(--line)}
+body.mode-paper .prose ul.elsewhere-list strong{
+  font-family:var(--sans);font-size:11.5px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-mute);
+  flex:0 0 auto;min-width:90px;
+}
+body.mode-paper .prose ul.elsewhere-list a{color:var(--ink-dim);background:transparent}
+body.mode-paper .prose ul.elsewhere-list a:hover{
+  background:linear-gradient(180deg, transparent 64%, rgba(91,110,63,0.28) 64%, rgba(91,110,63,0.28) 92%, transparent 92%);
+}
+
+/* article doc — editorial post template */
+body.mode-paper .doc{padding:64px 0 36px}
 body.mode-paper .doc .crumbs{font-family:var(--sans);font-size:13px;color:var(--ink-mute)}
 body.mode-paper .doc .crumbs a{color:var(--ink-dim)}
 body.mode-paper .doc .crumbs a:hover{color:var(--green)}
 body.mode-paper .doc .crumbs .sep{color:var(--line-2)}
 body.mode-paper .doc .post-prompt{display:none}
 body.mode-paper .doc h1{
-  font-family:var(--sans);font-size:clamp(30px,4vw,40px);
-  font-weight:600;letter-spacing:-0.02em;line-height:1.18;color:var(--ink);
-  margin:0 0 14px;
-  text-wrap:pretty;
+  font-family:var(--sans);
+  font-size:clamp(30px,4.4vw,44px);
+  font-weight:600;letter-spacing:-0.022em;line-height:1.14;
+  color:var(--ink);
+  margin:0 0 18px;
+  text-wrap:balance;
+  max-width:22ch;
 }
-body.mode-paper .doc .meta-row{font-family:var(--sans);font-size:13.5px;color:var(--ink-mute);gap:18px;letter-spacing:0}
-body.mode-paper .doc .meta-row span b{color:var(--ink-dim);text-transform:capitalize;letter-spacing:0;font-weight:500;margin-right:6px}
+body.mode-paper .doc .meta-row{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:8px 16px;
+  font-family:var(--sans);font-size:13px;color:var(--ink-mute);
+  letter-spacing:0;
+  padding:14px 0 18px;margin:0 0 28px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+body.mode-paper .doc .meta-row span{display:inline-flex;align-items:baseline;gap:6px}
+body.mode-paper .doc .meta-row span b{
+  color:var(--ink-mute);text-transform:uppercase;
+  letter-spacing:.1em;font-weight:600;font-size:10.5px;
+  margin-right:0;
+}
 /* Hex post-id (Id 0x04) is engineer-only cataloguing — drop it in paper.
    The slug page emits id as the first meta cell, so :first-child is stable. */
 body.mode-paper .doc .meta-row span:first-child{display:none}
@@ -296,14 +445,73 @@ body.mode-paper .cover{
   box-shadow:none;
 }
 
-/* avatar — round photo, no hard shadow */
-body.mode-paper .avatar{
-  width:120px;height:120px;border-radius:50%;overflow:hidden;
-  border:1px solid var(--line-2);background:#fff8e8;
-  box-shadow:none;
+/* about — bio header. Avatar + name + role + contact links sit as a
+   business-card masthead above the lede. Decision-makers see the answer
+   to "who is this and how do I reach them" in the first 3 seconds. */
+body.mode-paper .bio-head{
+  display:flex;flex-wrap:wrap;align-items:center;gap:24px;
+  margin:8px 0 32px;padding:0;
+  float:none;clear:both;
 }
+body.mode-paper .bio-head .avatar{
+  width:104px;height:104px;border-radius:50%;overflow:hidden;flex:0 0 auto;
+  border:1px solid var(--line-2);background:#fff8e8;box-shadow:none;
+  margin:0;
+}
+body.mode-paper .bio-head .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+body.mode-paper .bio-head-text{
+  flex:1 1 260px;min-width:0;
+  display:flex;flex-direction:column;gap:4px;
+}
+body.mode-paper .bio-name{
+  font-family:var(--sans);
+  font-size:22px;font-weight:600;letter-spacing:-0.012em;
+  color:var(--ink);margin:0;line-height:1.2;
+}
+body.mode-paper .bio-role{
+  font-family:var(--sans);
+  font-size:14.5px;color:var(--ink-mute);
+  margin:0;letter-spacing:0;line-height:1.45;
+}
+body.mode-paper .prose ul.bio-contact{
+  list-style:none;padding:0;margin:8px 0 0;
+  display:flex;flex-wrap:wrap;gap:6px 8px;
+}
+body.mode-paper .prose ul.bio-contact li{
+  position:static;padding:0;margin:0;
+}
+body.mode-paper .prose ul.bio-contact li::before{display:none}
+body.mode-paper .prose ul.bio-contact a{
+  font-family:var(--sans);font-size:13.5px;font-weight:500;
+  color:var(--ink-dim);background:transparent;
+  border:1px solid var(--line-2);border-radius:999px;
+  padding:5px 13px;letter-spacing:0;
+  transition:color .14s ease, border-color .14s ease, background .14s ease;
+}
+body.mode-paper .prose ul.bio-contact a:hover{
+  color:var(--green-2);border-color:var(--green-2);
+  background:rgba(91,110,63,0.06);
+}
+@media (max-width:560px){
+  body.mode-paper .bio-head{gap:18px;margin-bottom:24px}
+  body.mode-paper .bio-head .avatar{width:84px;height:84px}
+  body.mode-paper .bio-name{font-size:20px}
+  body.mode-paper .bio-role{font-size:14px}
+}
+
+/* lede — bigger, slightly heavier first paragraph signals the
+   "elevator pitch" and gives the page a hierarchy decision-makers can
+   scan. Subsequent paragraphs return to the standard prose scale. */
+body.mode-paper .prose p.lede{
+  font-size:21px;line-height:1.55;
+  color:var(--ink);font-weight:400;
+  letter-spacing:-0.005em;
+  margin:0 0 22px;text-wrap:pretty;
+  max-width:62ch;
+}
+body.mode-paper .prose p.lede strong{font-weight:600}
 @media (max-width:720px){
-  body.mode-paper .avatar{width:108px;height:108px}
+  body.mode-paper .prose p.lede{font-size:18.5px;line-height:1.55}
 }
 
 /* prose — Inter throughout, no mono prefixes, highlighter links */
@@ -491,10 +699,8 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e
 @media (max-width:720px){
   body.mode-paper{font-size:16.5px}
   body.mode-paper nav.top .row{height:56px}
-  body.mode-paper .page-head{padding:44px 0 12px}
-  body.mode-paper .page-head h1{font-size:clamp(30px,8.5vw,40px);line-height:1.1}
-  body.mode-paper .page-head h1.prompt{font-size:clamp(30px,8.5vw,40px)}
-  body.mode-paper .page-head p.intro{font-size:16.5px}
+  body.mode-paper .page-head h1{font-size:clamp(30px,8.5vw,42px);line-height:1.08}
+  body.mode-paper .page-head h1.prompt{font-size:clamp(30px,8.5vw,42px)}
   body.mode-paper .doc{padding:36px 0 24px}
   body.mode-paper .doc h1{font-size:clamp(26px,7.5vw,34px);line-height:1.18}
   body.mode-paper .prose{font-size:17px;line-height:1.7}
@@ -502,8 +708,6 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e
   body.mode-paper .prose h2{font-size:22px;margin:32px 0 12px;padding-top:24px}
   body.mode-paper .prose h3{font-size:17.5px;margin:22px 0 8px}
   body.mode-paper .prose blockquote{padding:6px 0 6px 14px;margin:18px 0}
-  body.mode-paper .prose ul.work-list li{padding:18px 0 20px}
-  body.mode-paper .prose ul.work-list strong{font-size:16.5px;margin:0 0 8px}
   body.mode-paper .post-row{padding:18px 0}
   body.mode-paper .post-row h2{font-size:17px}
   body.mode-paper .post-row p{font-size:15px}
@@ -514,7 +718,6 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e
   body.mode-paper .work-frame{font-size:15.5px}
 }
 @media (max-width:480px){
-  body.mode-paper .page-head{padding:36px 0 10px}
   body.mode-paper .page-head h1{font-size:clamp(28px,9vw,34px)}
   body.mode-paper .doc h1{font-size:clamp(24px,8vw,30px)}
   body.mode-paper .prose{font-size:16.5px}
