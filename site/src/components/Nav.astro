@@ -88,8 +88,27 @@ const links: Link[] = [
       const isEng = document.body.classList.contains('mode-eng');
       themeBtn.setAttribute('aria-pressed', isEng ? 'true' : 'false');
     }
+    // Pick the element nearest the top of the viewport (skipping fixed nav)
+    // so we can pin its on-screen position across the mode swap. Without
+    // this, the font/scale change reflows the page out from under the
+    // reader and the eye loses its place.
+    function pickAnchor() {
+      const candidates = document.querySelectorAll(
+        'main h1, main h2, main h3, main p, main li, main figure, main pre, main .post-row, main .work-list > li'
+      );
+      const navOffset = 80;
+      let best = null;
+      for (const el of candidates) {
+        const r = el.getBoundingClientRect();
+        if (r.bottom < navOffset) continue;
+        if (r.top > window.innerHeight) break;
+        if (!best || r.top < best.top) best = { el, top: r.top };
+      }
+      return best;
+    }
     function setMode(mode) {
       const m = mode === 'eng' ? 'eng' : 'paper';
+      const anchor = pickAnchor();
       const body = document.body;
       body.classList.remove('mode-paper', 'mode-eng');
       body.classList.add('mode-' + m);
@@ -99,6 +118,17 @@ const links: Link[] = [
       const icon = document.getElementById('favicon-svg');
       if (icon) icon.href = m === 'eng' ? '/favicon.svg' : '/favicon-paper.svg';
       syncTogglePressed();
+      if (anchor) {
+        // Run after layout settles. rAF once isn't always enough because
+        // font swap + class change can take an extra paint to flush.
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const after = anchor.el.getBoundingClientRect().top;
+            const delta = after - anchor.top;
+            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, left: 0, behavior: 'instant' });
+          });
+        });
+      }
     }
     syncTogglePressed();
     themeBtn && themeBtn.addEventListener('click', () => {
