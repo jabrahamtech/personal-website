@@ -194,7 +194,8 @@ body.mode-paper .links-row li:not(:last-child)::after{color:var(--line-2)}
 
 /* post filters - editorial dropdowns */
 body.mode-paper .post-filters{font-family:var(--sans);gap:12px 14px;margin:8px 0 22px;padding:0 0 22px;border-bottom:1px solid var(--line)}
-body.mode-paper .post-filters .filter-field{gap:7px;min-width:min(100%,284px)}
+body.mode-paper .post-filters .filter-field{gap:7px;min-width:min(100%,205px)}
+body.mode-paper .post-filters .filter-field-order{min-width:min(100%,245px)}
 body.mode-paper .post-filters .filter-label{
   color:var(--ink-mute);
   font-family:var(--sans);

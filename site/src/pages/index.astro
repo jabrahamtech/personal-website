@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { computeReadTime } from '../lib/readTime';
 
 type Post = CollectionEntry<'posts'>;
 
@@ -36,10 +35,23 @@ const contentTypeOrder = [
   'POV / Strategic Opinion Post',
 ] as const;
 
+type ContentType = typeof contentTypeOrder[number];
+
+const contentTypeLabels: Record<ContentType, string> = {
+  'Learning Journey Guide': 'Guide',
+  'Technical Build Breakdown': 'Build',
+  'Business Outcome Case Study': 'Case study',
+  'Decision / Comparison Guide': 'Decision',
+  'Diagnostic / Failure Mode Guide': 'Diagnostic',
+  'Playbook / Checklist / SOP Guide': 'Checklist',
+  'POV / Strategic Opinion Post': 'Opinion',
+};
+
 const contentTypeFilters = contentTypeOrder
   .map((value) => ({
     kind: 'type',
     value,
+    label: contentTypeLabels[value],
     count: sorted.filter((p) => p.data.contentTypes.includes(value)).length,
   }))
   .filter((f) => f.count > 0);
@@ -53,24 +65,11 @@ const clusterFilters = Array.from(new Set(sorted.map((p) => p.data.cluster).filt
 
 function fmt(p: Post) {
   if (p.data.posted) return p.data.posted.toISOString().slice(0, 10);
-  return 'unpublished';
+  return '';
 }
 
-function wordCount(p: Post) {
-  // Strip frontmatter-passthrough markers, code fences, and HTML tags before
-  // counting words so the meta line reflects readable prose only.
-  const raw = (p.body || '')
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/`[^`]*`/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/[#>*_\-\[\]\(\)!|]/g, ' ');
-  const words = raw.trim().split(/\s+/).filter(Boolean);
-  return words.length;
-}
-
-function fmtWords(n: number) {
-  if (n < 1000) return `${n} words`;
-  return `${(n / 1000).toFixed(1)}k words`;
+function contentTypeLabel(value: string) {
+  return contentTypeLabels[value as ContentType] ?? value;
 }
 
 const siteOrigin = (Astro.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
@@ -135,9 +134,9 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
           <label class="filter-field" for="filter-type">
             <span class="filter-label">type</span>
             <select class="filter-select" id="filter-type" data-filter-kind="type">
-              <option value="all">all content types ({total})</option>
+              <option value="all">all types ({total})</option>
               {contentTypeFilters.map((filter) => (
-                <option value={filter.value}>{filter.value} ({filter.count})</option>
+                <option value={filter.value}>{filter.label} ({filter.count})</option>
               ))}
             </select>
           </label>
@@ -165,8 +164,7 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
 
     <ul class="post-list" id="post-list">
       {sorted.map((post) => {
-        const wc = wordCount(post);
-        const rt = post.data.readTime ?? computeReadTime(post.body || '');
+        const posted = fmt(post);
         return (
           <li
             data-types={post.data.contentTypes.join('|')}
@@ -179,15 +177,13 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
               <h2>{post.data.title}</h2>
               <p>{post.data.summary}</p>
               <div class="meta">
-                {post.data.draft && <><span class="draft">draft</span><span class="sep">·</span></>}
-                {post.data.pipelineStatus && <><span>{post.data.pipelineStatus}</span><span class="sep">·</span></>}
-                {post.data.priority && <><span>P{post.data.priority}</span><span class="sep">·</span></>}
-                <span>{fmt(post)}</span>
-                <span class="sep">·</span><span>{fmtWords(wc)}</span>
-                <span class="sep">·</span><span>{rt}</span>
-                {post.data.cluster && <><span class="sep">·</span><span class="tag tag-cluster">{post.data.cluster}</span></>}
-                {post.data.contentTypes.length > 0 && <><span class="sep">·</span><span class="tag tag-cat">{post.data.contentTypes.join(' · ')}</span></>}
-                {post.data.tags.length > 0 && <><span class="sep">·</span><span class="tag">{post.data.tags.join(' · ')}</span></>}
+                {post.data.draft && <span class="draft">draft</span>}
+                {post.data.priority && <span>P{post.data.priority}</span>}
+                {posted && <span>{posted}</span>}
+                {post.data.cluster && <span class="tag tag-cluster">{post.data.cluster}</span>}
+                {post.data.contentTypes.map((type) => (
+                  <span class="tag tag-cat" title={type}>{contentTypeLabel(type)}</span>
+                ))}
               </div>
             </a>
           </li>

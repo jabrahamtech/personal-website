@@ -38,8 +38,16 @@ test.describe('home (posts list)', () => {
 
     await expect(page.locator('#post-filters .filter-select')).toHaveCount(3);
     await expect(page.locator('#post-filters .chip')).toHaveCount(0);
+    await expect(page.locator('#filter-type option')).toHaveText([
+      'all types (5)',
+      'Guide (2)',
+      'Build (1)',
+      'Case study (2)',
+      'Decision (1)',
+      'Opinion (2)',
+    ]);
 
-    await page.locator('#filter-type').selectOption('Learning Journey Guide');
+    await page.locator('#filter-type').selectOption({ label: 'Guide (2)' });
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(2);
     await expect(page.locator('.post-list li:not([hidden]) h2')).toHaveText([
       'Why AI Is Starting to Sound Like You',
@@ -77,14 +85,14 @@ test.describe('home (posts list)', () => {
       'Why AI Is Starting to Sound Like You',
     ]);
 
-    await page.locator('#filter-type').selectOption('Learning Journey Guide');
+    await page.locator('#filter-type').selectOption({ label: 'Guide (2)' });
     await expect(visibleTitles).toHaveText([
       'Polymarket Bot and What I Learned About EDA',
       'Why AI Is Starting to Sound Like You',
     ]);
   });
 
-  test('post-row meta sits AFTER the summary and includes word count', async ({ page }) => {
+  test('post cards use short type names and keep meta uncluttered', async ({ page }) => {
     await page.goto('/');
     const first = page.locator('.post-list .post-row').first();
     // DOM order: h2 → p (summary) → .meta
@@ -95,10 +103,26 @@ test.describe('home (posts list)', () => {
     expect(order[0]).toMatch(/^h2/);
     expect(order[1]).toMatch(/^p/);
     expect(order[2]).toMatch(/^div\.meta/);
-    // Word count line: "<n> words" or "X.Yk words"
-    await expect(first.locator('.meta')).toContainText(/\d+(\.\d+k)? words/);
-    // Computed read time appears alongside the word count: "~ N min"
-    await expect(first.locator('.meta')).toContainText(/~\s+\d+\s+min/);
+
+    const meta = first.locator('.meta');
+    await expect(meta).toContainText('draft');
+    await expect(meta).toContainText('P1');
+    await expect(meta).toContainText('Adaptive AI / Voice AI');
+    await expect(meta.locator('.tag-cat')).toHaveText(['Guide', 'Opinion']);
+
+    const visibleListText = (await page.locator('.post-list').textContent()) || '';
+    for (const noisy of [
+      'Prioritised',
+      'unpublished',
+      'Learning Journey Guide',
+      'POV / Strategic Opinion Post',
+      'words',
+      '~ ',
+      'adaptive-ai',
+      'personalisation',
+    ]) {
+      expect(visibleListText).not.toContain(noisy);
+    }
   });
 
   test('the old "Notes / Working notes…" intro is gone', async ({ page }) => {
