@@ -35,3 +35,16 @@ a{color:inherit;text-decoration:none}
 @media (max-width:720px){
   .wrap{padding:0 18px}
 }
+
+/* Theme-toggle crossfade. The layout reflows because the two modes use
+   different fonts and metrics; the View Transitions API takes a paint
+   snapshot of the old state and morphs into the new, masking the
+   unavoidable shift behind a 220ms blend. */
+::view-transition-old(root),
+::view-transition-new(root){
+  animation-duration:220ms;animation-timing-function:cubic-bezier(.4,0,.2,1);
+}
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-old(root),
+  ::view-transition-new(root){animation:none}
+}

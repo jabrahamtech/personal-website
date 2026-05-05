@@ -106,15 +106,7 @@ const links: Link[] = [
       }
       return best;
     }
-    function setMode(mode) {
-      const m = mode === 'eng' ? 'eng' : 'paper';
-      // Near the top of the page, preserving raw scroll position is the
-      // wrong behavior: paper has no status strip, so toggling to eng
-      // adds ~28px above the fold and the anchor preserve would scroll
-      // past the strip the user just summoned. Skip the anchor and pin
-      // to top instead.
-      const wasAtTop = window.scrollY < 80;
-      const anchor = wasAtTop ? null : pickAnchor();
+    function applyMode(m, wasAtTop, anchor) {
       const body = document.body;
       body.classList.remove('mode-paper', 'mode-eng');
       body.classList.add('mode-' + m);
@@ -138,6 +130,26 @@ const links: Link[] = [
             if (Math.abs(delta) > 1) window.scrollBy({ top: delta, left: 0, behavior: 'instant' });
           });
         });
+      }
+    }
+    function setMode(mode) {
+      const m = mode === 'eng' ? 'eng' : 'paper';
+      // Near the top of the page, preserving raw scroll position is the
+      // wrong behavior: paper has no status strip, so toggling to eng
+      // adds ~28px above the fold and the anchor preserve would scroll
+      // past the strip the user just summoned. Skip the anchor and pin
+      // to top instead.
+      const wasAtTop = window.scrollY < 80;
+      const anchor = wasAtTop ? null : pickAnchor();
+      // View Transitions API masks the unavoidable font/size reflow with
+      // a crossfade snapshot — the layout still changes underneath, but
+      // the user sees a smooth blend instead of a jump. Falls back to a
+      // plain mode swap on browsers without the API.
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduceMotion && document.startViewTransition) {
+        document.startViewTransition(() => applyMode(m, wasAtTop, anchor));
+      } else {
+        applyMode(m, wasAtTop, anchor);
       }
     }
     syncTogglePressed();
