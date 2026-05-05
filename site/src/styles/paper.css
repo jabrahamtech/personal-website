@@ -665,32 +665,32 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e
 /* mobile paper tweaks — tighter rhythm, comfortable reading scale,
    hairlines and rules narrower so the column doesn't feel boxed in. */
 @media (max-width:720px){
-  body.mode-paper{font-size:16.5px}
+  body.mode-paper{font-size:16px}
   body.mode-paper nav.top .row{height:56px}
-  body.mode-paper .page-head h1{font-size:clamp(24px,5.5vw,32px);line-height:1.12}
-  body.mode-paper .page-head h1.prompt{font-size:clamp(24px,5.5vw,32px)}
+  body.mode-paper .page-head h1{font-size:clamp(24px,7vw,32px);line-height:1.18}
+  body.mode-paper .page-head h1.prompt{font-size:clamp(24px,7vw,32px)}
   body.mode-paper .doc{padding:36px 0 24px}
-  body.mode-paper .doc h1{font-size:clamp(26px,7.5vw,34px);line-height:1.18}
-  body.mode-paper .prose{font-size:17px;line-height:1.7}
+  body.mode-paper .doc h1{font-size:clamp(24px,7vw,32px);line-height:1.18}
+  body.mode-paper .prose{font-size:16.5px;line-height:1.7}
   body.mode-paper .prose p{margin:0 0 16px}
-  body.mode-paper .prose h2{font-size:22px;margin:40px 0 12px;padding-top:0}
-  body.mode-paper .prose h3{font-size:17.5px;margin:26px 0 8px}
+  body.mode-paper .prose h2{font-size:20px;margin:32px 0 12px;padding-top:0}
+  body.mode-paper .prose h3{font-size:17px;margin:24px 0 8px}
   body.mode-paper .prose blockquote{padding:6px 0 6px 14px;margin:18px 0}
   body.mode-paper .post-row{padding:18px 0}
-  body.mode-paper .post-row h2{font-size:17px}
-  body.mode-paper .post-row p{font-size:15px}
-  body.mode-paper .post-row .meta{font-size:12.5px;gap:8px;row-gap:5px}
-  body.mode-paper .post-row .meta .tag,body.mode-paper .post-row .meta .tag-cat{font-size:11.5px}
+  body.mode-paper .post-row h2{font-size:16.5px}
+  body.mode-paper .post-row p{font-size:14.5px;line-height:1.55}
+  body.mode-paper .post-row .meta{font-size:12px;gap:8px;row-gap:5px}
+  body.mode-paper .post-row .meta .tag,body.mode-paper .post-row .meta .tag-cat{font-size:11px}
   body.mode-paper footer{padding:28px 0 44px;margin-top:48px}
-  body.mode-paper .foot{font-size:13px;gap:10px}
-  body.mode-paper .work-frame{font-size:15.5px}
+  body.mode-paper .foot{font-size:12.5px;gap:10px}
+  body.mode-paper .work-frame{font-size:15px}
 }
 @media (max-width:480px){
   body.mode-paper .page-head h1{font-size:clamp(22px,6vw,28px)}
-  body.mode-paper .doc h1{font-size:clamp(24px,8vw,30px)}
-  body.mode-paper .prose{font-size:16.5px}
-  body.mode-paper .prose h2{font-size:20px;margin:32px 0 10px;padding-top:0}
+  body.mode-paper .doc h1{font-size:clamp(22px,6vw,28px)}
+  body.mode-paper .prose{font-size:16px}
+  body.mode-paper .prose h2{font-size:19px;margin:28px 0 10px;padding-top:0}
   body.mode-paper .pn{margin-top:28px;padding-top:16px;gap:14px}
   body.mode-paper .pn a{padding:6px 0}
-  body.mode-paper .pn a span{font-size:15px}
+  body.mode-paper .pn a span{font-size:14.5px}
 }

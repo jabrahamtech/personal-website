@@ -155,8 +155,14 @@ const links: Link[] = [
     syncTogglePressed();
     themeBtn && themeBtn.addEventListener('click', () => {
       const isEng = document.body.classList.contains('mode-eng');
-      // /terminal forces eng — don't let users toggle into paper there.
-      if ((location.pathname.replace(/\/$/, '') || '/') === '/terminal' && isEng) return;
+      // /terminal hard-locks eng. A toggle there has nowhere to go in
+      // place, so route the click into "exit terminal": persist paper
+      // mode, then navigate to /posts so the next paint lands there.
+      if ((location.pathname.replace(/\/$/, '') || '/') === '/terminal') {
+        try { localStorage.setItem('ja_mode', 'paper'); } catch (_) {}
+        location.href = '/';
+        return;
+      }
       setMode(isEng ? 'paper' : 'eng');
     });
     // Click on backdrop (the dialog itself) — anything inside .nav-sheet-inner stops propagation.
