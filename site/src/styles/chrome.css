@@ -108,7 +108,7 @@ nav.top .nav-actions{
 
 /* status strip (Bloomberg-style system bar under nav) */
 .status-strip{border-bottom:1px solid var(--line);background:#070a08;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em;position:relative;z-index:40}
-.status-strip .row{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:7px 0;flex-wrap:wrap}
+.status-strip .row{display:flex;justify-content:space-between;align-items:center;gap:24px;padding-block:7px;flex-wrap:wrap}
 .status-strip .cell{white-space:nowrap;display:inline-flex;align-items:baseline;gap:6px}
 .status-strip b{color:var(--ink-dim);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
 .status-strip .suf{color:var(--line-2);margin-left:4px;font-size:10.5px;letter-spacing:.05em}

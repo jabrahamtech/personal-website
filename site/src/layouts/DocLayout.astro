@@ -57,6 +57,12 @@ const tocItems = headings
   .filter((h) => h.depth === 2 || h.depth === 3)
   .map((h) => ({ ...h, text: h.text.replace(/\s*#\s*$/, '').trim() }));
 const showToc = tocItems.length >= 2;
+
+const cleanTitle = title.replace(/ — Jonathan Abraham$/, '');
+const titleSizeClass =
+  cleanTitle.length > 56 ? 'size-long'
+  : cleanTitle.length > 36 ? 'size-medium'
+  : 'size-short';
 ---
 <Base
   title={title}
@@ -92,7 +98,7 @@ const showToc = tocItems.length >= 2;
       <div class={`doc-grid${showToc ? '' : ' no-toc'}`}>
         <div class="doc-main">
           <div class="post-prompt eng-only">&gt; {promptPath}</div>
-          <h1>{title.replace(/ — Jonathan Abraham$/, '')}</h1>
+          <h1 class={titleSizeClass}>{cleanTitle}</h1>
           {metaRow && (
             <div class="meta-row">
               {metaRow.map((m) => <span><b>{m.label}</b> {m.value}</span>)}
