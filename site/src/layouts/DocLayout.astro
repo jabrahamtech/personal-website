@@ -92,7 +92,6 @@ const showToc = tocItems.length >= 2;
       <div class={`doc-grid${showToc ? '' : ' no-toc'}`}>
         <div class="doc-main">
           <div class="post-prompt eng-only">&gt; {promptPath}</div>
-          <p class="page-kicker paper-only" aria-hidden="true">{promptPath.replace(/^\.?\//, '/')}</p>
           <h1>{title.replace(/ — Jonathan Abraham$/, '')}</h1>
           {metaRow && (
             <div class="meta-row">

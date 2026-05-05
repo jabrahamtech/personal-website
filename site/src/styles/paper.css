@@ -372,16 +372,16 @@ body.mode-paper .doc h1{
 }
 body.mode-paper .doc .meta-row{
   display:flex;flex-wrap:wrap;align-items:center;
-  gap:6px 14px;
+  gap:6px 22px;
   font-family:var(--sans);font-size:13px;color:var(--ink-mute);
   letter-spacing:0;
   padding:12px 0 14px;margin:0 0 22px;
   border-top:1px solid var(--line);border-bottom:1px solid var(--line);
 }
-body.mode-paper .doc .meta-row span{display:inline-flex;align-items:baseline;gap:6px}
+body.mode-paper .doc .meta-row span{display:inline-flex;align-items:baseline;gap:8px}
 body.mode-paper .doc .meta-row span b{
   color:var(--ink-mute);text-transform:uppercase;
-  letter-spacing:.1em;font-weight:600;font-size:10.5px;
+  letter-spacing:.08em;font-weight:600;font-size:10.5px;
   margin-right:0;
 }
 /* Hex post-id (Id 0x04) is engineer-only cataloguing — drop it in paper.
