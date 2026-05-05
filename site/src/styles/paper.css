@@ -150,12 +150,6 @@ body.mode-paper .page-head{
   position:relative;
 }
 body.mode-paper .page-head::before{display:none}
-body.mode-paper .page-kicker{
-  font-family:var(--mono);
-  font-size:12.5px;font-weight:500;
-  color:var(--ink-mute);
-  margin:0 0 10px;letter-spacing:0;line-height:1;
-}
 body.mode-paper .page-head h1{
   font-family:var(--sans);
   font-size:clamp(28px,3.6vw,38px);
@@ -321,7 +315,7 @@ body.mode-paper .prose ul.work-list li:last-child{border-bottom:1px solid var(--
 body.mode-paper .work-list strong{
   display:block;
   font-family:var(--sans);
-  font-size:17.5px;font-weight:600;
+  font-size:18px;font-weight:600;
   color:var(--ink);letter-spacing:-0.005em;
   margin:0 0 10px;line-height:1.35;
 }
@@ -419,7 +413,7 @@ body.mode-paper .bio-name{
 }
 body.mode-paper .bio-role{
   font-family:var(--sans);
-  font-size:14.5px;color:var(--ink-mute);
+  font-size:15px;color:var(--ink-mute);
   margin:0;letter-spacing:0;line-height:1.45;
 }
 body.mode-paper .prose ul.bio-contact{
@@ -492,7 +486,7 @@ body.mode-paper .prose code{
   padding:1px 5px;border-radius:2px;color:var(--ink);
 }
 body.mode-paper .prose pre{
-  font-family:var(--mono);font-size:13.5px;line-height:1.6;
+  font-family:var(--mono);font-size:14.5px;line-height:1.6;
   background:#fff8e8;border:1px solid var(--line-2);
   color:var(--ink);
   padding:16px 18px;
@@ -506,7 +500,7 @@ body.mode-paper .prose h2{
 }
 body.mode-paper .prose h2::before{content:""}
 body.mode-paper .prose h3{
-  font-family:var(--sans);font-size:19px;font-weight:600;color:var(--ink);
+  font-family:var(--sans);font-size:21px;font-weight:600;color:var(--ink);
   margin:36px 0 10px;letter-spacing:-0.008em;line-height:1.35;
 }
 body.mode-paper .prose h3::before{content:""}
@@ -565,13 +559,13 @@ body.mode-paper .reading-progress span{background:var(--green);box-shadow:none}
 
 /* TOC desktop + mobile */
 body.mode-paper .doc.has-toc .toc-desktop{font-family:var(--sans);font-size:13px;color:var(--ink-mute);border-left:1px solid var(--line)}
-body.mode-paper .toc-desktop .toc-head{color:var(--ink);font-weight:600;letter-spacing:0;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+body.mode-paper .toc-desktop .toc-head{color:var(--ink);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
 body.mode-paper .toc-desktop a{color:var(--ink-mute)}
 body.mode-paper .toc-desktop a:hover{color:var(--ink-dim)}
 body.mode-paper .toc-desktop a.active{color:var(--green);border-left-color:var(--green)}
 body.mode-paper .doc.has-toc .toc-mobile{font-family:var(--sans);background:var(--bg);border:1px solid var(--line);box-shadow:none}
 body.mode-paper .toc-mobile summary{color:var(--ink-dim)}
-body.mode-paper .toc-mobile .toc-prompt{color:var(--ink);font-weight:600;letter-spacing:0;text-transform:uppercase;font-size:11.5px;letter-spacing:.06em}
+body.mode-paper .toc-mobile .toc-prompt{color:var(--ink);font-weight:600;text-transform:uppercase;font-size:11.5px;letter-spacing:.08em}
 body.mode-paper .toc-mobile .toc-count{color:var(--ink-mute)}
 body.mode-paper .toc-mobile .toc-count::before{content:"("}
 body.mode-paper .toc-mobile .toc-count::after{content:")"}

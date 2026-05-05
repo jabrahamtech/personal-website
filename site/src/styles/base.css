@@ -1,5 +1,6 @@
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+html,body{overflow-x:clip}
 /* Reserve scrollbar space always so .wrap stays centered identically
    whether the current page overflows or not. Otherwise short pages
    (terminal) and long pages (home) end up centered on different
