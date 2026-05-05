@@ -193,23 +193,28 @@ body.mode-paper .links-row a:hover{color:var(--green)}
 body.mode-paper .links-row li:not(:last-child)::after{color:var(--line-2)}
 
 /* post filters - editorial dropdowns */
-body.mode-paper .post-filters{font-family:var(--sans);gap:12px;margin:8px 0 18px}
-body.mode-paper .post-filters .filter-field{gap:6px;min-width:min(100%,280px)}
+body.mode-paper .post-filters{font-family:var(--sans);gap:12px 14px;margin:8px 0 22px;padding:0 0 22px;border-bottom:1px solid var(--line)}
+body.mode-paper .post-filters .filter-field{gap:7px;min-width:min(100%,284px)}
 body.mode-paper .post-filters .filter-label{
   color:var(--ink-mute);
   font-family:var(--sans);
-  font-size:12px;
-  letter-spacing:.04em;
+  font-size:11px;
+  letter-spacing:.07em;
   text-transform:uppercase;
 }
 body.mode-paper .post-filters .filter-select{
   font-family:var(--sans);font-size:14px;letter-spacing:0;
-  min-height:38px;color:var(--ink-dim);background:#fff8e8;
-  border:1px solid var(--line-2);border-radius:3px;
-  padding:8px 34px 8px 11px;
+  min-height:40px;color:var(--ink-dim);background:#fff8e8;
+  border:1px solid var(--line-2);border-radius:4px;
+  box-shadow:0 1px 0 rgba(26,22,18,0.04), inset 0 1px 0 rgba(255,255,255,0.42);
+  padding:9px 36px 9px 12px;
 }
-body.mode-paper .post-filters .filter-select:hover,body.mode-paper .post-filters .filter-select:focus{color:var(--ink);border-color:var(--ink-dim);background:#fffaf0}
-body.mode-paper .post-filters .filter-hint{font-family:var(--sans);font-size:13px;color:var(--ink-mute);font-style:italic}
+body.mode-paper .post-filters .filter-select:hover,body.mode-paper .post-filters .filter-select:focus{
+  color:var(--ink);
+  border-color:var(--green-2);
+  background-color:#fffaf0;
+  box-shadow:0 0 0 3px rgba(91,110,63,0.09), inset 0 1px 0 rgba(255,255,255,0.42);
+}
 body.mode-paper .post-empty{font-family:var(--sans);color:var(--ink-mute);border-top:1px solid var(--line)}
 
 /* content-type tag in post-row meta - soft sage tint, no border */
@@ -221,8 +226,9 @@ body.mode-paper .post-row .meta .tag-cat{
 body.mode-paper .post-row .meta .tag-cluster{color:var(--ink-dim)}
 
 /* posts list — editorial, hairline rules, sage hover */
-body.mode-paper .post-row{padding:24px 0;border-top:1px solid var(--line)}
-body.mode-paper .post-row:last-child{border-bottom:1px solid var(--line)}
+body.mode-paper .post-row{padding:24px 0;border-top:0}
+body.mode-paper .post-list li + li .post-row{border-top:1px solid var(--line)}
+body.mode-paper .post-list li:last-child .post-row{border-bottom:1px solid var(--line)}
 body.mode-paper .post-row:hover{background:transparent}
 body.mode-paper .post-row h2{
   font-family:var(--sans);font-size:19px;font-weight:500;line-height:1.35;color:var(--ink);
