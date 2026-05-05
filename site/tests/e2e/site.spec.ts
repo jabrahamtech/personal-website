@@ -36,7 +36,7 @@ test.describe('home (posts list)', () => {
   test('filters upcoming drafts by content type and cluster', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page.locator('#post-filters .filter-select')).toHaveCount(2);
+    await expect(page.locator('#post-filters .filter-select')).toHaveCount(3);
     await expect(page.locator('#post-filters .chip')).toHaveCount(0);
 
     await page.locator('#filter-type').selectOption('Learning Journey Guide');
@@ -53,6 +53,35 @@ test.describe('home (posts list)', () => {
 
     await page.locator('#filter-cluster').selectOption('all');
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(5);
+  });
+
+  test('sorts newest first by default and can switch to oldest first', async ({ page }) => {
+    await page.goto('/');
+
+    const visibleTitles = page.locator('.post-list li:not([hidden]) h2');
+    await expect(page.locator('#filter-order')).toHaveValue('desc');
+    await expect(visibleTitles).toHaveText([
+      'Why AI Is Starting to Sound Like You',
+      'When You Should Use Traditional Solutions in Your AI Agent',
+      'How We Reduced Broker Quote Processing Time by 70% With an AI Intake Workflow',
+      "How I Cut 80% of a Recruitment Agency's Work Week in a 2-Hour AI Call",
+      'Polymarket Bot and What I Learned About EDA',
+    ]);
+
+    await page.locator('#filter-order').selectOption('asc');
+    await expect(visibleTitles).toHaveText([
+      'Polymarket Bot and What I Learned About EDA',
+      "How I Cut 80% of a Recruitment Agency's Work Week in a 2-Hour AI Call",
+      'How We Reduced Broker Quote Processing Time by 70% With an AI Intake Workflow',
+      'When You Should Use Traditional Solutions in Your AI Agent',
+      'Why AI Is Starting to Sound Like You',
+    ]);
+
+    await page.locator('#filter-type').selectOption('Learning Journey Guide');
+    await expect(visibleTitles).toHaveText([
+      'Polymarket Bot and What I Learned About EDA',
+      'Why AI Is Starting to Sound Like You',
+    ]);
   });
 
   test('post-row meta sits AFTER the summary and includes word count', async ({ page }) => {

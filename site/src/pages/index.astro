@@ -7,15 +7,24 @@ type Post = CollectionEntry<'posts'>;
 
 const all = await getCollection('posts');
 
-const sorted = all.sort((a, b) => {
+function comparePosts(a: Post, b: Post, order: 'asc' | 'desc' = 'desc') {
+  const ad = a.data.posted?.getTime();
+  const bd = b.data.posted?.getTime();
+  if (ad !== undefined || bd !== undefined) {
+    if (ad === undefined) return 1;
+    if (bd === undefined) return -1;
+    if (ad !== bd) return order === 'desc' ? bd - ad : ad - bd;
+  }
+
   const ap = a.data.priority ?? Number.POSITIVE_INFINITY;
   const bp = b.data.priority ?? Number.POSITIVE_INFINITY;
-  if (ap !== bp) return ap - bp;
-  const ad = a.data.posted?.getTime() ?? 0;
-  const bd = b.data.posted?.getTime() ?? 0;
-  if (ad !== bd) return bd - ad;
-  return a.data.title.localeCompare(b.data.title);
-});
+  if (ap !== bp) return order === 'desc' ? ap - bp : bp - ap;
+  return order === 'desc'
+    ? a.data.title.localeCompare(b.data.title)
+    : b.data.title.localeCompare(a.data.title);
+}
+
+const sorted = [...all].sort((a, b) => comparePosts(a, b));
 
 const contentTypeOrder = [
   'Learning Journey Guide',
@@ -143,6 +152,13 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
               </select>
             </label>
           )}
+          <label class="filter-field filter-field-order" for="filter-order">
+            <span class="filter-label">order</span>
+            <select class="filter-select" id="filter-order" data-order-control>
+              <option value="desc" selected>descending - newest first</option>
+              <option value="asc">ascending - oldest first</option>
+            </select>
+          </label>
         </div>
       );
     })()}
@@ -156,6 +172,8 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
             data-types={post.data.contentTypes.join('|')}
             data-cluster={post.data.cluster ?? ''}
             data-priority={post.data.priority ?? ''}
+            data-posted-time={post.data.posted?.getTime() ?? ''}
+            data-title={post.data.title}
           >
             <a class="post-row" href={`/posts/${post.id}`}>
               <h2>{post.data.title}</h2>
@@ -187,10 +205,38 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
       const empty = document.getElementById('post-empty');
       if (!root || !list) return;
       const items = Array.from(list.querySelectorAll('li'));
-      const selects = Array.from(root.querySelectorAll('.filter-select'));
-      const storageKey = 'ja_post_filter_v2';
+      const filterSelects = Array.from(root.querySelectorAll('.filter-select[data-filter-kind]'));
+      const orderSelect = root.querySelector('[data-order-control]');
+      const storageKey = 'ja_post_filter_v3';
 
-      function apply(kind, value) {
+      function sortItems(order) {
+        const normalised = order === 'asc' ? 'asc' : 'desc';
+        items.sort((a, b) => {
+          const aRawDate = a.getAttribute('data-posted-time') || '';
+          const bRawDate = b.getAttribute('data-posted-time') || '';
+          const aHasDate = aRawDate !== '';
+          const bHasDate = bRawDate !== '';
+          if (aHasDate || bHasDate) {
+            if (!aHasDate) return 1;
+            if (!bHasDate) return -1;
+            const diff = Number(aRawDate) - Number(bRawDate);
+            if (diff !== 0) return normalised === 'desc' ? -diff : diff;
+          }
+
+          const ap = Number(a.getAttribute('data-priority') || Number.POSITIVE_INFINITY);
+          const bp = Number(b.getAttribute('data-priority') || Number.POSITIVE_INFINITY);
+          if (ap !== bp) return normalised === 'desc' ? ap - bp : bp - ap;
+
+          const at = a.getAttribute('data-title') || '';
+          const bt = b.getAttribute('data-title') || '';
+          return normalised === 'desc' ? at.localeCompare(bt) : bt.localeCompare(at);
+        });
+        items.forEach((li) => list.appendChild(li));
+      }
+
+      function apply(kind, value, order) {
+        const normalisedOrder = order === 'asc' ? 'asc' : 'desc';
+        sortItems(normalisedOrder);
         let shown = 0;
         items.forEach((li) => {
           const types = (li.getAttribute('data-types') || '').split('|').filter(Boolean);
@@ -201,15 +247,16 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
           li.hidden = !match;
           if (match) shown++;
         });
-        selects.forEach((select) => {
+        filterSelects.forEach((select) => {
           const selectKind = select.getAttribute('data-filter-kind') || '';
           select.value = selectKind === kind ? value : 'all';
         });
+        if (orderSelect) orderSelect.value = normalisedOrder;
         if (empty) empty.hidden = shown !== 0;
-        try { localStorage.setItem(storageKey, JSON.stringify({ kind, value })); } catch (_) {}
+        try { localStorage.setItem(storageKey, JSON.stringify({ kind, value, order: normalisedOrder })); } catch (_) {}
       }
 
-      let initial = { kind: 'all', value: 'all' };
+      let initial = { kind: 'all', value: 'all', order: 'desc' };
       try {
         const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
         if (
@@ -218,20 +265,33 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
           && typeof saved.value === 'string'
           && (
             saved.kind === 'all'
-            || selects.some((select) => select.getAttribute('data-filter-kind') === saved.kind && Array.from(select.options).some((option) => option.value === saved.value))
+            || filterSelects.some((select) => select.getAttribute('data-filter-kind') === saved.kind && Array.from(select.options).some((option) => option.value === saved.value))
           )
         ) {
-          initial = saved;
+          initial = {
+            kind: saved.kind,
+            value: saved.value,
+            order: saved.order === 'asc' ? 'asc' : 'desc',
+          };
         }
       } catch (_) {}
-      apply(initial.kind, initial.value);
+      apply(initial.kind, initial.value, initial.order);
 
-      selects.forEach((select) => {
+      filterSelects.forEach((select) => {
         select.addEventListener('change', () => {
           const value = select.value || 'all';
-          apply(value === 'all' ? 'all' : select.getAttribute('data-filter-kind') || 'all', value);
+          const order = orderSelect ? orderSelect.value : 'desc';
+          apply(value === 'all' ? 'all' : select.getAttribute('data-filter-kind') || 'all', value, order);
         });
       });
+      if (orderSelect) {
+        orderSelect.addEventListener('change', () => {
+          const selectedFilter = filterSelects.find((select) => select.value !== 'all');
+          const kind = selectedFilter ? selectedFilter.getAttribute('data-filter-kind') || 'all' : 'all';
+          const value = selectedFilter ? selectedFilter.value || 'all' : 'all';
+          apply(kind, value, orderSelect.value);
+        });
+      }
     })();
   </script>
 </Base>
