@@ -220,41 +220,7 @@
   margin: 0;
 }
 
-/* stack — definition grid (label | value) */
-.prose dl.stack-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
-  margin: 8px 0 26px;
-  padding: 0;
-}
-.prose dl.stack-list > div {
-  display: grid;
-  grid-template-columns: minmax(110px, 130px) 1fr;
-  column-gap: 18px;
-  align-items: baseline;
-  padding: 10px 0;
-  border-top: 1px dashed var(--line);
-  font-family: var(--mono);
-  font-size: 14px;
-}
-.prose dl.stack-list > div:last-child { border-bottom: 1px dashed var(--line) }
-.prose dl.stack-list dt {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--green-2);
-  letter-spacing: .06em;
-  text-transform: lowercase;
-  margin: 0;
-}
-.prose dl.stack-list dd {
-  font-family: var(--mono);
-  font-size: 13.5px;
-  color: var(--ink-dim);
-  margin: 0;
-}
-
-/* elsewhere — flex list mirroring stack rhythm */
+/* elsewhere — flex list mirroring work rhythm */
 .prose ul.elsewhere-list {
   list-style: none;
   padding: 0;
