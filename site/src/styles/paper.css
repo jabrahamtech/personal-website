@@ -1,38 +1,21 @@
-/* paper theme — non-technical reading surface, default mode.
-   loaded after components so it wins on cascade. only overrides what
-   genuinely differs from engineer mode; everything else inherits. */
+/* paper theme — editorial reading surface for non-technical visitors.
+   palette + mode visibility utilities live in tokens.css; this file is
+   paper-specific structural overrides only. loaded last so it wins on
+   the cascade against the eng-mode component layers. */
 
-body.mode-paper{
-  /* palette — overrides tokens.css */
-  --bg:#f4ede0;
-  --bg-2:#efe6d4;
-  --panel:#ffffff;
-  --line:#d8cdb8;
-  --line-2:#b8a98c;
-  --ink:#1a1612;
-  --ink-dim:#3a342c;
-  --ink-mute:#8a7d68;
-  --green:#5b6e3f;
-  --green-2:#3f5028;
-  --cyan:#4a5d3a;
-  --amber:#8a6d2c;
-  --red:#a04030;
-
-  font-family:var(--sans);
-  font-size:17px;
-  line-height:1.65;
+/* body-level type defaults — palette comes from tokens.css */
+body.mode-paper {
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.65;
   background:
-    radial-gradient(1100px 600px at 88% -8%, rgba(91,110,63,0.06), transparent 62%),
-    radial-gradient(900px 500px at -8% 32%, rgba(184,169,140,0.16), transparent 60%),
+    radial-gradient(1100px 600px at 88% -8%, rgba(91, 110, 63, 0.06), transparent 62%),
+    radial-gradient(900px 500px at -8% 32%, rgba(184, 169, 140, 0.16), transparent 60%),
     var(--bg);
 }
 
-/* hide engineer-only elements; engineer mode hides paper-only elements */
-body.mode-paper .eng-only{display:none !important}
-body.mode-eng .paper-only,body:not(.mode-paper):not(.mode-eng) .paper-only{display:none !important}
-
 /* drop the CRT scanline overlay entirely */
-body.mode-paper::before{content:none}
+body.mode-paper::before { content: none }
 
 /* cursor — paper uses native pointers, no terminal crosshair.
    set on <html data-mode> because base.css attaches the SVG cursor at the
@@ -646,7 +629,9 @@ body.mode-paper .foot .links .sep{color:var(--line-2)}
 /* ascii-div is engineer-only visual chrome — collapse in paper mode */
 body.mode-paper .ascii-div{display:none}
 
-/* 404 — clean editorial layout instead of segfault terminal */
+/* 404 — clean editorial layout instead of segfault terminal.
+   Inherits display:flex/flex-direction/min-height/max-width/margin from
+   pages.css; only overrides what differs. */
 body.mode-paper .panic{
   font-family:var(--sans);
   padding:72px 32px;

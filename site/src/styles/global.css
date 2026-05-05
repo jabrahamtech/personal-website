@@ -1,7 +1,30 @@
 /* jonathan_abraham — entry stylesheet.
-   modular CSS in cascade order: tokens → base → components.
-   add a theme by overriding tokens.css vars on a body class
-   (e.g. body.mode-paper) — components don't need to change. */
+
+   Theme model
+   -----------
+   The site has two visual modes: `eng` (terminal) and `paper` (editorial).
+   Mode is set on `<body class="mode-eng|mode-paper">` by a pre-paint
+   resolver in <head>; default is paper, /terminal forces eng.
+
+   Cascade — eng is the *default* theme (rules unscoped), paper.css
+   overrides via `body.mode-paper` selectors that win on the cascade
+   thanks to import order.
+
+     1. tokens.css   — palette tokens (eng default + body.mode-paper override)
+                       + .eng-only / .paper-only mode visibility utilities
+     2. base.css     — mode-agnostic resets (html, body, .wrap, .skip-link)
+     3. chrome.css   — shared chrome (nav, footer, status-strip, page-loader)
+     4. pages.css    — index/about/404 surfaces
+     5. doc.css      — post template (article, callouts, TOC, prev/next)
+     6. terminal.css — /terminal page (forced eng mode by route)
+     7. paper.css    — paper-mode overrides — body.mode-paper-scoped only
+
+   Adding a new mode
+   -----------------
+   - Add palette overrides under `body.mode-<name>` in tokens.css
+   - Add `<name>.css` of mode-scoped overrides, imported after paper.css
+   - Components don't need to change — they consume tokens. */
+
 @import './tokens.css';
 @import './base.css';
 @import './chrome.css';
@@ -11,6 +34,10 @@
 @import './paper.css';
 
 /* global reduced-motion catch-all — last so it wins everywhere */
-@media (prefers-reduced-motion: reduce){
-  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
 }

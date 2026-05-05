@@ -1,63 +1,218 @@
-/* terminal (game) */
-.term-page{padding:36px 0 24px}
-.term-page .preamble{font-family:var(--mono);font-size:13px;color:var(--ink-dim);margin:0 0 22px;max-width:640px;line-height:1.65}
-.term-page .preamble b{color:var(--green);font-weight:500}
-.term{font-family:var(--mono);font-size:13.5px;background:#070a08;border:1px solid var(--line-2);box-shadow:0 0 0 1px var(--bg) inset, 6px 6px 0 0 rgba(0,0,0,0.55), 6px 6px 0 1px var(--line), 0 0 60px rgba(125,255,138,0.06);position:relative}
-.term-bar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);background:#0a0e0b}
-.term-bar .lights{display:flex;gap:6px}
-.term-bar .lights i{width:9px;height:9px;display:block;border:1px solid rgba(0,0,0,0.4)}
-.term-bar .lights .r{background:#ff5f56}
-.term-bar .lights .y{background:#ffbd2e}
-.term-bar .lights .g{background:#27c93f;animation:tlpulse 2.2s ease-in-out infinite;box-shadow:0 0 6px rgba(39,201,63,0.55)}
-@keyframes tlpulse{0%,100%{opacity:1;box-shadow:0 0 6px rgba(39,201,63,0.55)}50%{opacity:.55;box-shadow:0 0 2px rgba(39,201,63,0.2)}}
-.term-bar .title{font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em;margin-left:8px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.term-bar .title b{color:var(--ink-dim);font-weight:500}
-.term-bar .audio{flex:0 0 auto;font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink-mute);background:transparent;border:1px solid var(--line-2);padding:3px 8px;cursor:pointer;line-height:1.2}
-.term-bar .audio:hover{color:var(--green);border-color:var(--green-2)}
-.term-bar .audio[data-on="true"]{color:var(--green);border-color:var(--green-2);box-shadow:0 0 6px rgba(125,255,138,0.18) inset}
-.term-body{padding:18px 18px 22px;min-height:420px;color:#cfe9d3;cursor:text;max-height:560px;overflow-y:auto}
-.term-line{display:block;white-space:pre-wrap;word-break:break-word;color:#cfe9d3;margin:1px 0;animation:tlineIn 160ms ease-out both}
-@keyframes tlineIn{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){.term-line{animation:none}.term-bar .lights .g{animation:none}.term-input-row .pmt{animation:none}.term-foot .stat{animation:none}.term-foot .meter i.on{animation:none}.page-head .prompt::before{animation:none}}
-.term-line .pmt{color:var(--green)}
-.term-line .ok{color:var(--green)}
-.term-line .warn{color:var(--amber)}
-.term-line .info{color:var(--cyan)}
-.term-line .dim{color:var(--ink-mute)}
-.term-line .err{color:var(--red)}
-.term-line.heading{color:var(--green);font-weight:500;margin-top:14px}
-.term-line.teach{color:var(--ink-dim);background:rgba(125,255,138,0.04);border-left:2px solid var(--green-2);padding:8px 12px;margin:8px 0;font-size:13px;line-height:1.6}
-.term-line.teach b{color:var(--amber);font-weight:500}
-.term-input-row{display:flex;align-items:center;gap:6px;margin-top:6px}
-.term-input-row .pmt{color:var(--green);font-family:var(--mono);font-size:13.5px}
-.term-input-row input{flex:1;background:transparent;border:0;outline:0;color:#cfe9d3;font-family:var(--mono);font-size:13.5px;caret-color:var(--green);padding:0}
-.term-input-row input::placeholder{color:var(--ink-mute)}
-.term-input-row .pmt{animation:trcaret 1.05s steps(2,start) infinite}
-@keyframes trcaret{0%,55%{opacity:1}56%,100%{opacity:.25}}
-.term-line.typing::after{content:"\2588";display:inline-block;color:var(--green);margin-left:1px;animation:trcaret 0.7s steps(2,start) infinite}
-.term-foot .stat{color:var(--green);animation:trcaret 1.6s steps(2,start) infinite}
-.term-foot .meter i.on{background:var(--green);box-shadow:0 0 4px var(--green);animation:meterFill 0.42s ease-out both}
-@keyframes meterFill{from{transform:scaleY(0);transform-origin:bottom;opacity:.2}to{transform:scaleY(1);opacity:1}}
-.term-foot{border-top:1px solid var(--line);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);background:#0a0e0b;gap:10px;flex-wrap:wrap}
-.term-foot .stat{color:var(--green)}
-.term-foot .score{color:var(--cyan)}
-.term-foot .meter{display:inline-flex;gap:2px;margin-left:6px}
-.term-foot .meter i{width:6px;height:8px;background:var(--line-2);display:block}
-.term-foot .meter i.on{background:var(--green);box-shadow:0 0 4px var(--green)}
+/* terminal page — only reachable at /terminal which forces eng mode in
+   the pre-paint resolver. Rules are unscoped because the route guarantees
+   eng mode. Palette comes from tokens.css. */
 
-/* mobile terminal — tighten spacing, shrink box, allow term-foot HUD to wrap */
-@media (max-width:720px){
-  .term-page{padding:24px 0 16px}
-  .term-page .preamble{font-size:12.5px;line-height:1.6;margin:0 0 16px}
-  .term-bar{padding:8px 10px;gap:6px}
-  .term-bar .lights i{width:8px;height:8px}
-  .term-bar .title{font-size:10.5px;margin-left:4px}
-  .term-body{padding:14px 12px 16px;min-height:300px;max-height:62vh;font-size:12.5px}
-  .term-line{font-size:12.5px;line-height:1.55}
-  .term-line.teach{padding:7px 10px;font-size:12px}
-  .term-input-row .pmt,
-  .term-input-row input{font-size:12.5px}
-  .term-foot{padding:8px 10px;font-size:11px;gap:8px;row-gap:6px;justify-content:flex-start}
-  .term-foot > span{flex:0 0 auto}
-  .term-foot .meter i{width:5px;height:7px}
+@keyframes tlpulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(39, 201, 63, 0.55) }
+  50% { opacity: .55; box-shadow: 0 0 2px rgba(39, 201, 63, 0.2) }
 }
+@keyframes tlineIn {
+  from { opacity: 0; transform: translateY(-2px) }
+  to { opacity: 1; transform: none }
+}
+@keyframes trcaret {
+  0%, 55% { opacity: 1 }
+  56%, 100% { opacity: .25 }
+}
+@keyframes meterFill {
+  from { transform: scaleY(0); transform-origin: bottom; opacity: .2 }
+  to { transform: scaleY(1); opacity: 1 }
+}
+
+.term-page { padding: 36px 0 24px }
+.term-page .preamble {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink-dim);
+  margin: 0 0 22px;
+  max-width: 640px;
+  line-height: 1.65;
+}
+.term-page .preamble b { color: var(--green); font-weight: 500 }
+
+.term {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  background: #070a08;
+  border: 1px solid var(--line-2);
+  box-shadow:
+    0 0 0 1px var(--bg) inset,
+    6px 6px 0 0 rgba(0, 0, 0, 0.55),
+    6px 6px 0 1px var(--line),
+    0 0 60px rgba(125, 255, 138, 0.06);
+  position: relative;
+}
+
+.term-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: #0a0e0b;
+}
+.term-bar .lights { display: flex; gap: 6px }
+.term-bar .lights i {
+  width: 9px;
+  height: 9px;
+  display: block;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+.term-bar .lights .r { background: #ff5f56 }
+.term-bar .lights .y { background: #ffbd2e }
+.term-bar .lights .g {
+  background: #27c93f;
+  animation: tlpulse 2.2s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(39, 201, 63, 0.55);
+}
+.term-bar .title {
+  font-size: 11.5px;
+  color: var(--ink-mute);
+  letter-spacing: .04em;
+  margin-left: 8px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.term-bar .title b { color: var(--ink-dim); font-weight: 500 }
+.term-bar .audio {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--ink-mute);
+  background: transparent;
+  border: 1px solid var(--line-2);
+  padding: 3px 8px;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.term-bar .audio:hover { color: var(--green); border-color: var(--green-2) }
+.term-bar .audio[data-on="true"] {
+  color: var(--green);
+  border-color: var(--green-2);
+  box-shadow: 0 0 6px rgba(125, 255, 138, 0.18) inset;
+}
+
+.term-body {
+  padding: 18px 18px 22px;
+  min-height: 420px;
+  color: #cfe9d3;
+  cursor: text;
+  max-height: 560px;
+  overflow-y: auto;
+}
+.term-line {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #cfe9d3;
+  margin: 1px 0;
+  animation: tlineIn 160ms ease-out both;
+}
+.term-line .pmt { color: var(--green) }
+.term-line .ok { color: var(--green) }
+.term-line .warn { color: var(--amber) }
+.term-line .info { color: var(--cyan) }
+.term-line .dim { color: var(--ink-mute) }
+.term-line .err { color: var(--red) }
+.term-line.heading { color: var(--green); font-weight: 500; margin-top: 14px }
+.term-line.teach {
+  color: var(--ink-dim);
+  background: rgba(125, 255, 138, 0.04);
+  border-left: 2px solid var(--green-2);
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.term-line.teach b { color: var(--amber); font-weight: 500 }
+.term-line.typing::after {
+  content: "\2588";
+  display: inline-block;
+  color: var(--green);
+  margin-left: 1px;
+  animation: trcaret 0.7s steps(2, start) infinite;
+}
+
+.term-input-row { display: flex; align-items: center; gap: 6px; margin-top: 6px }
+.term-input-row .pmt {
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 13.5px;
+  animation: trcaret 1.05s steps(2, start) infinite;
+}
+.term-input-row input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: #cfe9d3;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  caret-color: var(--green);
+  padding: 0;
+}
+.term-input-row input::placeholder { color: var(--ink-mute) }
+
+.term-foot {
+  border-top: 1px solid var(--line);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-mute);
+  background: #0a0e0b;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.term-foot .stat { color: var(--green); animation: trcaret 1.6s steps(2, start) infinite }
+.term-foot .score { color: var(--cyan) }
+.term-foot .meter { display: inline-flex; gap: 2px; margin-left: 6px }
+.term-foot .meter i {
+  width: 6px;
+  height: 8px;
+  background: var(--line-2);
+  display: block;
+}
+.term-foot .meter i.on {
+  background: var(--green);
+  box-shadow: 0 0 4px var(--green);
+  animation: meterFill 0.42s ease-out both;
+}
+
+/* mobile — tighten spacing, shrink terminal box, allow HUD to wrap */
+@media (max-width: 720px) {
+  .term-page { padding: 24px 0 16px }
+  .term-page .preamble { font-size: 12.5px; line-height: 1.6; margin: 0 0 16px }
+  .term-bar { padding: 8px 10px; gap: 6px }
+  .term-bar .lights i { width: 8px; height: 8px }
+  .term-bar .title { font-size: 10.5px; margin-left: 4px }
+  .term-body {
+    padding: 14px 12px 16px;
+    min-height: 300px;
+    max-height: 62vh;
+    font-size: 12.5px;
+  }
+  .term-line { font-size: 12.5px; line-height: 1.55 }
+  .term-line.teach { padding: 7px 10px; font-size: 12px }
+  .term-input-row .pmt,
+  .term-input-row input { font-size: 12.5px }
+  .term-foot {
+    padding: 8px 10px;
+    font-size: 11px;
+    gap: 8px;
+    row-gap: 6px;
+    justify-content: flex-start;
+  }
+  .term-foot > span { flex: 0 0 auto }
+  .term-foot .meter i { width: 5px; height: 7px }
+}
+
+
+/* The global @media (prefers-reduced-motion: reduce) catch-all in
+   global.css already disables animations — no per-file guard needed. */

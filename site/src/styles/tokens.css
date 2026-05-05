@@ -1,20 +1,51 @@
-/* design tokens — single theme surface.
-   to add a theme, override these vars on a body class (e.g. body.mode-paper)
-   instead of touching component CSS. */
-:root{
-  --bg:#0b0e0c;
-  --bg-2:#0f1411;
-  --panel:#10150f;
-  --line:#1d2820;
-  --line-2:#2a3a2d;
-  --ink:#ecebe4;
-  --ink-dim:#c7c6bc;
-  --ink-mute:#8b9286;
-  --green:#7dff8a;
-  --green-2:#46c463;
-  --cyan:#6ee7ff;
-  --amber:#f5b860;
-  --red:#ff7a7a;
-  --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
-  --sans:'Inter', system-ui, sans-serif;
+/* design tokens — single source of palette + type primitives.
+   themes swap palette by overriding these vars on a body class.
+   components consume vars only; they never hardcode colour. */
+
+:root {
+  /* type primitives — shared across modes */
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --sans: 'Inter', system-ui, sans-serif;
+
+  /* palette — engineer / terminal mode (default) */
+  --bg: #0b0e0c;
+  --bg-2: #0f1411;
+  --panel: #10150f;
+  --line: #1d2820;
+  --line-2: #2a3a2d;
+  --ink: #ecebe4;
+  --ink-dim: #c7c6bc;
+  --ink-mute: #8b9286;
+  --green: #7dff8a;
+  --green-2: #46c463;
+  --cyan: #6ee7ff;
+  --amber: #f5b860;
+  --red: #ff7a7a;
+}
+
+/* palette — paper / editorial mode. Overrides only the palette vars;
+   type primitives stay shared. */
+body.mode-paper {
+  --bg: #f4ede0;
+  --bg-2: #efe6d4;
+  --panel: #ffffff;
+  --line: #d8cdb8;
+  --line-2: #b8a98c;
+  --ink: #1a1612;
+  --ink-dim: #3a342c;
+  --ink-mute: #8a7d68;
+  --green: #5b6e3f;
+  --green-2: #3f5028;
+  --cyan: #4a5d3a;
+  --amber: #8a6d2c;
+  --red: #a04030;
+}
+
+/* mode visibility utilities — content can opt in to a single mode.
+   the SSR fallback (`:not(.mode-paper):not(.mode-eng)`) handles the
+   pre-paint frame before the mode resolver script runs. */
+body.mode-paper .eng-only,
+body:not(.mode-paper):not(.mode-eng) .paper-only,
+body.mode-eng .paper-only {
+  display: none !important;
 }
