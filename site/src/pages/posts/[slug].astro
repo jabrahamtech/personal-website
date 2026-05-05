@@ -44,7 +44,9 @@ const editUrl = `https://github.com/jabrahamtech/personal-website/edit/main/${so
 const metaRow: { label: string; value: string }[] = [];
 metaRow.push({ label: 'id', value: postId });
 if (data.posted) metaRow.push({ label: 'posted', value: data.posted.toISOString().slice(0, 10) });
-else metaRow.push({ label: 'status', value: 'draft' });
+else metaRow.push({ label: 'status', value: `${data.pipelineStatus.toLowerCase()} draft` });
+if (data.priority) metaRow.push({ label: 'priority', value: `P${data.priority}` });
+if (data.cluster) metaRow.push({ label: 'cluster', value: data.cluster });
 metaRow.push({ label: 'read', value: data.readTime ?? computeReadTime(post.body) });
 
 const siteOrigin = (Astro.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
@@ -64,7 +66,7 @@ const blogPosting: Record<string, unknown> = {
   isPartOf: { '@id': siteId },
   author: { '@id': personId },
   publisher: { '@id': personId },
-  keywords: data.tags.length ? data.tags.join(', ') : undefined,
+  keywords: [...data.tags, ...data.contentTypes, data.cluster].filter(Boolean).join(', ') || undefined,
   datePublished: data.posted?.toISOString(),
   dateModified: (data.posted ?? new Date()).toISOString(),
   image: {

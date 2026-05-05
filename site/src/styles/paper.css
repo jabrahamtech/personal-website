@@ -194,6 +194,15 @@ body.mode-paper .links-row li:not(:last-child)::after{color:var(--line-2)}
 
 /* post filters — editorial pills, ink-fill on active */
 body.mode-paper .post-filters{font-family:var(--sans);gap:8px;margin:8px 0 18px}
+body.mode-paper .post-filters .filter-group{gap:8px}
+body.mode-paper .post-filters .filter-label{
+  flex:0 0 58px;
+  color:var(--ink-mute);
+  font-family:var(--sans);
+  font-size:12px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
 body.mode-paper .post-filters .chip{
   font-family:var(--sans);font-size:13px;letter-spacing:0;
   padding:6px 13px;border-radius:999px;
@@ -213,12 +222,13 @@ body.mode-paper .post-filters .chip.is-active .chip-count{color:rgba(255,248,232
 body.mode-paper .post-filters .chip-hint{font-family:var(--sans);font-size:13px;color:var(--ink-mute);font-style:italic}
 body.mode-paper .post-empty{font-family:var(--sans);color:var(--ink-mute);border-top:1px solid var(--line)}
 
-/* category tag in post-row meta — soft sage tint, no border */
+/* content-type tag in post-row meta - soft sage tint, no border */
 body.mode-paper .post-row .meta .tag-cat{
   font-family:var(--sans);font-size:12.5px;color:var(--green-2);
   background:rgba(91,110,63,0.10);
   border:0;padding:1px 7px;border-radius:2px;letter-spacing:0;
 }
+body.mode-paper .post-row .meta .tag-cluster{color:var(--ink-dim)}
 
 /* posts list — editorial, hairline rules, sage hover */
 body.mode-paper .post-row{padding:24px 0;border-top:1px solid var(--line)}

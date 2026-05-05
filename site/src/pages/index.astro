@@ -8,11 +8,39 @@ type Post = CollectionEntry<'posts'>;
 const all = await getCollection('posts');
 
 const sorted = all.sort((a, b) => {
+  const ap = a.data.priority ?? Number.POSITIVE_INFINITY;
+  const bp = b.data.priority ?? Number.POSITIVE_INFINITY;
+  if (ap !== bp) return ap - bp;
   const ad = a.data.posted?.getTime() ?? 0;
   const bd = b.data.posted?.getTime() ?? 0;
   if (ad !== bd) return bd - ad;
   return a.data.title.localeCompare(b.data.title);
 });
+
+const contentTypeOrder = [
+  'Learning Journey Guide',
+  'Technical Build Breakdown',
+  'Business Outcome Case Study',
+  'Decision / Comparison Guide',
+  'Diagnostic / Failure Mode Guide',
+  'Playbook / Checklist / SOP Guide',
+  'POV / Strategic Opinion Post',
+] as const;
+
+const contentTypeFilters = contentTypeOrder
+  .map((value) => ({
+    kind: 'type',
+    value,
+    count: sorted.filter((p) => p.data.contentTypes.includes(value)).length,
+  }))
+  .filter((f) => f.count > 0);
+
+const clusterFilters = Array.from(new Set(sorted.map((p) => p.data.cluster).filter(Boolean)))
+  .map((value) => ({
+    kind: 'cluster',
+    value: value as string,
+    count: sorted.filter((p) => p.data.cluster === value).length,
+  }));
 
 function fmt(p: Post) {
   if (p.data.posted) return p.data.posted.toISOString().slice(0, 10);
@@ -73,7 +101,7 @@ const blogJsonLd = {
     description: p.data.summary,
     image: imageFor(p),
     datePublished: p.data.posted?.toISOString(),
-    keywords: p.data.tags.join(', '),
+    keywords: [...p.data.tags, ...p.data.contentTypes, p.data.cluster].filter(Boolean).join(', '),
     author: { '@id': personId },
     ...(p.data.draft ? { creativeWorkStatus: 'Draft' } : {}),
   })),
@@ -93,14 +121,24 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
 
     {(() => {
       const total = sorted.length;
-      const outcomes = sorted.filter((p) => p.data.category === 'outcomes').length;
-      const technical = sorted.filter((p) => p.data.category === 'technical').length;
       return (
-        <div class="post-filters" id="post-filters" role="tablist" aria-label="filter posts by category">
-          <button type="button" class="chip is-active" role="tab" aria-selected="true" data-filter="all">all <span class="chip-count">{total}</span></button>
-          <button type="button" class="chip" role="tab" aria-selected="false" data-filter="outcomes">outcomes <span class="chip-count">{outcomes}</span></button>
-          <button type="button" class="chip" role="tab" aria-selected="false" data-filter="technical">technical <span class="chip-count">{technical}</span></button>
-          <span class="chip-hint">filter posts by what you're here for</span>
+        <div class="post-filters" id="post-filters" aria-label="filter upcoming drafts">
+          <div class="filter-group">
+            <span class="filter-label">type</span>
+            <button type="button" class="chip is-active" aria-pressed="true" data-filter-kind="all" data-filter-value="all">all <span class="chip-count">{total}</span></button>
+            {contentTypeFilters.map((filter) => (
+              <button type="button" class="chip" aria-pressed="false" data-filter-kind={filter.kind} data-filter-value={filter.value}>{filter.value} <span class="chip-count">{filter.count}</span></button>
+            ))}
+          </div>
+          {clusterFilters.length > 1 && (
+            <div class="filter-group">
+              <span class="filter-label">cluster</span>
+              {clusterFilters.map((filter) => (
+                <button type="button" class="chip" aria-pressed="false" data-filter-kind={filter.kind} data-filter-value={filter.value}>{filter.value} <span class="chip-count">{filter.count}</span></button>
+              ))}
+              <span class="chip-hint">filter by release angle</span>
+            </div>
+          )}
         </div>
       );
     })()}
@@ -110,16 +148,23 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
         const wc = wordCount(post);
         const rt = post.data.readTime ?? computeReadTime(post.body || '');
         return (
-          <li data-cat={post.data.category}>
+          <li
+            data-types={post.data.contentTypes.join('|')}
+            data-cluster={post.data.cluster ?? ''}
+            data-priority={post.data.priority ?? ''}
+          >
             <a class="post-row" href={`/posts/${post.slug}`}>
               <h2>{post.data.title}</h2>
               <p>{post.data.summary}</p>
               <div class="meta">
                 {post.data.draft && <><span class="draft">draft</span><span class="sep">·</span></>}
+                {post.data.pipelineStatus && <><span>{post.data.pipelineStatus}</span><span class="sep">·</span></>}
+                {post.data.priority && <><span>P{post.data.priority}</span><span class="sep">·</span></>}
                 <span>{fmt(post)}</span>
                 <span class="sep">·</span><span>{fmtWords(wc)}</span>
                 <span class="sep">·</span><span>{rt}</span>
-                <span class="sep">·</span><span class="tag tag-cat">{post.data.category}</span>
+                {post.data.cluster && <><span class="sep">·</span><span class="tag tag-cluster">{post.data.cluster}</span></>}
+                {post.data.contentTypes.length > 0 && <><span class="sep">·</span><span class="tag tag-cat">{post.data.contentTypes.join(' · ')}</span></>}
                 {post.data.tags.length > 0 && <><span class="sep">·</span><span class="tag">{post.data.tags.join(' · ')}</span></>}
               </div>
             </a>
@@ -139,33 +184,44 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
       if (!root || !list) return;
       const items = Array.from(list.querySelectorAll('li'));
       const chips = Array.from(root.querySelectorAll('.chip'));
+      const storageKey = 'ja_post_filter_v2';
 
-      function apply(filter) {
+      function apply(kind, value) {
         let shown = 0;
         items.forEach((li) => {
-          const cat = li.getAttribute('data-cat') || '';
-          const match = filter === 'all' || cat === filter;
+          const types = (li.getAttribute('data-types') || '').split('|').filter(Boolean);
+          const cluster = li.getAttribute('data-cluster') || '';
+          const match = kind === 'all'
+            || (kind === 'type' && types.indexOf(value) !== -1)
+            || (kind === 'cluster' && cluster === value);
           li.hidden = !match;
           if (match) shown++;
         });
         chips.forEach((c) => {
-          const active = c.getAttribute('data-filter') === filter;
+          const active = c.getAttribute('data-filter-kind') === kind && c.getAttribute('data-filter-value') === value;
           c.classList.toggle('is-active', active);
-          c.setAttribute('aria-selected', active ? 'true' : 'false');
+          c.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
         if (empty) empty.hidden = shown !== 0;
-        try { localStorage.setItem('ja_post_filter', filter); } catch (_) {}
+        try { localStorage.setItem(storageKey, JSON.stringify({ kind, value })); } catch (_) {}
       }
 
-      let initial = 'all';
+      let initial = { kind: 'all', value: 'all' };
       try {
-        const saved = localStorage.getItem('ja_post_filter');
-        if (saved === 'outcomes' || saved === 'technical' || saved === 'all') initial = saved;
+        const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+        if (
+          saved
+          && typeof saved.kind === 'string'
+          && typeof saved.value === 'string'
+          && chips.some((c) => c.getAttribute('data-filter-kind') === saved.kind && c.getAttribute('data-filter-value') === saved.value)
+        ) {
+          initial = saved;
+        }
       } catch (_) {}
-      apply(initial);
+      apply(initial.kind, initial.value);
 
       chips.forEach((c) => {
-        c.addEventListener('click', () => apply(c.getAttribute('data-filter') || 'all'));
+        c.addEventListener('click', () => apply(c.getAttribute('data-filter-kind') || 'all', c.getAttribute('data-filter-value') || 'all'));
       });
     })();
   </script>

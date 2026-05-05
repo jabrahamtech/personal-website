@@ -60,7 +60,7 @@ export async function GET(context: APIContext) {
       description: p.data.summary,
       link: `${site}/posts/${p.slug}`,
       pubDate: p.data.posted!,
-      categories: p.data.tags,
+      categories: [...p.data.tags, ...p.data.contentTypes, p.data.cluster].filter((value): value is string => Boolean(value)),
       author: 'jabrahamtech@gmail.com (Jonathan Abraham)',
       // Stable per-item GUID. Using the canonical post URL is the standard
       // pattern; isPermaLink="true" tells readers it's also a real URL.

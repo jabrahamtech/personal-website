@@ -73,6 +73,11 @@ summary: 'Short one-line description.'
 posted: 2026-05-01           # omit to keep it as a draft
 draft: false                  # true → excluded from RSS, shown on home with "draft" badge
 tags: ['voice-ai']
+priority: 1                   # optional — lower numbers sort first in the draft pipeline
+pipelineStatus: Prioritised
+contentTypes:
+  - Learning Journey Guide
+cluster: Adaptive AI / Voice AI
 image:                        # optional — falls back to /og/default.png
   src: /posts/my-cover.png
   alt: 'Alt text.'

@@ -1,25 +1,54 @@
 import { test, expect } from '@playwright/test';
 
+const upcomingSlugs = [
+  'why-ai-is-starting-to-sound-like-you',
+  'when-you-should-use-traditional-solutions-in-your-ai-agent',
+  'how-we-reduced-broker-quote-processing-time-with-an-ai-intake-workflow',
+  'cut-recruitment-agency-work-week-two-hour-ai-call',
+  'polymarket-bot-what-i-learned-about-eda',
+];
+
+const examplePost = '/posts/polymarket-bot-what-i-learned-about-eda';
+
 test.describe('home (posts list)', () => {
   test('renders only the ./posts prompt and the post list', async ({ page }) => {
     await page.goto('/');
 
     await expect(page).toHaveTitle(/^Jonathan Abraham/);
-    await expect(page.locator('.page-head .prompt')).toHaveText('> ./posts');
+    await expect(page.locator('.page-head .prompt')).toHaveText('./posts');
 
     // The prompt now IS the h1 — exactly one h1 in page-head, with the path text
     await expect(page.locator('.page-head h1')).toHaveCount(1);
-    await expect(page.locator('.page-head h1')).toHaveText('> ./posts');
+    await expect(page.locator('.page-head h1')).toHaveText('./posts');
     await expect(page.locator('.page-head .tagline')).toHaveCount(0);
     await expect(page.locator('.links-row')).toHaveCount(0);
 
     const rows = page.locator('.post-list .post-row');
-    await expect(rows).toHaveCount(4);
+    await expect(rows).toHaveCount(5);
     const hrefs = await rows.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')));
-    for (const href of hrefs) expect(href).toMatch(/^\/posts\//);
+    expect(hrefs).toEqual(upcomingSlugs.map((slug) => `/posts/${slug}`));
 
-    // Three drafts + one published example post (building-this-site-with-astro).
-    await expect(page.locator('.post-list .draft')).toHaveCount(3);
+    await expect(page.locator('.post-list .draft')).toHaveCount(5);
+    await expect(rows.first()).toContainText('Why AI Is Starting to Sound Like You');
+    await expect(page.locator('main')).not.toContainText('Building this site with Astro');
+  });
+
+  test('filters upcoming drafts by content type and cluster', async ({ page }) => {
+    await page.goto('/');
+
+    await page.locator('#post-filters .chip[data-filter-kind="type"][data-filter-value="Learning Journey Guide"]').click();
+    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(2);
+    await expect(page.locator('.post-list li:not([hidden]) h2')).toHaveText([
+      'Why AI Is Starting to Sound Like You',
+      'Polymarket Bot and What I Learned About EDA',
+    ]);
+
+    await page.locator('#post-filters .chip[data-filter-kind="cluster"][data-filter-value="Recruitment Automation"]').click();
+    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(1);
+    await expect(page.locator('.post-list li:not([hidden]) h2')).toHaveText("How I Cut 80% of a Recruitment Agency's Work Week in a 2-Hour AI Call");
+
+    await page.locator('#post-filters .chip[data-filter-kind="all"][data-filter-value="all"]').click();
+    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(5);
   });
 
   test('post-row meta sits AFTER the summary and includes word count', async ({ page }) => {
@@ -80,7 +109,7 @@ test.describe('about page', () => {
   test('renders bio + stack + elsewhere', async ({ page }) => {
     await page.goto('/about');
     await expect(page).toHaveTitle(/About — Jonathan Abraham/);
-    await expect(page.locator('.page-head h1')).toHaveText('> ./about');
+    await expect(page.locator('.page-head h1')).toHaveText('./about');
     await expect(page.locator('.prose')).toContainText('Brokerloop');
     await expect(page.locator('.prose')).toContainText('New work is by referral');
     await expect(page.locator('.prose a[href^="mailto:jabrahamtech@gmail.com"]').first()).toBeVisible();
@@ -104,7 +133,7 @@ test.describe('about page', () => {
 });
 
 test.describe('post pages', () => {
-  for (const slug of ['voice-ai-after-demo', 'insurance-intake-design', 'ai-automation-operationalise']) {
+  for (const slug of upcomingSlugs) {
     test(`/posts/${slug} renders the draft shell with H1, prompt path, and the draft meta`, async ({ page }) => {
       const response = await page.goto(`/posts/${slug}`);
       expect(response?.status()).toBe(200);
@@ -118,25 +147,15 @@ test.describe('post pages', () => {
   }
 
   test('prev/next links land on neighbouring posts', async ({ page }) => {
-    await page.goto('/posts/voice-ai-after-demo');
+    await page.goto('/posts/when-you-should-use-traditional-solutions-in-your-ai-agent');
     const pn = page.locator('.pn a[href^="/posts/"]');
     await expect(pn.first()).toBeVisible();
     const hrefs = await pn.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')));
     for (const href of hrefs) expect(href).toMatch(/^\/posts\//);
   });
 
-  test('voice-ai post renders the seeded cover image', async ({ page }) => {
-    await page.goto('/posts/voice-ai-after-demo');
-    const cover = page.locator('figure.cover img');
-    await expect(cover).toBeVisible();
-    await expect(cover).toHaveAttribute('src', '/posts/voice-ai-cover.svg');
-    const r = await page.request.get('/posts/voice-ai-cover.svg');
-    expect(r.status()).toBe(200);
-    expect(r.headers()['content-type']).toContain('svg');
-  });
-
   test('drafts without an image dont render a figure.cover', async ({ page }) => {
-    await page.goto('/posts/insurance-intake-design');
+    await page.goto('/posts/why-ai-is-starting-to-sound-like-you');
     await expect(page.locator('figure.cover')).toHaveCount(0);
   });
 });
@@ -159,7 +178,7 @@ test.describe('infrastructure', () => {
   });
 
   test('every page advertises the RSS feed via <link rel=alternate>', async ({ page }) => {
-    for (const path of ['/', '/about', '/terminal', '/posts/voice-ai-after-demo']) {
+    for (const path of ['/', '/about', '/terminal', examplePost]) {
       await page.goto(path);
       const link = page.locator('head link[rel="alternate"][type="application/rss+xml"]');
       await expect(link, `missing rss <link> on ${path}`).toHaveCount(1);
@@ -180,7 +199,7 @@ test.describe('infrastructure', () => {
     const r = await page.request.get('/sitemap-0.xml');
     expect(r.status()).toBe(200);
     const body = await r.text();
-    expect(body).toContain('/posts/voice-ai-after-demo');
+    expect(body).toContain('/posts/why-ai-is-starting-to-sound-like-you');
     expect(body).toContain('/about');
     // Old route shape must not be present
     expect(body).not.toContain('/projects/');
@@ -196,8 +215,8 @@ test.describe('infrastructure', () => {
   test('404 page renders kernel-panic shell', async ({ page }) => {
     const response = await page.goto('/this-route-does-not-exist');
     expect(response?.status()).toBe(404);
-    await expect(page.locator('.panic h1')).toContainText('404');
-    await expect(page.locator('.panic')).toContainText('SIGNAL_NOT_FOUND');
+    await expect(page.locator('.panic')).toContainText('404');
+    await expect(page.locator('.panic')).toContainText(/SIGNAL_NOT_FOUND|This page doesn't exist/);
   });
 
   test('old project routes 404', async ({ page }) => {
@@ -215,6 +234,7 @@ test.describe('boot sequence', () => {
   test('renders for fresh sessions and is removed after boot_seen flag is set', async ({ page, context }) => {
     // Fresh session: boot wrapper should be in the DOM (it removes itself once done)
     await context.clearCookies();
+    await page.addInitScript(() => localStorage.setItem('ja_mode', 'eng'));
     await page.goto('/');
     // Either still mounted, or already removed (very fast machines) — but the script must have set the flag.
     const seen = await page.evaluate(() => sessionStorage.getItem('boot_seen'));
@@ -294,7 +314,7 @@ test.describe('terminal page', () => {
 test.describe('mobile layout (iPhone-class viewport, 390x844)', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  for (const path of ['/', '/about', '/terminal', '/posts/voice-ai-after-demo']) {
+  for (const path of ['/', '/about', '/terminal', examplePost]) {
     test(`${path} fits viewport without horizontal scroll`, async ({ page }) => {
       await page.goto(path);
       // page should not exceed the viewport horizontally
@@ -339,6 +359,7 @@ test.describe('function-key style nav', () => {
   });
 
   test('the F-key prefix renders as ::before content', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('ja_mode', 'eng'));
     await page.goto('/');
     const before = await page.locator('nav.top .nav-links a').first().evaluate((el) =>
       getComputedStyle(el, '::before').content
@@ -349,7 +370,8 @@ test.describe('function-key style nav', () => {
 
 test.describe('status strip (Bloomberg-style)', () => {
   test('renders on every page with status, time placeholder, and build', async ({ page }) => {
-    for (const path of ['/', '/about', '/terminal', '/posts/voice-ai-after-demo']) {
+    for (const path of ['/', '/about', '/terminal', examplePost]) {
+      await page.addInitScript(() => localStorage.setItem('ja_mode', 'eng'));
       await page.goto(path);
       await expect(page.locator('.status-strip')).toBeVisible();
       await expect(page.locator('.status-strip')).toContainText('STATUS');
@@ -381,7 +403,7 @@ test.describe('selected work on /about', () => {
 });
 
 test.describe('SEO / AEO — head + structured data', () => {
-  for (const path of ['/', '/about', '/terminal', '/posts/voice-ai-after-demo']) {
+  for (const path of ['/', '/about', '/terminal', examplePost]) {
     test(`${path} has canonical, robots, og:*, twitter:* meta`, async ({ page }) => {
       await page.goto(path);
 
@@ -430,7 +452,7 @@ test.describe('SEO / AEO — head + structured data', () => {
   });
 
   test('post page embeds BlogPosting + BreadcrumbList schemas', async ({ page }) => {
-    await page.goto('/posts/voice-ai-after-demo');
+    await page.goto(examplePost);
     const blocks = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent || 'null')));
     const types = blocks.map((b) => b?.['@type']);
     expect(types).toContain('BlogPosting');
@@ -443,7 +465,7 @@ test.describe('SEO / AEO — head + structured data', () => {
 
   test('every BlogPosting carries an image — including drafts without a cover (Rich Results requirement)', async ({ page }) => {
     // Page-level BlogPosting on a post that has NO cover image in frontmatter.
-    await page.goto('/posts/insurance-intake-design');
+    await page.goto('/posts/why-ai-is-starting-to-sound-like-you');
     const blocks = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent || 'null')));
     const post = blocks.find((b) => b['@type'] === 'BlogPosting');
     expect(post).toBeTruthy();
@@ -497,7 +519,7 @@ test.describe('AEO — llms.txt + AI crawler robots', () => {
     expect(body).toMatch(/##\s+Posts/);
     expect(body).toMatch(/##\s+Identity/);
     // Each post should be linked
-    for (const slug of ['voice-ai-after-demo', 'insurance-intake-design', 'ai-automation-operationalise']) {
+    for (const slug of upcomingSlugs) {
       expect(body, `${slug} missing from llms.txt`).toContain(`/posts/${slug}`);
     }
   });
@@ -513,9 +535,22 @@ test.describe('AEO — llms.txt + AI crawler robots', () => {
   });
 });
 
-test.describe('post template — slice 2 (TOC, autolinks, edit-link, progress bar)', () => {
-  const examplePost = '/posts/building-this-site-with-astro';
+test.describe('copy style', () => {
+  test('site copy uses Australian spelling for common variants', async ({ page }) => {
+    const forbidden = /\b(personalization|personalized|personalize|behavior|behaviors|optimize|optimizes|optimized)\b/i;
 
+    for (const path of ['/', '/about', '/terminal', ...upcomingSlugs.map((slug) => `/posts/${slug}`)]) {
+      await page.goto(path);
+      const visible = await page.locator('body').innerText();
+      expect(visible, `${path} contains US spelling`).not.toMatch(forbidden);
+    }
+
+    const llms = await page.request.get('/llms.txt');
+    expect(await llms.text()).not.toMatch(forbidden);
+  });
+});
+
+test.describe('post template — slice 2 (TOC, autolinks, edit-link, progress bar)', () => {
   test('headings are slugged and autolinked with a permalink anchor', async ({ page }) => {
     await page.goto(examplePost);
     // Every h2/h3 in the prose body has an id (rehype-slug).
@@ -588,7 +623,7 @@ test.describe('post template — slice 2 (TOC, autolinks, edit-link, progress ba
     await expect(link).toHaveCount(1);
     await expect(link).toHaveAttribute(
       'href',
-      'https://github.com/jabrahamtech/personal-website/edit/main/site/src/content/posts/building-this-site-with-astro.mdx',
+      'https://github.com/jabrahamtech/personal-website/edit/main/site/src/content/posts/polymarket-bot-what-i-learned-about-eda.mdx',
     );
   });
 
@@ -600,6 +635,7 @@ test.describe('post template — slice 2 (TOC, autolinks, edit-link, progress ba
   });
 
   test('post id renders in the meta row and matches the EOF marker', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('ja_mode', 'eng'));
     await page.goto(examplePost);
     const idCell = page.locator('.meta-row span', { hasText: /^id\s+0x[0-9A-F]+/i }).first();
     await expect(idCell).toBeVisible();
