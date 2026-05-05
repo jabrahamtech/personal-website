@@ -1,5 +1,5 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import DocLayout from '../../layouts/DocLayout.astro';
 import { computeReadTime } from '../../lib/readTime';
 
@@ -14,7 +14,7 @@ export async function getStaticPaths() {
     // (renaming or reordering doesn't shuffle them backward over time).
     const postId = '0x' + (posts.length - i).toString(16).padStart(2, '0').toUpperCase();
     return {
-      params: { slug: post.slug },
+      params: { slug: post.id },
       props: {
         post,
         postId,
@@ -34,11 +34,9 @@ interface Props {
 
 const { post, postId, newer, older } = Astro.props;
 const { data } = post;
-const { Content, headings } = await post.render();
+const { Content, headings } = await render(post);
 
-// Source path for edit-on-GitHub link. Astro doesn't expose post.id reliably
-// across versions, so we reconstruct from the slug.
-const sourcePath = `site/src/content/posts/${post.slug}.mdx`;
+const sourcePath = `site/src/content/posts/${post.id}.mdx`;
 const editUrl = `https://github.com/jabrahamtech/personal-website/edit/main/${sourcePath}`;
 
 const metaRow: { label: string; value: string }[] = [];
@@ -50,7 +48,7 @@ if (data.cluster) metaRow.push({ label: 'cluster', value: data.cluster });
 metaRow.push({ label: 'read', value: data.readTime ?? computeReadTime(post.body) });
 
 const siteOrigin = (Astro.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
-const url = `${siteOrigin}/posts/${post.slug}`;
+const url = `${siteOrigin}/posts/${post.id}`;
 const personId = `${siteOrigin}/#jonathan`;
 const siteId = `${siteOrigin}/#site`;
 
@@ -89,11 +87,11 @@ const breadcrumb = {
 <DocLayout
   title={`${data.title} — Jonathan Abraham`}
   description={data.summary}
-  promptPath={`./posts/${post.slug}`}
+  promptPath={`./posts/${post.id}`}
   crumbs={[
     { href: '/', label: '~' },
     { href: '/', label: 'posts' },
-    { label: post.slug },
+    { label: post.id },
   ]}
   metaRow={metaRow}
   tags={data.tags}
@@ -117,13 +115,13 @@ const breadcrumb = {
   {(newer || older) && (
     <div class="pn" slot="footer">
       {newer ? (
-        <a href={`/posts/${newer.slug}`}>
+        <a href={`/posts/${newer.id}`}>
           <small>← newer</small>
           <span>{newer.data.title}</span>
         </a>
       ) : <span></span>}
       {older ? (
-        <a class="next" href={`/posts/${older.slug}`}>
+        <a class="next" href={`/posts/${older.id}`}>
           <small>older →</small>
           <span>{older.data.title}</span>
         </a>

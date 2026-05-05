@@ -58,7 +58,7 @@ export async function GET(context: APIContext) {
     items: live.map((p) => ({
       title: p.data.title,
       description: p.data.summary,
-      link: `${site}/posts/${p.slug}`,
+      link: `${site}/posts/${p.id}`,
       pubDate: p.data.posted!,
       categories: [...p.data.tags, ...p.data.contentTypes, p.data.cluster].filter((value): value is string => Boolean(value)),
       author: 'jabrahamtech@gmail.com (Jonathan Abraham)',

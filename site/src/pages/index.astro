@@ -95,8 +95,8 @@ const blogJsonLd = {
   publisher: { '@id': personId },
   blogPost: sorted.map((p) => ({
     '@type': 'BlogPosting',
-    '@id': `${siteOrigin}/posts/${p.slug}#post`,
-    url: `${siteOrigin}/posts/${p.slug}`,
+    '@id': `${siteOrigin}/posts/${p.id}#post`,
+    url: `${siteOrigin}/posts/${p.id}`,
     headline: p.data.title,
     description: p.data.summary,
     image: imageFor(p),
@@ -157,7 +157,7 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
             data-cluster={post.data.cluster ?? ''}
             data-priority={post.data.priority ?? ''}
           >
-            <a class="post-row" href={`/posts/${post.slug}`}>
+            <a class="post-row" href={`/posts/${post.id}`}>
               <h2>{post.data.title}</h2>
               <p>{post.data.summary}</p>
               <div class="meta">
