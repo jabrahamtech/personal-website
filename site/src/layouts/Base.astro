@@ -189,8 +189,9 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
 
   <!-- Favicon set: SVG for modern browsers, PNG for Google's search-result
        crawler (which doesn't reliably handle data: URIs), Apple touch icon
-       for iOS home screen. -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+       for iOS home screen. The SVG href is rewritten by the mode resolver
+       below so paper/eng each get a tonally-matched mark. -->
+  <link id="favicon-svg" rel="icon" type="image/svg+xml" href="/favicon-paper.svg" />
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="sitemap" href="/sitemap-index.xml" />
@@ -218,6 +219,8 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
         else if (hash === '#eng') { mode = 'eng'; localStorage.setItem('ja_mode', 'eng'); }
         else if (stored === 'eng' || stored === 'paper') mode = stored;
         document.documentElement.dataset.mode = mode;
+        var icon = document.getElementById('favicon-svg');
+        if (icon) icon.href = mode === 'eng' ? '/favicon.svg' : '/favicon-paper.svg';
       } catch (_) {}
     })();
   </script>

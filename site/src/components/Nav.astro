@@ -96,6 +96,8 @@ const links: Link[] = [
       // Keep <html data-mode> in sync — the paper cursor override hangs off it.
       document.documentElement.dataset.mode = m;
       try { localStorage.setItem('ja_mode', m); } catch (_) {}
+      const icon = document.getElementById('favicon-svg');
+      if (icon) icon.href = m === 'eng' ? '/favicon.svg' : '/favicon-paper.svg';
       syncTogglePressed();
     }
     syncTogglePressed();

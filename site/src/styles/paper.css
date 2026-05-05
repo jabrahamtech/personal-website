@@ -144,39 +144,39 @@ body.mode-paper .nav-sheet-list a[aria-current="page"]{color:var(--green)}
 /* page header — editorial masthead with eyebrow rule, generous breathing
    room. Weight 500 keeps it confident without shouting. */
 body.mode-paper .page-head{
-  padding:88px 0 28px;
+  padding:64px 0 22px;
   margin:0 0 8px;
   border-bottom:1px solid var(--line);
   position:relative;
 }
 body.mode-paper .page-head::before{
-  content:"";position:absolute;left:0;top:64px;
-  width:28px;height:2px;background:var(--green);
+  content:"";position:absolute;left:0;top:48px;
+  width:24px;height:2px;background:var(--green);
 }
 body.mode-paper .page-head h1{
   font-family:var(--sans);
-  font-size:clamp(36px,5.2vw,54px);
+  font-size:clamp(28px,3.6vw,38px);
   font-weight:500;
-  letter-spacing:-0.028em;
+  letter-spacing:-0.022em;
   color:var(--ink);
-  line-height:1.05;
-  margin:0 0 14px;
+  line-height:1.1;
+  margin:0 0 10px;
   text-wrap:balance;
   text-transform:capitalize;
 }
 body.mode-paper .page-head .prompt{display:none}
 body.mode-paper .page-head h1.prompt{
   display:block;
-  font-size:clamp(36px,5.2vw,54px);
+  font-size:clamp(28px,3.6vw,38px);
   font-weight:500;
-  letter-spacing:-0.028em;
+  letter-spacing:-0.022em;
   color:var(--ink);
   text-transform:capitalize;
 }
 body.mode-paper .page-head h1.prompt::before{display:none}
 @media (max-width:720px){
-  body.mode-paper .page-head{padding:56px 0 18px}
-  body.mode-paper .page-head::before{top:38px;width:22px}
+  body.mode-paper .page-head{padding:44px 0 14px}
+  body.mode-paper .page-head::before{top:30px;width:20px}
 }
 
 /* post filters — editorial filter bar.
@@ -303,25 +303,18 @@ body.mode-paper .work-frame{
   line-height:1.6;font-style:italic;margin:-2px 0 14px;letter-spacing:0;
 }
 body.mode-paper .prose ul.work-list{
-  display:grid;grid-template-columns:1fr;gap:0;
   list-style:none;margin:8px 0 44px;padding:0;
 }
 body.mode-paper .prose ul.work-list li{
-  display:grid;grid-template-columns:auto 1fr;column-gap:18px;
-  padding:24px 0 26px;margin:0;
+  display:block;
+  padding:24px 0 26px 18px;margin:0;
   border-top:1px solid var(--line);
+  border-left:2px solid var(--line);
   font-size:16.5px;line-height:1.7;color:var(--ink-dim);
-  padding-left:0;
+  transition:border-left-color .14s ease;
 }
-body.mode-paper .prose ul.work-list li::before{
-  content:"";grid-column:1;
-  width:2px;align-self:stretch;background:var(--line);
-  border-radius:1px;
-  transition:background .14s ease;
-  position:static;color:transparent;
-}
-body.mode-paper .prose ul.work-list li:hover::before{background:var(--green)}
-body.mode-paper .prose ul.work-list li > *{grid-column:2}
+body.mode-paper .prose ul.work-list li::before{display:none}
+body.mode-paper .prose ul.work-list li:hover{border-left-color:var(--green)}
 body.mode-paper .prose ul.work-list li:last-child{border-bottom:1px solid var(--line)}
 body.mode-paper .work-list strong{
   display:block;
@@ -331,7 +324,7 @@ body.mode-paper .work-list strong{
   margin:0 0 10px;line-height:1.35;
 }
 @media (max-width:560px){
-  body.mode-paper .prose ul.work-list li{column-gap:14px;padding:20px 0 22px}
+  body.mode-paper .prose ul.work-list li{padding:20px 0 22px 14px}
   body.mode-paper .work-list strong{font-size:16.5px}
 }
 
@@ -684,8 +677,8 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e
 @media (max-width:720px){
   body.mode-paper{font-size:16.5px}
   body.mode-paper nav.top .row{height:56px}
-  body.mode-paper .page-head h1{font-size:clamp(30px,8.5vw,42px);line-height:1.08}
-  body.mode-paper .page-head h1.prompt{font-size:clamp(30px,8.5vw,42px)}
+  body.mode-paper .page-head h1{font-size:clamp(24px,5.5vw,32px);line-height:1.12}
+  body.mode-paper .page-head h1.prompt{font-size:clamp(24px,5.5vw,32px)}
   body.mode-paper .doc{padding:36px 0 24px}
   body.mode-paper .doc h1{font-size:clamp(26px,7.5vw,34px);line-height:1.18}
   body.mode-paper .prose{font-size:17px;line-height:1.7}
@@ -703,7 +696,7 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e
   body.mode-paper .work-frame{font-size:15.5px}
 }
 @media (max-width:480px){
-  body.mode-paper .page-head h1{font-size:clamp(28px,9vw,34px)}
+  body.mode-paper .page-head h1{font-size:clamp(22px,6vw,28px)}
   body.mode-paper .doc h1{font-size:clamp(24px,8vw,30px)}
   body.mode-paper .prose{font-size:16.5px}
   body.mode-paper .prose h2{font-size:20px;margin:28px 0 10px;padding-top:20px}
