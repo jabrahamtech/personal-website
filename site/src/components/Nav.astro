@@ -108,7 +108,13 @@ const links: Link[] = [
     }
     function setMode(mode) {
       const m = mode === 'eng' ? 'eng' : 'paper';
-      const anchor = pickAnchor();
+      // Near the top of the page, preserving raw scroll position is the
+      // wrong behavior: paper has no status strip, so toggling to eng
+      // adds ~28px above the fold and the anchor preserve would scroll
+      // past the strip the user just summoned. Skip the anchor and pin
+      // to top instead.
+      const wasAtTop = window.scrollY < 80;
+      const anchor = wasAtTop ? null : pickAnchor();
       const body = document.body;
       body.classList.remove('mode-paper', 'mode-eng');
       body.classList.add('mode-' + m);
@@ -118,6 +124,10 @@ const links: Link[] = [
       const icon = document.getElementById('favicon-svg');
       if (icon) icon.href = m === 'eng' ? '/favicon.svg' : '/favicon-paper.svg';
       syncTogglePressed();
+      if (wasAtTop) {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        return;
+      }
       if (anchor) {
         // Run after layout settles. rAF once isn't always enough because
         // font swap + class change can take an extra paint to flush.
