@@ -28,7 +28,7 @@ If the user's intent has a finite list of options and the cost of misreading the
 
 The Humane AI Pin and the Rabbit R1 were the two most-watched AI consumer launches of 2024 and 2025. Both went badly. The post-mortems converge on something almost embarrassingly simple: pure voice doesn't work for roughly 80% of real use cases. You need to see lists. You need to compare options. You need to re-read what was just said. Removing the screen sent the experience back fifteen years, and the model couldn't paper over it.
 
-The deeper lesson is not "voice is bad." Voice is fine. The lesson is that once you have a language model in your stack, the temptation to put it in charge of *everything* — navigation, confirmation, state, control — is what kills the product. The Pin and the R1 are the spectacular version of a mistake almost every AI feature team makes in some form.
+The deeper lesson is not "voice is bad." Voice is fine. The lesson is that once you have a language model in your stack, the temptation to put it in charge of *everything* is what kills the product. Navigation. Confirmation. State. Control. The model ends up owning all of them, and the product ends up brittle in places that should never have been brittle. The Pin and the R1 are the spectacular version of a mistake almost every AI feature team makes in some form.
 
 <Callout type="tip">
   The default failure mode of AI products is forcing the LLM to do jobs a button could do.
@@ -36,13 +36,13 @@ The deeper lesson is not "voice is bad." Voice is fine. The lesson is that once 
 
 ## What "forcing the LLM" actually costs
 
-It costs three things at once.
+Three things, paid at once.
 
-**Accuracy.** Every step you hand to the model is a step where intent can be misread. Stack five of those steps in a session and the joint probability of an end-to-end success drops fast.
+Accuracy goes first. Every step you hand to the model is a step where intent can be misread, and the joint probability of running five of those steps cleanly drops faster than most people expect.
 
-**Latency.** Each step is an inference call. A button click is roughly zero milliseconds. In voice, the natural turn-taking budget sits around half a second, and the model can't promise that. If the same user does the same action ten times in a session, that maths is brutal.
+Latency next. Each step is an inference call. A button takes roughly zero milliseconds. Voice turn-taking sits around half a second, and the model can't promise that. Ten of the same action in a session and the maths is brutal.
 
-**Cost.** This one is silent. The 2026 story in AI economics isn't that prices went up — it's that agentic workflows multiplied token use across every step. One user action can fan out to plan, retrieve, call a tool, validate, retry, and respond. If the action could have been a button, you just paid for six inference calls to do the work of one click.
+Then there's cost, which is the silent one. The 2026 story in AI economics isn't that prices went up. It's that agentic workflows multiplied token use across every step. One user action can fan out to plan, retrieve, call a tool, validate, retry, respond. If it could have been a button, you just paid for six inference calls to do the work of one click.
 
 <Figure
   src="/posts/when-to-force-the-llm-stat-500ms.png"
@@ -52,23 +52,23 @@ It costs three things at once.
 
 ## A small fix that taught me the pattern
 
-In a voice AI workflow I worked on at Brokerloop — a system that ran structured intake conversations with insurance brokers — we hit this wall early. The model handled the open part of the conversation well: asking the right questions, listening, capturing detail. But we also wanted users to be able to do four things at any moment: pause, go back to the previous question, skip to the next one, and confirm that what the model had captured was correct.
+I worked on a voice AI workflow at Brokerloop. The system ran structured intake conversations with insurance brokers, and we hit this wall early. The model handled the open part of the conversation well: asking the right questions, listening, capturing detail. But we also wanted users to be able to do four things at any moment: pause, go back to the previous question, skip to the next one, and confirm that what the model had captured was correct.
 
 For a few weeks, all four lived inside the model. The user could say *"go back"* or *"wait, that's wrong"* and the model would try to interpret intent. Sometimes it worked. Sometimes "go back" was read as "stop the call." Sometimes "actually, the date is wrong" was acknowledged verbally but not reflected in the captured data. Users got frustrated because they were never sure the correction had landed.
 
-The fix was small and slightly embarrassing: we added buttons to the companion web interface. *Pause. Previous question. Next question. Confirm captured value.* The four things the model kept guessing at became four things the user could click. The voice agent kept doing the open-ended part — listening, asking, capturing. The four deterministic controls moved out of the prompt and into the UI.
+The fix was small and slightly embarrassing: we added buttons to the companion web interface. *Pause. Previous question. Next question. Confirm captured value.* The four things the model kept guessing at became four things the user could click. The voice agent kept doing the open-ended part: listening, asking, capturing. The four deterministic controls moved out of the prompt and into the UI.
 
 Accuracy on captured data went up. Frustration went down. Latency on those four interactions dropped to roughly zero, because clicking a button doesn't require an inference call. None of this was a model upgrade. It was a workflow change.
 
 ## Back-channel UI: the pattern, named
 
-The thing we ended up building isn't really a chat interface and it isn't really a form. It's a *back-channel* — a persistent surface running alongside the voice flow, never interrupting it, but always available to take a deterministic action from the user.
+The thing we ended up building isn't really a chat interface, and it isn't really a form. It's a *back-channel*: a persistent surface running alongside the voice flow, never interrupting it, but always available to take a deterministic action from the user.
 
-Three properties matter:
+The controls are always there. They don't appear and disappear with the conversation, and the user doesn't have to wait for a turn or a prompt to use them.
 
-1. **Persistent.** The controls don't appear and disappear with the conversation. They're always there. The user doesn't have to wait for a turn or a prompt to use them.
-2. **Parallel.** Pressing a button doesn't interrupt the voice flow. The flow advances *because* of the press. The model's job is to listen and to keep speaking; the user's job is to steer.
-3. **Authoritative.** When the button and the model disagree, the button wins. If the user clicks *"that's wrong"*, the captured value is wrong, end of discussion.
+They run parallel to the voice. Pressing one doesn't cut the model off. The flow advances *because* the user pressed something. The model keeps listening and keeps speaking; the user steers.
+
+They're authoritative. When the button and the model disagree, the button wins. If the user clicks *"that's wrong,"* the captured value is wrong, full stop.
 
 <Figure
   src="/posts/when-to-force-the-llm-architecture.png"
@@ -82,7 +82,7 @@ When you're trying to decide whether a step in your product should be owned by t
 
 1. Is the set of valid outcomes finite and known?
 2. Would a wrong interpretation here cost the user real time, money, or trust?
-3. Is the user trying to *control the flow* — pause, skip, undo — rather than express something?
+3. Is the user trying to *control the flow* (pause, skip, undo) rather than express something?
 4. Will this happen many times per session?
 
 If you're answering yes to two or more, that step almost certainly belongs to a button, form, dropdown, slider, or rule, not the model. Save the model for the parts where the input is open-ended and the human gains something from being heard rather than clicking.
@@ -93,7 +93,7 @@ If you're answering yes to two or more, that step almost certainly belongs to a 
 
 ## The structured-input research nobody is quoting
 
-If you're sceptical that this is just my taste, there's a paper out of 2025 on *generative interfaces for language models* that ran the experiment cleanly. They compared two ways of letting an LLM handle a user request: one where the interface was described to the model in free natural language, and one where it was described as a structured representation with explicit fields and constraints. Structured representations won — measurably — in human evaluation. Around a 13% to 17% lift on overall win rates.
+If you're sceptical that this is just my taste, there's a 2025 paper on *generative interfaces for language models* that ran the experiment cleanly. They compared two ways of letting an LLM handle a user request: one where the interface was described to the model in free natural language, and one where it was described as a structured representation with explicit fields and constraints. Structured representations won, measurably, in human evaluation. Around a 13% to 17% lift on overall win rates.
 
 The takeaway sits one level deeper than "use buttons for users." It's that **structured beats free-text even when the LLM is the one doing the work.** The model is not actually better off in ambiguity. We just keep assuming it is, because the demo runs fine.
 
@@ -145,17 +145,17 @@ Yes, and that's usually a feature. Most users don't want an "AI experience." The
 For some things, yes. For natural turn-taking in voice, the threshold is around 500 milliseconds. A button click is roughly zero. If a user is going to do an action ten times in a session, those numbers compound.
 
 **Where should I start if my product is currently all LLM?**
-Run the diagnostic above. The places where users repeat themselves or correct the model are the candidates. You probably don't need to rebuild — you need to peel.
+Run the diagnostic above. The places where users repeat themselves or correct the model are the candidates. You probably don't need to rebuild. You need to peel.
 
 **How does this relate to agents?**
 Same idea, scaled up. An agent with full autonomy over a long task is the maximally-LLM-owned design. A workflow with the model inside specific steps is the minimum. Most real products live closer to the workflow end and the ones that try to live near the agent end usually walk back.
 
 **Is this just "use traditional software inside your AI agent?"**
-Related, but different angle. That post (coming) is about the *back-end* parts of an agent that should stay deterministic — rules, queues, database constraints, retries. This one is about the *front-end* — what the user clicks, sees, and steers with. Same instinct, different surface.
+Related, but a different angle. That post (coming) is about the *back-end* parts of an agent that should stay deterministic: rules, queues, database constraints, retries. This one is about the *front-end*: what the user clicks, sees, and steers with. Same instinct, different surface.
 
 ## Caveats
 
-The Brokerloop example is described in general terms. Accuracy and frustration improvements were observed qualitatively across the team, not measured against a fixed benchmark or an A/B test. The ~500ms voice turn-taking figure comes from published conversational UX research and is a useful threshold, not a guarantee for any specific stack. Your numbers will differ.
+The Brokerloop example is described in general terms. Accuracy and frustration improvements were observed qualitatively across the team, not measured against a fixed benchmark or an A/B test. The ~500ms figure is a commonly cited threshold in conversational UX work, not a number from a specific study in my back pocket. Your stack will produce its own numbers.
 
 ## If you're working through this
 
