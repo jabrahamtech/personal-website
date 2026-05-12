@@ -364,9 +364,9 @@ body.mode-paper .doc h1{
   margin:0 0 18px;
   text-wrap:balance;
 }
-body.mode-paper .doc h1.size-short{font-size:clamp(34px,5vw,50px);line-height:1.1}
-body.mode-paper .doc h1.size-medium{font-size:clamp(30px,4.4vw,44px);line-height:1.14}
-body.mode-paper .doc h1.size-long{font-size:clamp(24px,3.4vw,34px);line-height:1.2;letter-spacing:-0.014em}
+body.mode-paper .doc h1.size-short{font-size:clamp(30px,4.2vw,42px);line-height:1.12}
+body.mode-paper .doc h1.size-medium{font-size:clamp(28px,3.8vw,38px);line-height:1.16}
+body.mode-paper .doc h1.size-long{font-size:clamp(24px,3.2vw,32px);line-height:1.22;letter-spacing:-0.014em}
 body.mode-paper .doc .meta-row{
   display:flex;flex-wrap:wrap;align-items:center;
   gap:6px 22px;
@@ -670,7 +670,12 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e
   body.mode-paper .page-head h1{font-size:clamp(24px,7vw,32px);line-height:1.18}
   body.mode-paper .page-head h1.prompt{font-size:clamp(24px,7vw,32px)}
   body.mode-paper .doc{padding:36px 0 24px}
-  body.mode-paper .doc h1{font-size:clamp(24px,7vw,32px);line-height:1.18}
+  /* Size variants need to be listed so they win against the more
+     specific .size-* selectors set above. */
+  body.mode-paper .doc h1,
+  body.mode-paper .doc h1.size-short,
+  body.mode-paper .doc h1.size-medium{font-size:clamp(24px,7vw,32px);line-height:1.18}
+  body.mode-paper .doc h1.size-long{font-size:clamp(22px,6.2vw,28px);line-height:1.24}
   body.mode-paper .prose{font-size:16.5px;line-height:1.7}
   body.mode-paper .prose p{margin:0 0 16px}
   body.mode-paper .prose h2{font-size:20px;margin:32px 0 12px;padding-top:0}
@@ -687,7 +692,10 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e
 }
 @media (max-width:480px){
   body.mode-paper .page-head h1{font-size:clamp(22px,6vw,28px)}
-  body.mode-paper .doc h1{font-size:clamp(22px,6vw,28px)}
+  body.mode-paper .doc h1,
+  body.mode-paper .doc h1.size-short,
+  body.mode-paper .doc h1.size-medium{font-size:clamp(22px,6vw,28px)}
+  body.mode-paper .doc h1.size-long{font-size:clamp(20px,5.6vw,26px)}
   body.mode-paper .prose{font-size:16px}
   body.mode-paper .prose h2{font-size:19px;margin:28px 0 10px;padding-top:0}
   body.mode-paper .pn{margin-top:28px;padding-top:16px;gap:14px}
