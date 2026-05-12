@@ -97,6 +97,8 @@ const breadcrumb = {
   tags={data.tags}
   image={data.image?.src}
   imageAlt={data.image?.alt}
+  imageWidth={data.image?.width}
+  imageHeight={data.image?.height}
   pageType="article"
   publishedAt={data.posted}
   modifiedAt={data.posted}
@@ -107,8 +109,17 @@ const breadcrumb = {
   sourcePath={sourcePath}
 >
   {data.image && (
-    <figure class="cover">
-      <img src={data.image.src} alt={data.image.alt} loading="eager" />
+    <figure class="cover" slot="hero">
+      <img
+        src={data.image.src}
+        alt={data.image.alt}
+        width={data.image.width ?? 1600}
+        height={data.image.height ?? 900}
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+      />
+      {data.image.caption && <figcaption>{data.image.caption}</figcaption>}
     </figure>
   )}
   <Content />

@@ -31,6 +31,9 @@ const posts = defineCollection({
       .object({
         src: z.string(),
         alt: z.string(),
+        caption: z.string().optional(),
+        width: z.number().int().positive().optional(),
+        height: z.number().int().positive().optional(),
       })
       .optional(),
   }),

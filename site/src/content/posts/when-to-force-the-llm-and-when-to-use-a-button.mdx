@@ -9,16 +9,16 @@ contentTypes:
   - "Decision / Comparison Guide"
 cluster: "Agents and Workflows"
 tags: ['agents', 'workflows', 'voice-ai', 'ui-design']
+image:
+  src: "/posts/when-to-force-the-llm-hero.png"
+  alt: "The post title on the left, with a microphone connected to a single rust-coloured button on the right."
+  caption: "Sometimes the answer is the button."
+  width: 1600
+  height: 900
 ---
 
 import Callout from '../../components/Callout.astro';
 import Figure from '../../components/Figure.astro';
-
-<Figure
-  src="/posts/when-to-force-the-llm-hero.png"
-  alt="The post title on the left, with a microphone connected to a single rust-coloured button on the right."
-  caption="Sometimes the answer is the button."
-/>
 
 ## Short answer
 
@@ -48,6 +48,8 @@ Then there's cost, which is the silent one. The 2026 story in AI economics isn't
   src="/posts/when-to-force-the-llm-stat-500ms.png"
   alt="~500ms — the voice turn-taking budget the LLM cannot guarantee."
   caption="Voice has a budget the LLM can't promise to hit."
+  width={1600}
+  height={900}
 />
 
 ## A small fix that taught me the pattern
@@ -74,6 +76,8 @@ They're authoritative. When the button and the model disagree, the button wins. 
   src="/posts/when-to-force-the-llm-architecture.png"
   alt="A deterministic outer loop with three nodes — open step (LLM), captured value, next step — and four back-channel buttons beneath: pause, previous, next, confirm."
   caption="Where the model sits inside the workflow."
+  width={1600}
+  height={900}
 />
 
 ## The button test
@@ -134,6 +138,8 @@ You'll know you've drawn the line correctly when users stop noticing the model i
   src="/posts/when-to-force-the-llm-pull-quote.png"
   alt="The model is doing the part that needs language. The UI is doing the part that needs certainty."
   caption="The line, written out."
+  width={1600}
+  height={900}
 />
 
 ## FAQ
