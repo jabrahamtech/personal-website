@@ -1,0 +1,164 @@
+---
+title: "When to Force the LLM, and When to Use a Button"
+summary: "A decision guide for founders and ops leaders working out which parts of a product the model should own, and which parts belong to a button. Uses voice AI as the worked example and back-channel UI as the named pattern."
+posted: 2026-05-12
+draft: true
+priority: 1
+pipelineStatus: "Drafted"
+contentTypes:
+  - "Decision / Comparison Guide"
+cluster: "Agents and Workflows"
+tags: ['agents', 'workflows', 'voice-ai', 'ui-design']
+---
+
+import Callout from '../../components/Callout.astro';
+import Figure from '../../components/Figure.astro';
+
+<Figure
+  src="/posts/when-to-force-the-llm-hero.png"
+  alt="The post title on the left, with a microphone connected to a single rust-coloured button on the right."
+  caption="Sometimes the answer is the button."
+/>
+
+## Short answer
+
+If the user's intent has a finite list of options and the cost of misreading them is high, use a button. If the intent is open-ended and the cost of asking a clarifying question is low, use the model. Most teams default to the model because it feels more impressive. They pay for it in accuracy, latency, and trust.
+
+## The most expensive AI lesson of the last two years was free
+
+The Humane AI Pin and the Rabbit R1 were the two most-watched AI consumer launches of 2024 and 2025. Both went badly. The post-mortems converge on something almost embarrassingly simple: pure voice doesn't work for roughly 80% of real use cases. You need to see lists. You need to compare options. You need to re-read what was just said. Removing the screen sent the experience back fifteen years, and the model couldn't paper over it.
+
+The deeper lesson is not "voice is bad." Voice is fine. The lesson is that once you have a language model in your stack, the temptation to put it in charge of *everything* — navigation, confirmation, state, control — is what kills the product. The Pin and the R1 are the spectacular version of a mistake almost every AI feature team makes in some form.
+
+<Callout type="tip">
+  The default failure mode of AI products is forcing the LLM to do jobs a button could do.
+</Callout>
+
+## What "forcing the LLM" actually costs
+
+It costs three things at once.
+
+**Accuracy.** Every step you hand to the model is a step where intent can be misread. Stack five of those steps in a session and the joint probability of an end-to-end success drops fast.
+
+**Latency.** Each step is an inference call. A button click is roughly zero milliseconds. In voice, the natural turn-taking budget sits around half a second, and the model can't promise that. If the same user does the same action ten times in a session, that maths is brutal.
+
+**Cost.** This one is silent. The 2026 story in AI economics isn't that prices went up — it's that agentic workflows multiplied token use across every step. One user action can fan out to plan, retrieve, call a tool, validate, retry, and respond. If the action could have been a button, you just paid for six inference calls to do the work of one click.
+
+<Figure
+  src="/posts/when-to-force-the-llm-stat-500ms.png"
+  alt="~500ms — the voice turn-taking budget the LLM cannot guarantee."
+  caption="Voice has a budget the LLM can't promise to hit."
+/>
+
+## A small fix that taught me the pattern
+
+In a voice AI workflow I worked on at Brokerloop — a system that ran structured intake conversations with insurance brokers — we hit this wall early. The model handled the open part of the conversation well: asking the right questions, listening, capturing detail. But we also wanted users to be able to do four things at any moment: pause, go back to the previous question, skip to the next one, and confirm that what the model had captured was correct.
+
+For a few weeks, all four lived inside the model. The user could say *"go back"* or *"wait, that's wrong"* and the model would try to interpret intent. Sometimes it worked. Sometimes "go back" was read as "stop the call." Sometimes "actually, the date is wrong" was acknowledged verbally but not reflected in the captured data. Users got frustrated because they were never sure the correction had landed.
+
+The fix was small and slightly embarrassing: we added buttons to the companion web interface. *Pause. Previous question. Next question. Confirm captured value.* The four things the model kept guessing at became four things the user could click. The voice agent kept doing the open-ended part — listening, asking, capturing. The four deterministic controls moved out of the prompt and into the UI.
+
+Accuracy on captured data went up. Frustration went down. Latency on those four interactions dropped to roughly zero, because clicking a button doesn't require an inference call. None of this was a model upgrade. It was a workflow change.
+
+## Back-channel UI: the pattern, named
+
+The thing we ended up building isn't really a chat interface and it isn't really a form. It's a *back-channel* — a persistent surface running alongside the voice flow, never interrupting it, but always available to take a deterministic action from the user.
+
+Three properties matter:
+
+1. **Persistent.** The controls don't appear and disappear with the conversation. They're always there. The user doesn't have to wait for a turn or a prompt to use them.
+2. **Parallel.** Pressing a button doesn't interrupt the voice flow. The flow advances *because* of the press. The model's job is to listen and to keep speaking; the user's job is to steer.
+3. **Authoritative.** When the button and the model disagree, the button wins. If the user clicks *"that's wrong"*, the captured value is wrong, end of discussion.
+
+<Figure
+  src="/posts/when-to-force-the-llm-architecture.png"
+  alt="A deterministic outer loop with three nodes — open step (LLM), captured value, next step — and four back-channel buttons beneath: pause, previous, next, confirm."
+  caption="Where the model sits inside the workflow."
+/>
+
+## The button test
+
+When you're trying to decide whether a step in your product should be owned by the model or by something deterministic, run it through these four questions.
+
+| Question | If yes, lean deterministic | If no, lean LLM |
+|---|---|---|
+| Is the set of valid outcomes finite and known? | Yes | No |
+| Would a wrong interpretation here cost the user real time, money, or trust? | Yes | No |
+| Is the user trying to *control the flow* (pause, skip, undo) rather than express something? | Yes | No |
+| Will this happen many times per session? | Yes | No |
+
+If you're answering yes to two or more, that step almost certainly belongs to a button, form, dropdown, slider, or rule, not the model. Save the model for the parts where the input is open-ended and the human gains something from being heard rather than clicking.
+
+<Callout type="tip">
+  The model is doing the part that needs language. The UI is doing the part that needs certainty.
+</Callout>
+
+## The structured-input research nobody is quoting
+
+If you're sceptical that this is just my taste, there's a paper out of 2025 on *generative interfaces for language models* that ran the experiment cleanly. They compared two ways of letting an LLM handle a user request: one where the interface was described to the model in free natural language, and one where it was described as a structured representation with explicit fields and constraints. Structured representations won — measurably — in human evaluation. Around a 13% to 17% lift on overall win rates.
+
+The takeaway sits one level deeper than "use buttons for users." It's that **structured beats free-text even when the LLM is the one doing the work.** The model is not actually better off in ambiguity. We just keep assuming it is, because the demo runs fine.
+
+## When to force the LLM into the solution
+
+The mirror of the rule. Some places do call for the model:
+
+- The input is unstructured language and you can't predict the shape of it. Free-text intake, summarisation, classification of fuzzy categories, extraction from messy documents.
+- The user wins something specifically by *talking* rather than tapping. Hands-busy contexts. Field workflows. Anywhere typing or clicking adds real friction.
+- The branching is too wide for a UI. Thirty leaves where most users only touch three: a model that routes is cheaper than thirty buttons no one will read.
+- Personalisation needs context you can't pre-encode. Tone, follow-up phrasing, adaptive prompts.
+
+When all four are true, the model is the product. Don't apologise for it.
+
+## When to avoid forcing the LLM
+
+The reverse list, written out so it's hard to miss:
+
+- Anything binary and consequential. Confirmations. Authorisations. Payments. Account deletions.
+- Anything stateful that the user expects to control. Pause, resume, go back, skip, restart.
+- Anything where the valid answer set is small and the cost of a misread is large. Yes/no, today/tomorrow, this account/that account.
+- Anything that has to be auditable or compliant. Regulators don't want to read your prompt.
+- Anything that has to happen in under 500 milliseconds. Voice turn-taking breaks at that threshold, and the model can't make it.
+
+These aren't moral failings of the model. They're cases where deterministic logic does the job better.
+
+## A diagnostic you can run today
+
+Walk through one full session of your product. Note every place a user has to repeat themselves, rephrase, correct, or say *"no, that's not what I meant."* Note every place they pause because they're not sure the model heard them. Note every place they ask the model to do something procedural rather than something expressive.
+
+Each of those notes is a candidate for a button, a form field, or a fixed rule. You probably don't need to rebuild the product. You need to peel the model off a few specific steps.
+
+## The final rule
+
+You'll know you've drawn the line correctly when users stop noticing the model in the places where it's doing its job, and start noticing the buttons in the places where they need control. The model gets quieter, more useful, and more accurate. The product gets faster and more trusted. Nothing about it looks like a demo, which is exactly the point.
+
+<Figure
+  src="/posts/when-to-force-the-llm-pull-quote.png"
+  alt="The model is doing the part that needs language. The UI is doing the part that needs certainty."
+  caption="The line, written out."
+/>
+
+## FAQ
+
+**Doesn't adding buttons make the experience feel less like AI?**
+Yes, and that's usually a feature. Most users don't want an "AI experience." They want the thing they were trying to do to happen reliably. The model is a means, not an aesthetic.
+
+**Isn't the LLM fast enough now?**
+For some things, yes. For natural turn-taking in voice, the threshold is around 500 milliseconds. A button click is roughly zero. If a user is going to do an action ten times in a session, those numbers compound.
+
+**Where should I start if my product is currently all LLM?**
+Run the diagnostic above. The places where users repeat themselves or correct the model are the candidates. You probably don't need to rebuild — you need to peel.
+
+**How does this relate to agents?**
+Same idea, scaled up. An agent with full autonomy over a long task is the maximally-LLM-owned design. A workflow with the model inside specific steps is the minimum. Most real products live closer to the workflow end and the ones that try to live near the agent end usually walk back.
+
+**Is this just "use traditional software inside your AI agent?"**
+Related, but different angle. That post (coming) is about the *back-end* parts of an agent that should stay deterministic — rules, queues, database constraints, retries. This one is about the *front-end* — what the user clicks, sees, and steers with. Same instinct, different surface.
+
+## Caveats
+
+The Brokerloop example is described in general terms. Accuracy and frustration improvements were observed qualitatively across the team, not measured against a fixed benchmark or an A/B test. The ~500ms voice turn-taking figure comes from published conversational UX research and is a useful threshold, not a guarantee for any specific stack. Your numbers will differ.
+
+## If you're working through this
+
+If you're deciding how much of your product the model should own, the cheapest version of this conversation is to walk through your current workflow with someone who has shipped one. Reach out if that's useful.
