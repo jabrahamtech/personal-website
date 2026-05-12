@@ -28,11 +28,11 @@
 
 /* article shell */
 .doc { padding: 48px 0 32px; position: relative; z-index: 2 }
-/* Reading column — narrower than .wrap so the cover, figures and code
-   blocks land at a comfortable width while still leaving room for the
-   text-measure cap below. The TOC mode (>=1320px) overrides this via
-   the grid template. */
-.doc .doc-main { max-width: 680px; margin: 0 auto; min-width: 0 }
+/* Reading column — 640px puts 16px Inter at ~75ch and 18px (paper) at
+   ~67ch, both inside the comfortable 50-75ch reading measure. The
+   column edge is the measure: everything (text, figures, code) aligns
+   to it, so there's no asymmetric right-gutter on paragraphs. */
+.doc .doc-main { max-width: 640px; margin: 0 auto; min-width: 0 }
 .doc .crumbs {
   font-family: var(--mono);
   font-size: 12px;
@@ -116,13 +116,6 @@
   line-height: 1.7;
   color: var(--ink-dim);
 }
-/* Cap the comfortable measure at ~66ch (~520px at 16px Inter) on text-
-   blocks only. Code, figures, callouts and pn keep the column width so
-   wide content can breathe past the reading column. */
-.prose > p,
-.prose > ul,
-.prose > ol,
-.prose > blockquote { max-width: 66ch }
 .prose p { margin: 0 0 18px; text-wrap: pretty }
 .prose strong { color: var(--ink) }
 .prose em { color: var(--cyan); font-style: normal }
@@ -130,6 +123,7 @@
   color: var(--green);
   text-decoration: underline;
   text-decoration-color: rgba(125, 255, 138, 0.35);
+  overflow-wrap: break-word;
 }
 .prose ul,
 .prose ol { margin: 0 0 18px; padding-left: 22px }
@@ -448,10 +442,10 @@
 
 /* desktop right-rail TOC kicks in only at >=1320px */
 @media (min-width: 1320px) {
-  .doc.has-toc .wrap { max-width: 1256px }
+  .doc.has-toc .wrap { max-width: 1216px }
   .doc.has-toc .doc-grid {
     display: grid;
-    grid-template-columns: 220px minmax(0, 680px) 220px;
+    grid-template-columns: 220px minmax(0, 640px) 220px;
     column-gap: 48px;
     align-items: start;
     justify-content: center;
@@ -501,13 +495,6 @@
   .doc h1.size-long { font-size: clamp(22px, 6.2vw, 28px); line-height: 1.22 }
   .doc .meta-row { font-size: 11.5px; gap: 8px 12px }
   .prose { font-size: 16px; line-height: 1.7 }
-  /* On mobile the viewport is already narrower than 66ch — lifting the
-     cap stops `max-width: 66ch` (which is set in physical px, ch unit)
-     from crimping the column when the viewport itself is smaller. */
-  .prose > p,
-  .prose > ul,
-  .prose > ol,
-  .prose > blockquote { max-width: none }
   .prose p { margin: 0 0 16px }
   .prose h2 { font-size: 19px; margin: 28px 0 12px }
   .prose h3 { font-size: 16.5px; margin: 22px 0 8px }
