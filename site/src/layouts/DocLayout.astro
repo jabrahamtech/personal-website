@@ -14,6 +14,8 @@ interface Props {
   /** OG image (post cover, if any). */
   image?: string;
   imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
   /** Article meta — passed through to <Base>. */
   pageType?: 'article' | 'website' | 'profile';
   publishedAt?: Date;
@@ -39,6 +41,8 @@ const {
   tags,
   image,
   imageAlt,
+  imageWidth,
+  imageHeight,
   pageType = 'website',
   publishedAt,
   modifiedAt,
@@ -69,6 +73,8 @@ const titleSizeClass =
   description={description}
   image={image}
   imageAlt={imageAlt}
+  imageWidth={imageWidth}
+  imageHeight={imageHeight}
   pageType={pageType}
   publishedAt={publishedAt}
   modifiedAt={modifiedAt}
@@ -99,6 +105,7 @@ const titleSizeClass =
         <div class="doc-main">
           <div class="post-prompt eng-only">&gt; {promptPath}</div>
           <h1 class={titleSizeClass}>{cleanTitle}</h1>
+          <slot name="hero" />
           {metaRow && (
             <div class="meta-row">
               {metaRow.map((m) => <span><b>{m.label}</b> {m.value}</span>)}

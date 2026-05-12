@@ -390,6 +390,11 @@ body.mode-paper .cover{
   border:1px solid var(--line-2);background:#fff8e8;
   box-shadow:none;
 }
+body.mode-paper .cover figcaption{
+  font-family:var(--sans);font-style:italic;
+  color:var(--ink-mute);font-size:13.5px;letter-spacing:0;
+  margin-top:10px;
+}
 
 /* about — bio header. Avatar + name + role + contact links sit as a
    business-card masthead above the lede. Decision-makers see the answer

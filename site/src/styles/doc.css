@@ -88,13 +88,27 @@
 
 .cover {
   display: block;
-  margin: 0 0 28px;
+  margin: 8px 0 22px;
   border: 1px solid var(--line-2);
   background: #070a08;
   box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.4), 4px 4px 0 1px var(--line);
 }
 .cover img,
-.cover svg { display: block; width: 100%; height: auto }
+.cover svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+.cover figcaption {
+  margin: 10px 2px 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-mute);
+  letter-spacing: .02em;
+  text-align: center;
+}
 
 /* avatar — about-page float-right photo. Paper mode re-lays this out
    inside .bio-head and overrides the float. */
@@ -369,7 +383,15 @@
 }
 .toc-desktop a:hover { color: var(--ink-dim) }
 .toc-desktop a.active { color: var(--green); border-left-color: var(--green-2) }
-.toc-desktop .text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.toc-desktop .text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  line-height: 1.35;
+}
+.toc-desktop li { margin: 2px 0; line-height: 1.4 }
 .toc-desktop li.d3 a { padding-left: 14px; font-size: 11.5px }
 
 /* mobile / tablet TOC — sticky collapsible bar below the nav */
