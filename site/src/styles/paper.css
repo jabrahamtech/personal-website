@@ -386,7 +386,8 @@ body.mode-paper .doc .meta-row span b{
 body.mode-paper .doc .meta-row span:first-child{display:none}
 body.mode-paper .doc .tag{font-family:var(--sans);font-size:12px;color:var(--ink-mute);border:1px solid var(--line-2);padding:2px 8px;border-radius:2px;letter-spacing:0;text-transform:capitalize}
 
-body.mode-paper .cover{
+body.mode-paper .cover img,
+body.mode-paper .cover svg{
   border:1px solid var(--line-2);background:#fff8e8;
   box-shadow:none;
 }
