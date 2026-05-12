@@ -81,9 +81,6 @@
 .cover {
   display: block;
   margin: 8px 0 22px;
-  border: 1px solid var(--line-2);
-  background: #070a08;
-  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.4), 4px 4px 0 1px var(--line);
 }
 .cover img,
 .cover svg {
@@ -92,6 +89,9 @@
   height: auto;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+  border: 1px solid var(--line-2);
+  background: #070a08;
+  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.4), 4px 4px 0 1px var(--line);
 }
 .cover figcaption {
   margin: 10px 2px 0;
