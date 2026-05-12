@@ -24,7 +24,7 @@ import Figure from '../../components/Figure.astro';
 
 If the user's intent has a finite list of options and the cost of misreading them is high, use a button. If the intent is open-ended and the cost of asking a clarifying question is low, use the model. Most teams default to the model because it feels more impressive. They pay for it in accuracy, latency, and trust.
 
-## The most expensive AI lesson of the last two years was free
+## The most expensive AI lesson was free
 
 The Humane AI Pin and the Rabbit R1 were the two most-watched AI consumer launches of 2024 and 2025. Both went badly. The post-mortems converge on something almost embarrassingly simple: pure voice doesn't work for roughly 80% of real use cases. You need to see lists. You need to compare options. You need to re-read what was just said. Removing the screen sent the experience back fifteen years, and the model couldn't paper over it.
 
@@ -80,12 +80,10 @@ Three properties matter:
 
 When you're trying to decide whether a step in your product should be owned by the model or by something deterministic, run it through these four questions.
 
-| Question | If yes, lean deterministic | If no, lean LLM |
-|---|---|---|
-| Is the set of valid outcomes finite and known? | Yes | No |
-| Would a wrong interpretation here cost the user real time, money, or trust? | Yes | No |
-| Is the user trying to *control the flow* (pause, skip, undo) rather than express something? | Yes | No |
-| Will this happen many times per session? | Yes | No |
+1. Is the set of valid outcomes finite and known?
+2. Would a wrong interpretation here cost the user real time, money, or trust?
+3. Is the user trying to *control the flow* — pause, skip, undo — rather than express something?
+4. Will this happen many times per session?
 
 If you're answering yes to two or more, that step almost certainly belongs to a button, form, dropdown, slider, or rule, not the model. Save the model for the parts where the input is open-ended and the human gains something from being heard rather than clicking.
 
