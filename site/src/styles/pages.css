@@ -112,20 +112,17 @@
   text-align: center;
 }
 
-/* posts list — flex column, hairline rules between items */
+/* posts list — block rhythm with deliberate per-element margins so
+   title → summary → meta reads as a hierarchy, not a flat stack of
+   three same-spaced rows. */
 .post-list {
   list-style: none;
   margin: 0 0 64px;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
 }
 .post-row {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 22px 0;
+  display: block;
+  padding: 24px 0 26px;
   transition: background .12s ease;
 }
 .post-list li + li .post-row { border-top: 1px solid var(--line) }
@@ -133,31 +130,33 @@
 .post-row:hover { background: rgba(125, 255, 138, 0.025) }
 .post-row h2 {
   font-family: var(--mono);
-  font-size: 18px;
+  font-size: 18.5px;
   line-height: 1.3;
   font-weight: 600;
-  margin: 0;
+  margin: 0 0 8px;
   color: var(--ink);
+  text-wrap: balance;
 }
 .post-row:hover h2 { color: var(--green) }
 .post-row p {
-  margin: 0;
+  margin: 0 0 12px;
   color: var(--ink-dim);
   font-size: 14.5px;
   line-height: 1.55;
   max-width: 64ch;
+  text-wrap: pretty;
 }
 .post-row .meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  row-gap: 4px;
+  row-gap: 6px;
   font-family: var(--mono);
   font-size: 11.5px;
   color: var(--ink-mute);
   letter-spacing: .03em;
-  margin: 2px 0 0;
+  margin: 0;
 }
 .post-row .meta .draft {
   color: var(--amber);
@@ -307,9 +306,9 @@
 @media (max-width: 720px) {
   .page-head { padding: 56px 0 14px }
   .page-head h1 { font-size: clamp(24px, 7vw, 32px); margin: 0 0 10px }
-  .post-row { padding: 18px 0 }
-  .post-row h2 { font-size: 16.5px; line-height: 1.35 }
-  .post-row p { font-size: 14.5px; line-height: 1.55 }
+  .post-row { padding: 20px 0 22px }
+  .post-row h2 { font-size: 16.5px; line-height: 1.3; margin: 0 0 6px }
+  .post-row p { font-size: 14.5px; line-height: 1.55; margin: 0 0 10px }
   .post-row .meta { flex-wrap: wrap; row-gap: 6px; font-size: 11px }
   .post-empty { font-size: 12.5px; padding: 14px 0 }
 }
