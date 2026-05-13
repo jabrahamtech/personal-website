@@ -10,7 +10,6 @@ const posts = defineCollection({
     posted: z.coerce.date().optional(),
     draft: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
-    priority: z.number().int().positive().optional(),
     pipelineStatus: z.string().default('Prioritised'),
     contentTypes: z
       .array(

@@ -106,7 +106,6 @@ test.describe('home (posts list)', () => {
 
     const meta = first.locator('.meta');
     await expect(meta).toContainText('draft');
-    await expect(meta).toContainText('P1');
     await expect(meta).toContainText('Adaptive AI / Voice AI');
     await expect(meta.locator('.tag-cat')).toHaveText(['Guide', 'Opinion']);
 
