@@ -47,6 +47,16 @@ const siteOrigin = (Astro.site ?? new URL('https://jabrahamtech.com')).toString(
 const canonical = new URL(Astro.url.pathname, siteOrigin + '/').toString();
 const ogImage = new URL(image, siteOrigin + '/').toString();
 
+/* MIME for the OG card. Most platforms ignore og:image:type and detect
+   from bytes, but WhatsApp and a few legacy crawlers do consult it —
+   if it disagrees with the actual file, the card falls back to a
+   site-icon preview. So derive from the extension rather than hardcode. */
+const ogImageType =
+  /\.jpe?g($|\?)/i.test(image) ? 'image/jpeg'
+  : /\.webp($|\?)/i.test(image) ? 'image/webp'
+  : /\.gif($|\?)/i.test(image) ? 'image/gif'
+  : 'image/png';
+
 /* Site-wide identity (Person + WebSite) — emitted on every page so AEO/LLM
    crawlers always have an anchor entity to attach Article schemas to. */
 const personId = `${siteOrigin}/#jonathan`;
@@ -168,7 +178,7 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
   <meta property="og:url" content={canonical} />
   <meta property="og:image" content={ogImage} />
   <meta property="og:image:secure_url" content={ogImage} />
-  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:type" content={ogImageType} />
   <meta property="og:image:width" content={String(imageWidth)} />
   <meta property="og:image:height" content={String(imageHeight)} />
   <meta property="og:image:alt" content={imageAlt} />
