@@ -9,7 +9,7 @@ contentTypes:
 cluster: "Agents and Workflows"
 tags: ['agents', 'workflows', 'voice-ai', 'ui-design']
 image:
-  src: "/posts/when-to-force-the-llm-hero.jpg"
+  src: "/posts/when-to-force-the-llm-and-when-to-use-a-button/hero.jpg"
   alt: "The post title on the left, with a microphone connected to a single rust-coloured button on the right."
   caption: "Sometimes the answer is the button."
   width: 1200
@@ -44,11 +44,11 @@ Latency next. Each step is an inference call. A button takes roughly zero millis
 Then there's cost, which is the silent one. The 2026 story in AI economics isn't that prices went up. It's that agentic workflows multiplied token use across every step. One user action can fan out to plan, retrieve, call a tool, validate, retry, respond. If it could have been a button, you just paid for six inference calls to do the work of one click.
 
 <Figure
-  src="/posts/when-to-force-the-llm-stat-500ms.png"
+  src="/posts/when-to-force-the-llm-and-when-to-use-a-button/stat-500ms.jpg"
   alt="~500ms — the voice turn-taking budget the LLM cannot guarantee."
   caption="Voice has a budget the LLM can't promise to hit."
-  width={1600}
-  height={900}
+  width={1200}
+  height={675}
 />
 
 ## A small fix that taught me the pattern
@@ -72,11 +72,11 @@ They run parallel to the voice. Pressing one doesn't cut the model off. The flow
 They're authoritative. When the button and the model disagree, the button wins. If the user clicks *"that's wrong,"* the captured value is wrong, full stop.
 
 <Figure
-  src="/posts/when-to-force-the-llm-architecture.png"
+  src="/posts/when-to-force-the-llm-and-when-to-use-a-button/architecture.jpg"
   alt="A deterministic outer loop with three nodes — open step (LLM), captured value, next step — and four back-channel buttons beneath: pause, previous, next, confirm."
   caption="Where the model sits inside the workflow."
-  width={1600}
-  height={900}
+  width={1200}
+  height={675}
 />
 
 ## The button test
@@ -134,11 +134,11 @@ Each of those notes is a candidate for a button, a form field, or a fixed rule. 
 You'll know you've drawn the line correctly when users stop noticing the model in the places where it's doing its job, and start noticing the buttons in the places where they need control. The model gets quieter, more useful, and more accurate. The product gets faster and more trusted. Nothing about it looks like a demo, which is exactly the point.
 
 <Figure
-  src="/posts/when-to-force-the-llm-pull-quote.png"
+  src="/posts/when-to-force-the-llm-and-when-to-use-a-button/pull-quote.jpg"
   alt="The model is doing the part that needs language. The UI is doing the part that needs certainty."
   caption="The line, written out."
-  width={1600}
-  height={900}
+  width={1200}
+  height={675}
 />
 
 ## FAQ
