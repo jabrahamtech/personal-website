@@ -1,0 +1,202 @@
+---
+title: "Most 'human-in-the-loop' is escalation done badly"
+summary: "Putting humans in the default decision path of an AI system is the worst of all worlds. The pattern that actually delivers oversight is calibrated escalation — and most teams claiming to do HITL are doing escalation badly."
+posted: 2026-05-13
+draft: true
+pipelineStatus: "Drafting"
+contentTypes:
+  - "POV / Strategic Opinion Post"
+cluster: "Agents and Workflows"
+tags: ['agents', 'workflows', 'hitl', 'ai-oversight', 'escalation']
+image:
+  src: "/posts/most-hitl-is-escalation-done-badly/hero.jpg"
+  alt: "Handwritten title — Most human-in-the-loop is escalation done badly — on a cream notebook page, with a small upper-right vignette of a three-node AI loop interrupted by a deep-rust human bottleneck labelled 'the loop everyone draws'."
+  caption: "The loop everyone draws."
+  width: 1200
+  height: 630
+---
+
+import Figure from '../../components/Figure.astro';
+
+{/* TODO before flipping draft → false:
+  1) Footnote [1] needs primary citation. The 73% → 61.7% finding is well-cited in
+     secondary sources (EDPS TechDispatch 2/2025); the primary paper is likely
+     Goh et al. 2023/2024 in JAMA Internal Medicine or JAMA Network Open, but
+     that has NOT been verified against the original journal record. Replace
+     the placeholder in the Footnotes section before publishing.
+  2) Source links are referenced narratively but not hyperlinked. Add inline
+     citations / footnote links for: Vaccaro et al. 2024 (Nature Human Behaviour),
+     Sele & Chugunova 2024 (PLOS One), Bainbridge 1983 (Ironies of Automation),
+     EU AI Act Article 14, GDPR Article 22, EDPS TechDispatch 2/2025, Anthropic's
+     Claude Code autonomy data. Source URLs are in the local research file
+     `Claude/Projects/Blog Post/research-hitl-vs-escalation.md` under "Sources".
+  3) Forward-link the two unwritten posts when they ship (add them to the
+     Related section, alongside the existing when-to-force link):
+       "Why most AI products should start as workflows" — broader argument that
+         workflow design beats agent autonomy at the demo-to-product stage.
+       "What breaks when AI leaves the demo" — production failure modes that
+         wrap around the oversight argument.
+*/}
+
+A product direction essay for the people deciding how much human oversight to wire into an AI product, and where.
+
+## Short answer
+
+Put a human in the default decision path of an AI system and you get the worst of every option. At low risk they're a throughput bottleneck. At volume they rubber-stamp. When they actually engage with a hard case, the peer-reviewed evidence says they often make the system less accurate, not more.
+
+What "human-in-the-loop" claims to deliver is meaningful oversight. What actually delivers it is calibrated escalation, where humans are invoked only by triggers you can name and measure. Most teams running HITL are doing escalation, just without the calibration. The good teams are doing it deliberately.
+
+The rest of this post is the evidence and the design.
+
+## The terms are a mess, and the mess matters
+
+I want to be precise about three patterns before going further, because the literature, the vendor pages, and the regulators are all using the same words to mean different things.
+
+In *human-in-the-loop* the human is part of the default path. Every action, or every action of a certain class, pauses for human review or co-decision before it proceeds. Volume of cases drives cost linearly. The human is the gate.
+
+In *human-on-the-loop* the AI acts and the human supervises. The human can intervene at any time, but does not by default. Cost scales with the vigilance demand, not the volume of cases.
+
+In *escalation* the AI acts by default, and the human is invoked only by a trigger you have defined: low confidence, an irreversible action, a customer asking for one, a category the AI shouldn't touch. Cost scales with the edge-case rate, not the total volume.
+
+These three are not the same thing wearing different labels. They have different cost curves, different failure modes, and different things they ask the human to do. The single biggest source of confusion in this space is that "HITL" has come to mean "a human is involved somewhere." Once that conflation happens, you can't argue about design any more, because you're not pointing at the same object.
+
+The argument I want to make is about the first one. Default-path HITL. The pattern where a human sits inside every loop iteration, every action, every output. That pattern is broken in ways most product teams don't realise until it shows up in their metrics.
+
+<Figure
+  src="/posts/most-hitl-is-escalation-done-badly/figure-01.svg"
+  alt="Three patterns the term HITL gets used for. Side-by-side panels: HITL (human gates every step), HOTL (human observes from above), and escalation (human invoked only when a deep-rust trigger fires)."
+  caption="Fig. 1 — three patterns the term HITL gets used for."
+  width={1600}
+  height={900}
+/>
+
+## What the peer-reviewed evidence actually says
+
+I'll lead with two findings, because they're the ones I'd want a sceptical reader to have in front of them.
+
+The first is a meta-analysis published in *Nature Human Behaviour* in 2024 by Vaccaro, Almaatouq and Malone. They aggregated 106 experimental studies covering 370 effect sizes published between 2020 and 2023. The headline: human-AI combinations performed *significantly worse, on average*, than the better of either humans alone or AI alone. When the AI was stronger than the human, the combined team was weaker than the AI. When the human was stronger, the team was stronger than the human alone. Combining the two is not free. It is often net negative, especially on decision-making tasks.
+
+The second is a 2024 PLOS One paper by Sele and Chugunova called, with admirable honesty, "Putting a human in the loop: increasing uptake, but decreasing accuracy of automated decision-making." They ran a controlled experiment with 292 participants. People preferred algorithmic recommendations and used them more when they were given the ability to adjust them. But their adjustments *decreased* the final accuracy of the system. And, the finding that should make every product team uncomfortable: humans were *less* likely to override AI recommendations that contained large errors. The bigger the AI's mistake, the smaller the human correction. The emergency brake was worst exactly when you needed it.
+
+You can argue with the generalisability of any single study. You can't easily argue with both of those together. Adding a human to a default decision path is not a free upgrade. On many of the tasks where teams reach for HITL, it is a downgrade.
+
+<Figure
+  src="/posts/most-hitl-is-escalation-done-badly/figure-02.svg"
+  alt="Biased AI made clinicians less accurate, not more. Handwritten 73% upper-left descending diagonally to 61.7% lower-right, connected by a deep-rust dashed drop arrow labelled minus 11.3pp. Sub-caption: 2023 randomised clinical study, n=450."
+  caption="Fig. 2 — biased AI made clinicians less accurate, not more."
+  width={1600}
+  height={900}
+/>
+
+## Why default-path HITL fails in production
+
+There's forty-three years of human-factors research on this. Lisanne Bainbridge wrote "Ironies of Automation" in 1983, and it predicted every failure mode the AI industry is rediscovering at expensive scale. The core argument is that the more you automate the routine work, the worse the human gets at the residual work, and the more exhausting the monitoring task becomes. If you keep the human in the loop *to catch the failures the machine can't*, you've designed a job that requires sustained attention to rare events. Humans are bad at sustained attention to rare events. We are particularly bad at it after the system has worked correctly for a while and we've stopped really watching. The Therac-25 radiation therapy accidents are the textbook case: the machine worked correctly so often that operators couldn't recognise when it didn't.
+
+The same pattern shows up in modern clinical decision support. Clinicians override 90 to 95 percent of medication alerts in computerised order entry systems. More than half of those overrides get categorised as the alerts being clinically irrelevant. Primary care clinicians receive over 56 alerts per day and spend roughly 49 minutes responding to asynchronous ones. This is what HITL looks like when scaled to production volume. The humans aren't providing oversight. They're dismissing notifications so they can get on with the actual work. The system is lying to itself about what oversight is happening.
+
+And there's automation bias, the failure that goes the other way. When the AI is wrong but the human defers to it anyway. A 2023 study of 450 clinicians given diagnostic assistance from intentionally biased AI saw their accuracy fall from 73 percent to 61.7 percent. The clinicians weren't ignorant of the right answer. They knew it when working alone. They lost it when given a confident-looking machine to defer to. A separate 2025 governance analysis cited in the EDPS TechDispatch on automated decision-making found that humans providing in-the-loop oversight gave "correct" oversight only about half the time.
+
+Put these together and you get the production reality of default-path HITL. At low risk, you've added latency and headcount cost to actions that didn't need a human. At high volume, the human is desensitised and rubber-stamps. When the human does engage on a hard case, they often defer to the model exactly when they shouldn't. The shape of what you've built is not "human catches AI errors." The shape is "human enables AI errors with their signature on the bottom."
+
+> **The shape of what you've built is not "human catches AI errors."**
+> **The shape is "human enables AI errors with their signature on the bottom."**
+
+## The reframe that actually works
+
+The interesting question is not whether a human is involved in your AI system. The interesting question is what triggers them to be invoked, and what they can actually do once they are.
+
+That sentence is doing a lot of work, so let me unpack it. Default-path HITL gives you one trigger ("every action") and one role ("approve or correct"). Both are wrong for almost every production AI workflow. The trigger is wrong because most actions don't warrant a human, and putting one there desensitises them for the actions that do. The role is wrong because "approve or correct" requires sustained vigilance and detailed engagement that no human delivers under volume. You wouldn't design any other production system that way.
+
+Calibrated escalation gives you a different shape. The trigger is conditional, and you choose the conditions deliberately. The role is whatever the trigger calls for. Sometimes that's "approve before send." Sometimes that's "take the conversation from here." Sometimes that's "tell us this is the wrong category so we can add it to the training set." Human time is a finite, expensive resource. You spend it on the cases where it does real work.
+
+The escalation literature in production AI systems has converged on four useful trigger categories. I'm going to name them, because every team I've watched build this badly has been missing one or two.
+
+The first is *confidence*. The model produces a confidence signal, calibrated against historical correctness, and you escalate below a threshold. This is the trigger that gets the most attention in vendor pitches, and it's the one most likely to be wrong if you skip the calibration work. LLM confidence is harder to calibrate than classical ML confidence because the sources of uncertainty are different. Input ambiguity, reasoning path divergence, and decoding stochasticity all introduce uncertainty that doesn't fit the aleatoric/epistemic split. Verbalised confidence with the right prompting can be reasonably well-calibrated. Selective prediction and learning-to-defer literature gives you a deeper toolkit if you need it. If your "confidence threshold" is the model's raw self-reported probability with no calibration check, you're guessing.
+
+The second is *reversibility*. Independent of confidence, some actions are cheap to undo and some aren't. Add a label, post a comment, run a read-only query — these tolerate high autonomy. Delete a record, transfer money, send a customer email, push a config change — these don't. The most useful single guardrail in agentic AI right now is gating tool calls by reversibility. This is what most of the production agent guidance from Anthropic and others is converging on, and it's the trigger that actually does the work in agentic workflows.
+
+The third is *policy*. Categorical rules that override everything else. Insurance underwriting beyond an authority limit is referred to an underwriter, no matter how confident the model is. A loan application from a sanctioned country is escalated, no matter how clean the application looks. Don't let the model resolve a complaint above a certain monetary value. These are rules, not signals, and they should be in code, not in the prompt.
+
+The fourth is *user request*. The customer asked for a human. This is the simplest trigger and the one too many teams under-tune. If a user has typed "agent" or "human" or "this isn't working", you've already lost the resolution on that case. Stop trying to win it back. Hand it over.
+
+A good escalation system uses all four. If any trigger fires, you escalate, with full context, to the right kind of human (a domain reviewer, a senior agent, a compliance officer — not all the same person). The human's role at that moment is the action the trigger named, not "review everything we just did." You measure the escalation rate, the false-escalation rate, the missed-escalation rate, and the outcome quality on escalated cases. These are the metrics that tell you whether your system is doing its job. They are also the metrics that almost no team reports on, which is why so many production AI rollouts have a quiet quality problem you only discover at the post-mortem.
+
+## Klarna, read correctly
+
+The Klarna story is the most common example in this space and the most commonly misread. Let me put it back together with the right reading.
+
+In February 2024 Klarna announced that their AI assistant was handling two-thirds of all customer service chats in its first month, around 2.3 million conversations, with resolution times dropping from eleven minutes to under two. The company claimed the system was doing the work of seven hundred agents and saving forty million dollars a year. (Treat those numbers as Klarna's own claims rather than independently verified; analysts have pushed back.) By early 2025, CSAT had dropped, complaints had risen, and customers were specifically frustrated by responses that felt generic and that failed on nuanced cases. By mid-2025, the CEO publicly said the company had pushed too hard on cost and quality had suffered, and announced a pivot to a hybrid "Uber-style" model with rehired remote human agents.
+
+The dominant reading of this story is that AI customer service "doesn't work" and that humans are back. That reading is wrong, and the reason is the central argument of this post. Klarna didn't fail at automation. They failed at escalation design. They optimised for resolution rate as a metric, which biased the system toward not escalating, which meant the AI kept trying to resolve cases that should have gone to a human, which is precisely how you produce the "generic, repetitive" complaints customers actually had. The fix was not "put a human in every loop." It was to redesign the trigger so the AI hands off when it should, with context, to a human who can do something the AI can't.
+
+Read the case study at the level of the trigger, not the level of the model, and it stops being a cautionary tale about AI and starts being one about the design discipline that needs to surround it.
+
+## The high-stakes caveat, which is more interesting than it looks
+
+I have to be honest about regulated high-stakes decisions, because they're where the argument runs into its hardest test, and where it actually gets sharper.
+
+GDPR Article 22 gives data subjects the right not to be subject to a decision based solely on automated processing if it produces legal or similarly significant effects on them. The EU AI Act's Article 14 mandates human oversight for high-risk AI systems. NYC's Local Law 144 imposes audit obligations on automated employment decisions. US state insurance regulators are tightening explainability and human-review requirements for underwriting decisions. The surface reading of all this is "the law requires HITL, so the argument fails for high-stakes decisions."
+
+The deeper reading is that the law is asking for *meaningful* oversight, and the empirical evidence I just walked through says default-path HITL doesn't deliver it. The European Data Protection Supervisor's 2025 TechDispatch on human oversight of automated decision-making explicitly recognises the rubber-stamping problem. EU AI Act Article 14 requires that the design of the oversight "enable awareness of the possible tendency of automatically relying or over-relying on the output produced by a high-risk AI system (automation bias)." Guidance under GDPR Article 22 has been clear for years that mere rubber-stamping or superficial review doesn't satisfy the requirement.
+
+Read together, the regulators are describing exactly the failure mode this post is arguing against, and asking for exactly the design discipline this post is arguing for. They have read the literature. The legal requirement of "meaningful human oversight" is, when you look closely, asking you to do escalation properly. With designed triggers, meaningful human authority, audit logging, and the human capacity to actually do the job when invoked.
+
+This is the part of the argument I'd want to lean on if I were writing for a chief compliance officer, not a head of product. Pointing at GDPR or the EU AI Act and saying "see, the law requires HITL" is reading the headline. Reading the substance of the law and the regulator commentary turns the same regulation into a brief against default-path HITL and for designed escalation. It is the most contrarian and the most defensible move in this whole space.
+
+## When default-path HITL is still the right call
+
+I'm not writing this to argue that humans don't belong in AI systems. They do. There are three contexts where default-path HITL is the correct, non-negotiable choice, and I'd push back on any team I worked with that tried to escalation-design them away.
+
+The first is the calibration phase of a new system in a new domain. If you have no production telemetry, no eval data, and no signal you can trust, your confidence threshold is a guess. Default-path human review during a deliberate ramp-up gives you the data you need to design the trigger. Anthropic's own data on Claude Code adoption shows this pattern: new users auto-approve about 20 percent of the time, experienced users (more than 750 sessions) auto-approve more than 40 percent of the time, and the trust is co-constructed between the model, the product, and the user as the data accumulates. You don't start at the destination. You earn your way to it.
+
+The second is active learning. If the point of putting the human in the loop is to *teach the model*, the human is doing different work and the comparison in this post doesn't apply. They are a labeller. Different problem, different design.
+
+The third is decisions where a wrong autonomous outcome is genuinely catastrophic and there is no audit, undo, or apology that fixes it. Some medical decisions. Some military targeting decisions. Some critical infrastructure decisions. The bar for "catastrophic" is higher than most teams claim. Be honest about whether your decision actually clears it, or whether you're invoking the catastrophic-irreversible argument to avoid the harder work of designing the trigger properly.
+
+Outside those three, the argument holds. Default-path HITL is the worst of the available patterns, and the pattern most teams reach for first.
+
+## The thing to take away
+
+The interesting question is not whether a human is in the loop. It's what triggers them to be invoked, and what they can actually do when they are. The teams who get this right are the ones building production AI that works. The teams who default to "we'll have a human review it" are the ones who'll be writing post-mortems in eighteen months about why their oversight didn't catch anything.
+
+The hard part of AI isn't building the demo. It's choosing where the human goes, why, and on what trigger. Get that right and the system you build is one people actually use. Get it wrong and you've built something that has the shape of oversight without the function.
+
+## FAQ
+
+**Is human-on-the-loop the same as escalation?**
+Close, but not quite. Human-on-the-loop has the human monitoring throughout and able to intervene at any time. Escalation has the human invoked only when a trigger fires. In practice, mature production systems often use HOTL for the monitoring layer (dashboards, anomaly alerts) and escalation for the action layer (specific cases routed to specific humans). They complement each other.
+
+**What's a sensible starting confidence threshold?**
+There isn't a number that's right across contexts. The honest answer is: instrument your model, look at the relationship between its confidence signal and actual correctness on real production data, and pick the threshold that achieves your target risk level at your target coverage. If you skip that step and pick a round number, you are guessing, and your "calibrated escalation" is uncalibrated escalation. The selective-prediction and conformal-prediction literature gives you formal tools if you need them. Start with the measurement.
+
+**What about regulated decisions where the law explicitly names "human review"?**
+Read the regulation and the regulator commentary together, not just the law's heading. In every major framework I've looked at (GDPR Article 22, EU AI Act Article 14, FDA SaMD guidance, US state insurance regulation), the substantive requirement is *meaningful* human review with authority and capacity to act. That's what designed escalation gives you. Rubber-stamping HITL doesn't satisfy the substance even if it satisfies the heading.
+
+**Doesn't this just shift the problem to "your triggers are wrong"?**
+Yes, and that's the point. The problem has always been "how do we know when a human is needed." Default-path HITL papers over the question by always saying yes. Escalation forces the question into the open, where you can measure your answer, see when it's wrong, and improve it. Better to be wrong with feedback than confidently wrong without.
+
+## Caveats and claim-safety notes
+
+The Vaccaro et al. meta-analysis covers 106 experimental studies, mostly with non-experts on synthetic tasks. The signal is real. Generalising to production expert workflows is one step of inference, and I've made it. A reader could reasonably push back on that step. I'd accept it as a fair point and not as a refutation.
+
+The clinician accuracy drop from 73 to 61.7 percent was specifically with *intentionally biased* AI assistance. Real production AI is rarely as adversarially biased as a research design makes it. The size of the drop is illustrative of the failure mode, not a literal prediction of what will happen with your system.
+
+LLM confidence calibration is workable in 2026 but not a solved problem. I'm asking you to do work that isn't trivial. If you don't have anyone who can do it, that's the gap to close before the escalation design pays off.
+
+Klarna's specific dollar and headcount figures (seven hundred agents, forty million dollars saved) are the company's own numbers and have been disputed by analysts. The directional story of CSAT decline and the hybrid pivot is well documented. Treat the specifics as illustrative, not as ground truth.
+
+GDPR Article 22 and EU AI Act Article 14 are legal frameworks subject to interpretation. The reading I've given is mine, and it's consistent with the EDPS commentary and recent academic analysis (e.g. the Oxford Law Blog summary of the Sele & Chugunova findings), but a lawyer with a stricter reading could argue that you need default-path HITL for specific decisions in specific sectors. If you're operating in regulated territory, get specific legal advice for your specific use case.
+
+This argument applies to most production AI workflows. It doesn't apply to active learning, to genuinely catastrophic decisions, or to early ramp-up of new systems where no calibration is yet possible.
+
+## Related
+
+- [When to force the LLM, and when to use a button](/posts/when-to-force-the-llm-and-when-to-use-a-button) — for the related decision about which parts of a workflow the model should own at all.
+
+## Footnotes
+
+[1] Specific paper for the 73 percent to 61.7 percent finding: 2023 randomised clinical study of 450 clinicians given diagnostic assistance from intentionally biased AI. Reported in multiple secondary sources including the European Data Protection Supervisor TechDispatch 2/2025 on Human Oversight of Automated Decision-Making. Full primary citation to be added when verified against the original journal record.
+
+## If you're designing this right now
+
+If you're designing an AI product right now and you can't name your escalation triggers in one sentence each, the system probably has an oversight problem you haven't noticed yet. I help teams find and fix those.

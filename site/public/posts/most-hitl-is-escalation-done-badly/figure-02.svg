@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <defs>
+    <filter id="wobble" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="23" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2"/>
+    </filter>
+    <filter id="wobble-soft" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="29" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.4"/>
+    </filter>
+    <marker id="arrow-ink" viewBox="0 0 14 14" refX="11" refY="7" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M 0 0 L 14 7 L 0 14 z" fill="#3E2A1E"/>
+    </marker>
+    <marker id="arrow-rust" viewBox="0 0 14 14" refX="11" refY="7" markerWidth="11" markerHeight="11" orient="auto">
+      <path d="M 0 0 L 14 7 L 0 14 z" fill="#A14A2A"/>
+    </marker>
+    <style type="text/css">
+      @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap');
+      .h    { font-family: 'Caveat', cursive; font-weight: 700; }
+      .lbl  { font-family: 'Caveat', cursive; font-weight: 500; }
+      .mono { font-family: 'JetBrains Mono', monospace; font-weight: 400; }
+    </style>
+  </defs>
+
+  <!-- Cream paper -->
+  <rect width="1600" height="900" fill="#F5E9D7"/>
+
+  <!-- Notebook ruled lines -->
+  <g stroke="#D4A14A" stroke-width="1" opacity="0.16">
+    <line x1="0" y1="28"  x2="1600" y2="28"/><line x1="0" y1="56"  x2="1600" y2="56"/>
+    <line x1="0" y1="84"  x2="1600" y2="84"/><line x1="0" y1="112" x2="1600" y2="112"/>
+    <line x1="0" y1="140" x2="1600" y2="140"/><line x1="0" y1="168" x2="1600" y2="168"/>
+    <line x1="0" y1="196" x2="1600" y2="196"/><line x1="0" y1="224" x2="1600" y2="224"/>
+    <line x1="0" y1="252" x2="1600" y2="252"/><line x1="0" y1="280" x2="1600" y2="280"/>
+    <line x1="0" y1="308" x2="1600" y2="308"/><line x1="0" y1="336" x2="1600" y2="336"/>
+    <line x1="0" y1="364" x2="1600" y2="364"/><line x1="0" y1="392" x2="1600" y2="392"/>
+    <line x1="0" y1="420" x2="1600" y2="420"/><line x1="0" y1="448" x2="1600" y2="448"/>
+    <line x1="0" y1="476" x2="1600" y2="476"/><line x1="0" y1="504" x2="1600" y2="504"/>
+    <line x1="0" y1="532" x2="1600" y2="532"/><line x1="0" y1="560" x2="1600" y2="560"/>
+    <line x1="0" y1="588" x2="1600" y2="588"/><line x1="0" y1="616" x2="1600" y2="616"/>
+    <line x1="0" y1="644" x2="1600" y2="644"/><line x1="0" y1="672" x2="1600" y2="672"/>
+    <line x1="0" y1="700" x2="1600" y2="700"/><line x1="0" y1="728" x2="1600" y2="728"/>
+    <line x1="0" y1="756" x2="1600" y2="756"/><line x1="0" y1="784" x2="1600" y2="784"/>
+    <line x1="0" y1="812" x2="1600" y2="812"/><line x1="0" y1="840" x2="1600" y2="840"/>
+    <line x1="0" y1="868" x2="1600" y2="868"/>
+  </g>
+
+  <!-- Vertical margin line -->
+  <line x1="80" y1="0" x2="80" y2="900" stroke="#A14A2A" stroke-width="1.5" opacity="0.45"/>
+
+  <!-- BIG NUMBER 1: 73% upper-left, slightly tilted -->
+  <g transform="rotate(-1.8 450 380)">
+    <text x="450" y="380" class="h" font-size="240" fill="#3E2A1E" text-anchor="middle">73%</text>
+  </g>
+
+  <!-- DEEP-RUST DESCENDING DROP ARROW (the punchline) -->
+  <path d="M 640 350 Q 800 430 880 560" stroke="#A14A2A" stroke-width="4" fill="none" stroke-dasharray="9 6" marker-end="url(#arrow-rust)" filter="url(#wobble)"/>
+  <!-- Descent label on the arrow -->
+  <text x="785" y="475" class="lbl" font-size="28" fill="#A14A2A" font-style="italic" transform="rotate(28 785 475)">−11.3pp</text>
+
+  <!-- BIG NUMBER 2: 61.7% lower-right, slightly tilted -->
+  <g transform="rotate(-1.5 1100 620)">
+    <text x="1100" y="620" class="h" font-size="240" fill="#3E2A1E" text-anchor="middle">61.7%</text>
+  </g>
+
+  <!-- LABEL -->
+  <text x="800" y="730" class="mono" font-size="22" fill="#3E2A1E" text-anchor="middle">clinician accuracy when given biased AI assistance</text>
+
+  <!-- SOURCE LINE with cyan footnote marker -->
+  <text x="800" y="765" class="mono" font-size="15" fill="#3E2A1E" text-anchor="middle" opacity="0.75">
+    2023 randomised clinical study, n=450 <tspan fill="#2BB8C4" font-weight="500">[1]</tspan>
+  </text>
+  <!-- Cyan underline marker under [1] (the wildcard accent at meaningful frequency) -->
+  <line x1="1024" y1="769" x2="1042" y2="769" stroke="#2BB8C4" stroke-width="1.5"/>
+
+  <!-- NIB upper-left, pointing at "73%" -->
+  <g transform="translate(170, 240)">
+    <path d="M 0 30 L -15 9 L -15 -14 Q -15 -23 0 -23 Q 15 -23 15 -14 L 15 9 Z"
+          fill="#F5E9D7" stroke="#3E2A1E" stroke-width="2" filter="url(#wobble-soft)"/>
+    <circle cx="0" cy="3" r="2" fill="#3E2A1E"/>
+    <line x1="0" y1="5" x2="0" y2="28" stroke="#3E2A1E" stroke-width="1.5"/>
+    <circle cx="-4" cy="-11" r="1.8" fill="#3E2A1E"/>
+    <circle cx="6" cy="-11" r="1.8" fill="#3E2A1E"/>
+  </g>
+  <!-- Wobbly annotation arrow from Nib to 73% -->
+  <path d="M 195 295 Q 250 310 320 320" stroke="#3E2A1E" stroke-width="1.8" fill="none" opacity="0.65" marker-end="url(#arrow-ink)" filter="url(#wobble-soft)"/>
+
+  <!-- CAPTION STRIP -->
+  <text x="800" y="858" class="mono" font-size="15" fill="#3E2A1E" text-anchor="middle">figure 02 · biased AI made clinicians less accurate, not more</text>
+</svg>
