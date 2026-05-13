@@ -13,9 +13,10 @@ image:
   alt: "Handwritten title — Most human-in-the-loop is escalation done badly — on a cream notebook page, with a small upper-right vignette of a three-node AI loop interrupted by a deep-rust human bottleneck labelled 'the loop everyone draws'."
   caption: "The loop everyone draws."
   width: 1200
-  height: 630
+  height: 675
 ---
 
+import Callout from '../../components/Callout.astro';
 import Figure from '../../components/Figure.astro';
 
 {/* TODO before flipping draft → false:
@@ -98,8 +99,9 @@ And there's automation bias, the failure that goes the other way. When the AI is
 
 Put these together and you get the production reality of default-path HITL. At low risk, you've added latency and headcount cost to actions that didn't need a human. At high volume, the human is desensitised and rubber-stamps. When the human does engage on a hard case, they often defer to the model exactly when they shouldn't. The shape of what you've built is not "human catches AI errors." The shape is "human enables AI errors with their signature on the bottom."
 
-> **The shape of what you've built is not "human catches AI errors."**
-> **The shape is "human enables AI errors with their signature on the bottom."**
+<Callout type="tip">
+  The shape of what you've built is not "human catches AI errors." The shape is "human enables AI errors with their signature on the bottom."
+</Callout>
 
 ## The reframe that actually works
 

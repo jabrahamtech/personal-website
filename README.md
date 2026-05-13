@@ -4,7 +4,7 @@ Personal site / blog for **Jonathan Abraham** — founder, [Brokerloop](https://
 
 ## Stack
 
-- **Astro 4** (static, zero-JS-by-default)
+- **Astro 6** (static, zero-JS-by-default)
 - **Astro Content Collections** (MDX) for posts, with a Zod schema
 - **rehype-slug + rehype-autolink-headings** for `#`-anchored headings
 - **@astrojs/rss** for `/rss.xml` (XSL-styled human view, drafts excluded)
@@ -115,7 +115,6 @@ const x = 1;
 - [ ] Self-host fonts (`@fontsource/jetbrains-mono` + `@fontsource/inter`) — removes the only third-party network dependency
 - [ ] Analytics (Plausible / Umami / PostHog)
 - [ ] Per-tag pages so the existing tag pills click through
-- [ ] Astro 4 → 6 upgrade (current advisories are mostly SSR-only and don't apply to a fully static build, but worth doing)
 - [ ] Security response headers at the Fastly edge (CSP, HSTS, X-Frame-Options, etc.)
 
 ## License
