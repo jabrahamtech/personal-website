@@ -43,7 +43,6 @@ const metaRow: { label: string; value: string }[] = [];
 metaRow.push({ label: 'id', value: postId });
 if (data.posted) metaRow.push({ label: 'posted', value: data.posted.toISOString().slice(0, 10) });
 else metaRow.push({ label: 'status', value: `${data.pipelineStatus.toLowerCase()} draft` });
-if (data.priority) metaRow.push({ label: 'priority', value: `P${data.priority}` });
 if (data.cluster) metaRow.push({ label: 'cluster', value: data.cluster });
 metaRow.push({ label: 'read', value: data.readTime ?? computeReadTime(post.body) });
 

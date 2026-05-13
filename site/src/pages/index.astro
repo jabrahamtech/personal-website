@@ -15,9 +15,6 @@ function comparePosts(a: Post, b: Post, order: 'asc' | 'desc' = 'desc') {
     if (ad !== bd) return order === 'desc' ? bd - ad : ad - bd;
   }
 
-  const ap = a.data.priority ?? Number.POSITIVE_INFINITY;
-  const bp = b.data.priority ?? Number.POSITIVE_INFINITY;
-  if (ap !== bp) return order === 'desc' ? ap - bp : bp - ap;
   return order === 'desc'
     ? a.data.title.localeCompare(b.data.title)
     : b.data.title.localeCompare(a.data.title);
@@ -169,7 +166,6 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
           <li
             data-types={post.data.contentTypes.join('|')}
             data-cluster={post.data.cluster ?? ''}
-            data-priority={post.data.priority ?? ''}
             data-posted-time={post.data.posted?.getTime() ?? ''}
             data-title={post.data.title}
           >
@@ -178,7 +174,6 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
               <p>{post.data.summary}</p>
               <div class="meta">
                 {post.data.draft && <span class="draft">draft</span>}
-                {post.data.priority && <span>P{post.data.priority}</span>}
                 {posted && <span>{posted}</span>}
                 {post.data.cluster && <span class="tag tag-cluster">{post.data.cluster}</span>}
                 {post.data.contentTypes.map((type) => (
@@ -218,10 +213,6 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
             const diff = Number(aRawDate) - Number(bRawDate);
             if (diff !== 0) return normalised === 'desc' ? -diff : diff;
           }
-
-          const ap = Number(a.getAttribute('data-priority') || Number.POSITIVE_INFINITY);
-          const bp = Number(b.getAttribute('data-priority') || Number.POSITIVE_INFINITY);
-          if (ap !== bp) return normalised === 'desc' ? ap - bp : bp - ap;
 
           const at = a.getAttribute('data-title') || '';
           const bt = b.getAttribute('data-title') || '';
