@@ -55,7 +55,7 @@ async function findChromium() {
 }
 
 const svg = await readFile(SVG_IN, 'utf8');
-const html = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;background:#0b0e0c;width:${WIDTH}px;height:${HEIGHT}px;overflow:hidden}svg{display:block}</style></head><body>${svg}</body></html>`;
+const html = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;background:#0b0e0c;width:${WIDTH}px;height:${HEIGHT}px;overflow:hidden}svg{display:block;width:100%;height:100%}</style></head><body>${svg}</body></html>`;
 
 const exec = await findChromium();
 const browser = await chromium.launch(exec ? { executablePath: exec } : {});
