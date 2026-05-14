@@ -811,11 +811,31 @@ test.describe('post template — slice 2 (TOC, autolinks, edit-link, progress ba
     const fig = page.locator('figure.post-figure');
     const figCount = await fig.count();
     expect(figCount).toBeGreaterThan(0);
-    // Each figure carries an img + non-empty figcaption.
+    // Each figure carries a visible trigger img + non-empty figcaption.
+    // (A second <img> lives inside the per-figure <dialog> zoom modal but
+    // is hidden until the modal opens.)
     for (let i = 0; i < figCount; i++) {
-      await expect(fig.nth(i).locator('img')).toBeVisible();
+      await expect(fig.nth(i).locator('.post-figure-trigger img')).toBeVisible();
       const caption = (await fig.nth(i).locator('figcaption').textContent()) || '';
       expect(caption.trim().length, 'figcaption should not be empty').toBeGreaterThan(0);
     }
+  });
+
+  test('Figure click opens zoom modal, wheel zooms, ESC closes', async ({ page }) => {
+    await page.goto(examplePost);
+    const trigger = page.locator('.post-figure-trigger').first();
+    const dialog = page.locator('.figure-zoom').first();
+    await expect(trigger).toBeVisible();
+    // Dialog has no [open] until trigger fires.
+    await expect(dialog).not.toHaveAttribute('open', '');
+    await trigger.click();
+    await expect(dialog).toHaveAttribute('open', '');
+    // Panzoom should be wired: a wheel event applies a non-identity transform.
+    await page.locator('.figure-zoom-stage').first().dispatchEvent('wheel', { deltaY: -300, bubbles: true, cancelable: true });
+    const transform = await page.locator('.figure-zoom-img').first().evaluate((el) => getComputedStyle(el).transform);
+    expect(transform, 'panzoom should apply a non-identity transform on wheel zoom').not.toBe('none');
+    expect(transform).not.toBe('matrix(1, 0, 0, 1, 0, 0)');
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toHaveAttribute('open', '');
   });
 });
