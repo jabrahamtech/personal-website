@@ -183,6 +183,45 @@
    <Figure> share the same border weight inside a post. */
 .prose img { max-width: 100%; height: auto; border: 1px solid var(--line-2) }
 
+/* Tables — markdown pipe-tables render to a bare <table>. Block-level
+   with overflow-x:auto lets wide tables scroll on narrow viewports
+   without a wrapper element. Inside the block the inner table layout
+   still does its thing; min-width:100% keeps the table at column width
+   when it would otherwise shrink to content. */
+.prose table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  line-height: 1.5;
+  margin: 0 0 24px;
+  border-top: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--line-2);
+}
+.prose table thead { background: rgb(from var(--green) r g b / 0.06) }
+.prose table th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--green);
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line-2);
+  white-space: nowrap;
+}
+.prose table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-dim);
+  vertical-align: top;
+}
+.prose table tbody tr:last-child td { border-bottom: 0 }
+.prose table td:last-child { color: var(--ink) }
+.prose table code { font-size: 0.95em }
+
 /* code block — terminal-style filename header */
 .prose .codeblock { margin: 0 0 22px }
 .prose .codeblock.has-bar { border: 1px solid var(--line-2); background: var(--bg-3) }
