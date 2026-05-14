@@ -7,6 +7,8 @@ type Post = CollectionEntry<'posts'>;
 const all = await getCollection('posts');
 
 function comparePosts(a: Post, b: Post, order: 'asc' | 'desc' = 'desc') {
+  if (a.data.draft !== b.data.draft) return a.data.draft ? 1 : -1;
+
   const ad = a.data.posted?.getTime();
   const bd = b.data.posted?.getTime();
   if (ad !== undefined || bd !== undefined) {
@@ -170,6 +172,7 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
             data-cluster={post.data.cluster ?? ''}
             data-posted-time={post.data.posted?.getTime() ?? ''}
             data-title={post.data.title}
+            data-draft={post.data.draft ? '1' : '0'}
           >
             <a class="post-row" href={`/posts/${post.id}`}>
               <h2>{post.data.title}</h2>
@@ -207,6 +210,10 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
       function sortItems(order) {
         const normalised = order === 'asc' ? 'asc' : 'desc';
         items.sort((a, b) => {
+          const aDraft = a.getAttribute('data-draft') === '1';
+          const bDraft = b.getAttribute('data-draft') === '1';
+          if (aDraft !== bDraft) return aDraft ? 1 : -1;
+
           const aRawDate = a.getAttribute('data-posted-time') || '';
           const bRawDate = b.getAttribute('data-posted-time') || '';
           const aHasDate = aRawDate !== '';
