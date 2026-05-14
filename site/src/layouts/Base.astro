@@ -162,7 +162,11 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
   <meta name="color-scheme" content="dark" />
   <title>{title}</title>
   <meta name="description" content={description} />
-  <meta name="theme-color" content="#0b0e0c" />
+  <!-- theme-color is initialised to the paper-mode bg (SSR body class is
+       mode-paper). The pre-paint mode resolver flips it to the eng dark
+       when localStorage / hash / route forces eng mode, and Nav.astro
+       keeps it in sync with later toggle actions. -->
+  <meta id="theme-color-meta" name="theme-color" content="#f4ede0" />
   <meta name="author" content="Jonathan Abraham" />
   {noindex
     ? <meta name="robots" content="noindex,nofollow" />
@@ -222,7 +226,9 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
 
   <!-- Pre-paint mode resolver: paper is default; /terminal forces eng,
        #eng URL hash forces eng, otherwise localStorage decides. Sets
-       data-mode on <html> synchronously in <head>. -->
+       data-mode on <html> synchronously in <head>, plus the favicon
+       href and the theme-color meta so the address bar tint matches
+       on first paint. -->
   <script is:inline>
     (function () {
       try {
@@ -236,6 +242,8 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
         document.documentElement.dataset.mode = mode;
         var icon = document.getElementById('favicon-svg');
         if (icon) icon.href = mode === 'eng' ? '/favicon.svg' : '/favicon-paper.svg';
+        var themeMeta = document.getElementById('theme-color-meta');
+        if (themeMeta) themeMeta.content = mode === 'eng' ? '#0b0e0c' : '#f4ede0';
       } catch (_) {}
     })();
   </script>
@@ -310,6 +318,7 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
         loader.hidden = true;
         loader.setAttribute('aria-hidden', 'true');
       }
+      const reduceMotionMq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
       document.addEventListener('click', (e) => {
         if (e.defaultPrevented) return;
         if (e.button !== 0) return;
@@ -319,6 +328,9 @@ const allJsonLd = [...siteWideJsonLd, ...extraJsonLd];
         // Paper mode skips the loader entirely — the terminal-frame overlay
         // reads as a flash to non-technical readers. Native navigation only.
         if (document.body.classList.contains('mode-paper')) return;
+        // Reduced-motion: skip the loader too. The 380ms gate would feel
+        // like an unexplained delay; let the navigation be instant.
+        if (reduceMotionMq && reduceMotionMq.matches) return;
         // Let the animation breathe before navigation. 380ms is long enough for
         // the rings + figure to feel deliberate, short enough to stay snappy.
         e.preventDefault();

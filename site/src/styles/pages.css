@@ -83,9 +83,9 @@
   font-size: 12px;
   letter-spacing: .02em;
   color: var(--ink-dim);
-  background: #0b0e0c;
+  background: var(--bg);
   border: 1px solid var(--line-2);
-  border-radius: 0;
+  border-radius: var(--r-sm);
   padding: 9px 36px 9px 11px;
   cursor: pointer;
   background-image:
@@ -112,6 +112,17 @@
   text-align: center;
 }
 
+/* "Showing N of M · <filter>" status line — only visible when a filter
+   is active. Makes the type/cluster mutual exclusion obvious: when one
+   filter applies, the other select snaps to "all" AND the count drops. */
+.post-status {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-mute);
+  letter-spacing: .04em;
+  margin: -8px 0 14px;
+}
+
 /* posts list — block rhythm with deliberate per-element margins so
    title → summary → meta reads as a hierarchy, not a flat stack of
    three same-spaced rows. */
@@ -127,7 +138,7 @@
 }
 .post-list li + li .post-row { border-top: 1px solid var(--line) }
 .post-list li:last-child .post-row { border-bottom: 1px solid var(--line) }
-.post-row:hover { background: rgba(125, 255, 138, 0.025) }
+.post-row:hover { background: rgb(from var(--green) r g b / 0.025) }
 .post-row h2 {
   font-family: var(--mono);
   font-size: 18.5px;
@@ -168,7 +179,6 @@
 }
 .post-row .meta .tag { color: var(--ink-mute) }
 .post-row .meta .tag-cluster { color: var(--green-2) }
-.post-row .meta .sep { color: var(--line-2) }
 
 /* about — bio header in eng mode is a transparent wrapper so the
    figure inside floats inside the prose's block formatting context.
@@ -211,6 +221,13 @@
   line-height: 1.6;
 }
 .work-list li:last-child { border-bottom: 1px dashed var(--line) }
+/* hover affordance matches paper-mode's border-left highlight — both
+   modes need the same interactive cue. */
+.work-list li {
+  transition: border-color .14s ease;
+}
+.work-list li:hover { border-top-color: var(--green-2) }
+.work-list li:hover + li { border-top-color: var(--green-2) }
 .work-list strong {
   color: var(--ink);
   font-family: var(--mono);
@@ -261,7 +278,7 @@
   padding: 60px 32px;
   font-family: var(--mono);
   font-size: 14px;
-  color: #cfe9d3;
+  color: var(--ink-term);
   line-height: 1.7;
   max-width: 760px;
   margin: 0 auto;
@@ -280,7 +297,6 @@
   margin: 18px 0;
   border-left: 2px solid var(--line-2);
   padding-left: 14px;
-  white-space: pre-wrap;
 }
 .panic .stack b { color: var(--ink-dim); font-weight: 500 }
 .panic .actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px }

@@ -7,13 +7,13 @@
 /* terminal frame — re-uses the visual language of the /terminal page
    so the loader feels like the rest of the site, not a foreign overlay. */
 .pl-term{width:min(320px, calc(100vw - 48px));background:var(--bg);border:1px solid var(--line);box-shadow:0 12px 32px rgba(0,0,0,0.6),inset 0 0 0 1px rgba(125,255,138,0.05)}
-.pl-term-bar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);background:#0a0e0b}
+.pl-term-bar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--bg-2)}
 .pl-light{width:9px;height:9px;display:block;border:1px solid rgba(0,0,0,0.4)}
 .pl-light.r{background:#ff5f56}
 .pl-light.y{background:#ffbd2e}
 .pl-light.g{background:#27c93f;animation:plPulse 2.2s ease-in-out infinite;box-shadow:0 0 6px rgba(39,201,63,0.55)}
 .pl-term-title{margin-left:8px;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em}
-.pl-term-body{padding:14px 14px 16px;font-family:var(--mono);font-size:12.5px;color:#cfe9d3;line-height:1.7;min-height:90px}
+.pl-term-body{padding:14px 14px 16px;font-family:var(--mono);font-size:12.5px;color:var(--ink-term);line-height:1.7;min-height:90px}
 .pl-line{display:block;opacity:0;transform:translateY(-2px);animation:plLineIn 200ms ease-out forwards}
 .pl-line:nth-child(1){animation-delay:0ms}
 .pl-line:nth-child(2){animation-delay:130ms}
@@ -42,7 +42,7 @@
 }
 
 /* nav */
-nav.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:linear-gradient(180deg, rgba(11,14,12,0.92), rgba(11,14,12,0.78));border-bottom:1px solid var(--line)}
+nav.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:linear-gradient(180deg, rgb(from var(--bg) r g b / 0.92), rgb(from var(--bg) r g b / 0.78));border-bottom:1px solid var(--line)}
 /* 3-col grid: brand | centred links | actions cluster.
    Centred links sit balanced regardless of brand/action widths. On mobile
    the kebab takes the action slot and nav-links hide entirely. */
@@ -67,10 +67,27 @@ nav.top .nav-actions{
 .nav-links a::before{content:"[" attr(data-fkey) "]";color:var(--ink-mute);margin-right:6px;font-size:10.5px;letter-spacing:.06em;font-weight:500}
 .nav-links a:hover::before,.nav-links a[aria-current="page"]::before{color:var(--green-2)}
 
+/* theme toggle — outlined icon button, lights green when on.
+   Mode-aware override (paper.css) only adjusts borders/colours;
+   structural rules + aria-pressed indication live here. */
+.theme-toggle{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:32px;flex:0 0 auto;
+  background:transparent;border:1px solid var(--line-2);
+  color:var(--ink-mute);
+  padding:0;
+  transition:color .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+@media (max-width:560px){
+  .theme-toggle{width:42px;height:40px}
+}
+.theme-toggle:hover{color:var(--green);border-color:var(--green)}
+.theme-toggle[aria-pressed="true"]{color:var(--green);border-color:var(--green);box-shadow:0 0 8px rgb(from var(--green) r g b / 0.18) inset}
+
 /* mobile kebab — hidden on desktop, takes over the nav slot on mobile */
 .nav-kebab{display:none;background:transparent;border:1px solid var(--line-2);padding:8px 10px;width:42px;height:40px;flex-direction:column;justify-content:space-between;align-items:center;gap:0}
-.nav-kebab span{display:block;width:4px;height:4px;background:var(--green);box-shadow:0 0 4px rgba(125,255,138,0.5)}
-.nav-kebab[aria-expanded="true"]{border-color:var(--green-2);box-shadow:0 0 8px rgba(125,255,138,0.18) inset}
+.nav-kebab span{display:block;width:4px;height:4px;background:var(--green);box-shadow:0 0 4px rgb(from var(--green) r g b / 0.5)}
+.nav-kebab[aria-expanded="true"]{border-color:var(--green-2);box-shadow:0 0 8px rgb(from var(--green) r g b / 0.18) inset}
 .nav-kebab:hover{border-color:var(--green-2)}
 
 /* fullscreen dialog menu (mobile only — desktop never shows it) */
@@ -89,6 +106,13 @@ nav.top .nav-actions{
 .nav-sheet-list a[aria-current="page"]{color:var(--green)}
 .nav-sheet-list a[aria-current="page"] .fkey{color:var(--green-2)}
 
+/* Nav responsive ladder — declared widest-first so the smaller-viewport
+   rules win on the cascade (equal specificity, source order matters).
+   Earlier this file had 560/480 declared before 720, and at a 400px
+   viewport the 720 block silently overrode gap:10px/12px back to 14px. */
+@media (max-width:720px){
+  nav.top .row{height:52px;gap:14px}
+}
 @media (max-width:560px){
   /* collapse to 2-col so brand and actions sit edge-to-edge — no
      wasted centre slot when nav-links are hidden behind the kebab. */
@@ -107,8 +131,11 @@ nav.top .nav-actions{
 }
 
 /* status strip (Bloomberg-style system bar under nav) */
-.status-strip{border-bottom:1px solid var(--line);background:#070a08;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em;position:relative;z-index:40}
-.status-strip .row{display:flex;justify-content:space-between;align-items:center;gap:24px;padding-block:7px;flex-wrap:wrap}
+.status-strip{border-bottom:1px solid var(--line);background:var(--bg-3);font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:.04em;position:relative;z-index:40}
+/* nowrap everywhere — desktop cells comfortably fit at 4 × ~140px, and
+   the mobile cells (after mob-hide drops REGIONS/BUILD) fit on one line.
+   Wrapping was the source of the cluttered second-row at every size. */
+.status-strip .row{display:flex;justify-content:space-between;align-items:center;gap:24px;padding-block:7px;flex-wrap:nowrap}
 .status-strip .cell{white-space:nowrap;display:inline-flex;align-items:baseline;gap:6px}
 .status-strip b{color:var(--ink-dim);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
 .status-strip .suf{color:var(--line-2);margin-left:4px;font-size:10.5px;letter-spacing:.05em}
@@ -116,11 +143,10 @@ nav.top .nav-actions{
 @keyframes ssblink{0%,100%{opacity:1}50%{opacity:.45}}
 @media (max-width:720px){
   .status-strip{font-size:10.5px}
-  /* Drop the no-wrap so the row collapses to one tight line. The mob-hide
-     cells (REGIONS, BUILD) are removed entirely on mobile — low signal at
-     that size, and the wrap-to-second-row was the source of the clutter. */
-  .status-strip .row{justify-content:center;gap:18px;flex-wrap:nowrap}
-  .status-strip .mob-hide{display:none}
+  /* The .ss-mob-hide cells (REGIONS, BUILD) are removed entirely on
+     mobile — low signal at that size. */
+  .status-strip .row{justify-content:center;gap:18px}
+  .status-strip .ss-mob-hide{display:none}
   /* Tighter time cell — drop the AEST suffix; MEL implies it. */
   .status-strip .live .suf{display:none}
 }
@@ -138,9 +164,9 @@ footer{padding:36px 0 60px;border-top:1px solid var(--line);margin-top:60px;posi
 .ascii-div{font-family:var(--mono);color:var(--line-2);font-size:13px;letter-spacing:0.4em;text-align:center;margin:48px 0 0;user-select:none;overflow:hidden;white-space:nowrap}
 
 /* boot sequence (first visit) */
-#boot{position:fixed;inset:0;z-index:200;background:#070a08;display:flex;align-items:flex-start;justify-content:center;padding:120px 28px 48px;font-family:var(--mono);font-size:14px;color:#cfe9d3;line-height:1.65}
+#boot{position:fixed;inset:0;z-index:200;background:var(--bg-3);display:flex;align-items:flex-start;justify-content:center;padding:120px 28px 48px;font-family:var(--mono);font-size:14px;color:var(--ink-term);line-height:1.65}
 #boot.gone{opacity:0;pointer-events:none;transition:opacity .35s ease}
-#boot::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom, rgba(125,255,138,0.04) 0 1px, transparent 1px 3px)}
+#boot::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom, rgb(from var(--green) r g b / 0.04) 0 1px, transparent 1px 3px)}
 #boot::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%)}
 #boot .boot-inner{position:relative;z-index:2;max-width:780px;width:100%;margin:0 auto}
 #boot .boot-line{display:block;white-space:pre-wrap;opacity:0}
@@ -151,9 +177,8 @@ footer{padding:36px 0 60px;border-top:1px solid var(--line);margin-top:60px;posi
 @keyframes bootFlash{0%{opacity:0;transform:scale(1.02)}40%{opacity:.4}100%{opacity:1;transform:none}}
 @media (max-width:560px){#boot{padding:90px 18px 32px;font-size:12.5px}}
 
-/* mobile chrome */
+/* mobile chrome — nav.top .row is handled in the responsive ladder above */
 @media (max-width:720px){
-  nav.top .row{height:52px;gap:14px}
   .ascii-div{letter-spacing:.25em;font-size:11px;margin:36px 0 0}
   footer{padding:28px 0 48px;margin-top:44px}
   .foot{font-size:11.5px;gap:12px;justify-content:center;text-align:center}

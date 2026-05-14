@@ -26,13 +26,19 @@ const posts = defineCollection({
       .default(['POV / Strategic Opinion Post']),
     cluster: z.string().optional(),
     readTime: z.string().optional(),
+    /* image — width/height are REQUIRED when image is present so the OG
+       meta + on-page <img> never lie about dimensions. The Astro built-in
+       image() helper auto-infers these, but it requires images to live in
+       src/; this project stores them in public/posts/<slug>/, so authors
+       declare dimensions in frontmatter instead. The 1200×675 cover crop
+       is the established convention (see CLAUDE.md). */
     image: z
       .object({
         src: z.string(),
         alt: z.string(),
         caption: z.string().optional(),
-        width: z.number().int().positive().optional(),
-        height: z.number().int().positive().optional(),
+        width: z.number().int().positive(),
+        height: z.number().int().positive(),
       })
       .optional(),
   }),

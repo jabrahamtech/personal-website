@@ -2,6 +2,19 @@ import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
 
+/* Derive MIME type from the file extension. Same logic Base.astro:54
+   uses for og:image:type — kept inline here so the RSS feed module
+   doesn't take a dependency on the layout. Returns null for unknown
+   extensions so the enclosure can be omitted entirely. */
+function imageMime(src: string): string | null {
+  if (/\.jpe?g($|\?)/i.test(src)) return 'image/jpeg';
+  if (/\.png($|\?)/i.test(src)) return 'image/png';
+  if (/\.webp($|\?)/i.test(src)) return 'image/webp';
+  if (/\.gif($|\?)/i.test(src)) return 'image/gif';
+  if (/\.svg($|\?)/i.test(src)) return 'image/svg+xml';
+  return null;
+}
+
 export async function GET(context: APIContext) {
   const all = await getCollection('posts');
 
@@ -55,17 +68,29 @@ export async function GET(context: APIContext) {
       dc: 'http://purl.org/dc/elements/1.1/',
     },
 
-    items: live.map((p) => ({
-      title: p.data.title,
-      description: p.data.summary,
-      link: `${site}/posts/${p.id}`,
-      pubDate: p.data.posted!,
-      categories: [...p.data.tags, ...p.data.contentTypes, p.data.cluster].filter((value): value is string => Boolean(value)),
-      author: 'jabrahamtech@gmail.com (Jonathan Abraham)',
-      // Stable per-item GUID. Using the canonical post URL is the standard
-      // pattern; isPermaLink="true" tells readers it's also a real URL.
-      customData: `<dc:creator>Jonathan Abraham</dc:creator>${p.data.image ? `<enclosure url="${new URL(p.data.image.src, site + '/').toString()}" type="image/png" length="0" />` : ''}`,
-    })),
+    items: live.map((p) => {
+      const img = p.data.image;
+      // RSS Best Practices Profile allows length="0" when the byte size
+      // can't be cheaply determined; what validators DO reject is a MIME
+      // type that doesn't match the file extension. The previous version
+      // hardcoded image/png for every enclosure, so a .jpg cover was
+      // advertised as PNG. Derive from the actual filename.
+      const mime = img ? imageMime(img.src) : null;
+      const enclosure = img && mime
+        ? `<enclosure url="${new URL(img.src, site + '/').toString()}" type="${mime}" length="0" />`
+        : '';
+      return {
+        title: p.data.title,
+        description: p.data.summary,
+        link: `${site}/posts/${p.id}`,
+        pubDate: p.data.posted!,
+        categories: [...p.data.tags, ...p.data.contentTypes, p.data.cluster].filter((value): value is string => Boolean(value)),
+        author: 'jabrahamtech@gmail.com (Jonathan Abraham)',
+        // Stable per-item GUID. Using the canonical post URL is the standard
+        // pattern; isPermaLink="true" tells readers it's also a real URL.
+        customData: `<dc:creator>Jonathan Abraham</dc:creator>${enclosure}`,
+      };
+    }),
 
     // Trim the trailing newline difference that some validators flag.
     trailingSlash: false,

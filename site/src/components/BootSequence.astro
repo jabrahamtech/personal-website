@@ -3,6 +3,11 @@
   <div class="boot-inner" id="boot-inner"></div>
 </div>
 
+<!-- If JS is disabled the boot script never runs, which would leave
+     the #boot overlay covering the page indefinitely. Hide it for
+     no-JS visitors so the underlying content is reachable. -->
+<noscript><style>#boot{display:none}</style></noscript>
+
 <script is:inline>
   (function () {
     const boot = document.getElementById('boot');

@@ -7,8 +7,8 @@ const buildSlug = 'a3f8c'; // bumped manually on substantive deploys
   <div class="wrap row">
     <span class="cell live"><span class="dot"></span><b>MEL</b> <span id="ss-time">--:--</span><span class="suf">AEST</span></span>
     <span class="cell"><b>STATUS</b> open_to_select_work</span>
-    <span class="cell mob-hide"><b>REGIONS</b> AU + US</span>
-    <span class="cell mob-hide"><b>BUILD</b> {buildSlug}</span>
+    <span class="cell ss-mob-hide"><b>REGIONS</b> AU + US</span>
+    <span class="cell ss-mob-hide"><b>BUILD</b> {buildSlug}</span>
   </div>
 </div>
 
@@ -28,7 +28,16 @@ const buildSlug = 'a3f8c'; // bumped manually on substantive deploys
         el.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
       }
     }
+    // Tick once now, then schedule the next tick at the next real minute
+    // boundary so the displayed time flips when the wall clock does — not
+    // up-to-30s late as the previous setInterval(30_000) pattern allowed.
+    // After the first boundary, setInterval at 60s keeps it aligned for the
+    // session (drift over a typical visit is negligible).
     tick();
-    setInterval(tick, 30 * 1000);
+    const msToNextMinute = 60_000 - (Date.now() % 60_000);
+    setTimeout(function () {
+      tick();
+      setInterval(tick, 60_000);
+    }, msToNextMinute);
   })();
 </script>

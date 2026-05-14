@@ -9,8 +9,8 @@ body.mode-paper {
   font-size: 17px;
   line-height: 1.65;
   background:
-    radial-gradient(1100px 600px at 88% -8%, rgba(91, 110, 63, 0.06), transparent 62%),
-    radial-gradient(900px 500px at -8% 32%, rgba(184, 169, 140, 0.16), transparent 60%),
+    radial-gradient(1100px 600px at 88% -8%, rgb(from var(--green) r g b / 0.06), transparent 62%),
+    radial-gradient(900px 500px at -8% 32%, rgb(from var(--line-2) r g b / 0.16), transparent 60%),
     var(--bg);
 }
 
@@ -30,15 +30,17 @@ html[data-mode="paper"] input,
 html[data-mode="paper"] textarea{cursor:text}
 
 /* selection */
-body.mode-paper ::selection{background:rgba(91,110,63,0.22);color:var(--ink)}
+body.mode-paper ::selection{background:rgb(from var(--green) r g b / 0.22);color:var(--ink)}
 body.mode-paper :focus-visible{outline-color:var(--green)}
 
-/* skip link */
-body.mode-paper .skip-link{background:var(--green);color:#fff8e8;font-family:var(--sans);font-weight:600}
+/* skip link — text colour is the paper-mode --bg-3 cream so it stays
+   legible on the sage --green background. */
+body.mode-paper .skip-link{background:var(--green);color:var(--bg-3);font-family:var(--sans);font-weight:600}
 
-/* nav */
+/* nav — bg gradient is derived from --bg so a future palette swap
+   doesn't need to update this rule. */
 body.mode-paper nav.top{
-  background:linear-gradient(180deg, rgba(244,237,224,0.92), rgba(244,237,224,0.78));
+  background:linear-gradient(180deg, rgb(from var(--bg) r g b / 0.92), rgb(from var(--bg) r g b / 0.78));
   border-bottom:1px solid var(--line);
 }
 body.mode-paper nav.top .row{height:64px}
@@ -53,24 +55,13 @@ body.mode-paper .nav-links a[aria-current="page"]::after{
   content:"";position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--green);
 }
 
-/* engineer toggle — outlined icon button, lights sage when on */
-.theme-toggle{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:36px;height:32px;flex:0 0 auto;
-  background:transparent;border:1px solid var(--line-2);
-  color:var(--ink-mute);
-  padding:0;
-  transition:color .12s ease, border-color .12s ease, box-shadow .12s ease;
-}
-@media (max-width:560px){
-  .theme-toggle{width:42px;height:40px}
-}
-.theme-toggle:hover{color:var(--green);border-color:var(--green)}
-.theme-toggle[aria-pressed="true"]{color:var(--green);border-color:var(--green);box-shadow:0 0 8px rgba(125,255,138,0.18) inset}
+/* .theme-toggle base rules now live in chrome.css alongside the other
+   nav action buttons. paper.css only keeps the paper-specific tweaks. */
 body.mode-paper .theme-toggle{border-color:var(--line-2);color:var(--ink-mute)}
 body.mode-paper .theme-toggle:hover{color:var(--green);border-color:var(--green)}
 
-/* mobile kebab — clean hamburger lines, ink-dim, no green glow */
+/* mobile kebab — clean hamburger lines, ink-dim, no green glow.
+   --r-sm matches the kebab's "soft square" look in paper mode. */
 body.mode-paper .nav-kebab{
   flex-direction:column;
   justify-content:center;
@@ -78,7 +69,7 @@ body.mode-paper .nav-kebab{
   gap:4px;
   padding:0;
   border:1px solid var(--line-2);
-  border-radius:4px;
+  border-radius:var(--r-sm);
   background:transparent;
   box-shadow:none;
 }
@@ -93,8 +84,8 @@ body.mode-paper .nav-kebab[aria-expanded="true"]{border-color:var(--ink);box-sha
 body.mode-paper .nav-kebab[aria-expanded="true"] span{background:var(--ink)}
 
 /* mobile sheet menu — editorial dialog */
-body.mode-paper .nav-sheet::backdrop{background:rgba(26,22,18,0.55)}
-body.mode-paper .nav-sheet-inner{background:var(--bg);border-bottom:1px solid var(--line);box-shadow:0 24px 60px rgba(26,22,18,0.18)}
+body.mode-paper .nav-sheet::backdrop{background:rgb(from var(--ink) r g b / 0.55)}
+body.mode-paper .nav-sheet-inner{background:var(--bg);border-bottom:1px solid var(--line);box-shadow:0 24px 60px rgb(from var(--ink) r g b / 0.18)}
 body.mode-paper .nav-sheet-head{font-family:var(--sans);border-bottom:1px solid var(--line);padding:12px 0 18px}
 body.mode-paper .nav-sheet-title{color:var(--ink);font-weight:600;font-size:14.5px;letter-spacing:0;text-transform:none}
 body.mode-paper .nav-sheet-title::before{display:none}
@@ -102,19 +93,24 @@ body.mode-paper .nav-sheet-close{
   font-family:var(--sans);font-size:22px;line-height:1;
   color:var(--ink-mute);border:1px solid var(--line-2);
   width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;
-  padding:0;border-radius:4px;background:transparent;
+  padding:0;border-radius:var(--r-sm);background:transparent;
 }
-body.mode-paper .nav-sheet-close:hover{color:var(--ink);border-color:var(--ink-dim);background:rgba(184,169,140,0.10)}
+body.mode-paper .nav-sheet-close:hover{color:var(--ink);border-color:var(--ink-dim);background:rgb(from var(--line-2) r g b / 0.10)}
 body.mode-paper .nav-sheet-list{margin:18px 0 0}
 body.mode-paper .nav-sheet-list li{border-bottom:1px solid var(--line)}
 body.mode-paper .nav-sheet-list a{font-family:var(--sans);font-size:18px;color:var(--ink);text-transform:capitalize;padding:18px 4px}
 body.mode-paper .nav-sheet-list a .fkey{display:none}
 body.mode-paper .nav-sheet-list a .label{letter-spacing:0}
-body.mode-paper .nav-sheet-list a[aria-current="page"]{color:var(--green-2)}
+/* aria-current is set below alongside the navigating-state rules so the
+   active-link colour wins regardless of which rule a reader scans first. */
 body.mode-paper .nav-sheet-list a[aria-current="page"]::after{
   content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
   background:var(--green);margin-left:auto;align-self:center;flex:0 0 auto;
 }
+
+/* Trailing aria-current declaration above is intentional — it overrides
+   the green-2 default with the brighter --green for the "currently
+   selected" state on the open mobile sheet. */
 
 /* While a paper-mode tap is fetching the next page, dim non-target links
    and bring the tapped link forward. Sheet stays open as a visual cover
@@ -198,31 +194,35 @@ body.mode-paper .post-filters .filter-label{
 body.mode-paper .post-filters .filter-select{
   font-family:var(--sans);font-size:14.5px;letter-spacing:0;
   min-height:42px;color:var(--ink);
-  background-color:#fffaf0;
+  background-color:var(--bg-3);
   background-image:linear-gradient(45deg, transparent 50%, var(--ink-mute) 50%),linear-gradient(135deg, var(--ink-mute) 50%, transparent 50%);
   background-position:calc(100% - 18px) 18px, calc(100% - 13px) 18px;
   background-size:5px 5px, 5px 5px;
   background-repeat:no-repeat;
-  border:1px solid var(--line-2);border-radius:6px;
-  box-shadow:0 1px 0 rgba(26,22,18,0.03);
+  border:1px solid var(--line-2);border-radius:var(--r-md);
+  box-shadow:0 1px 0 rgb(from var(--ink) r g b / 0.03);
   padding:10px 38px 10px 14px;
   appearance:none;-webkit-appearance:none;
   transition:border-color .14s ease, box-shadow .14s ease, background-color .14s ease;
 }
 body.mode-paper .post-filters .filter-select:hover{
   border-color:var(--ink-dim);
-  background-color:#fff8e8;
+  background-color:var(--bg-3);
 }
 body.mode-paper .post-filters .filter-select:focus{
   outline:none;
   border-color:var(--green-2);
-  background-color:#fff8e8;
-  box-shadow:0 0 0 3px rgba(91,110,63,0.14);
+  background-color:var(--bg-3);
+  box-shadow:0 0 0 3px rgb(from var(--green) r g b / 0.14);
 }
 body.mode-paper .post-empty{
   font-family:var(--sans);font-style:italic;
   color:var(--ink-mute);font-size:15px;
   padding:32px 0;border-top:0;text-align:center;
+}
+body.mode-paper .post-status{
+  font-family:var(--sans);font-size:13px;letter-spacing:0;
+  color:var(--ink-mute);
 }
 @media (max-width:560px){
   body.mode-paper .post-filters{gap:12px}
@@ -266,29 +266,28 @@ body.mode-paper .post-row .meta > span:not(.tag):not(.draft) + span:not(.tag):no
   content:"·";position:absolute;left:-12px;top:0;color:var(--line-2);
 }
 body.mode-paper .post-row .meta .draft{
-  color:#8a6d2c;
-  background:rgba(138,109,44,0.08);
-  border:1px solid rgba(138,109,44,0.28);
-  padding:1.5px 8px;border-radius:2px;
+  color:var(--amber);
+  background:rgb(from var(--amber) r g b / 0.08);
+  border:1px solid rgb(from var(--amber) r g b / 0.28);
+  padding:1.5px 8px;border-radius:var(--r-sm);
   font-size:10.5px;font-weight:600;letter-spacing:.1em;
   text-transform:uppercase;
 }
-body.mode-paper .post-row .meta .sep{display:none}
 
 /* content-type tag in post-row meta — soft sage tint, no border */
 body.mode-paper .post-row .meta .tag-cat{
   font-family:var(--sans);
   font-size:12px;font-weight:500;
   color:var(--green-2);
-  background:rgba(91,110,63,0.10);
-  border:0;padding:2.5px 8px;border-radius:3px;
+  background:rgb(from var(--green) r g b / 0.10);
+  border:0;padding:2.5px 8px;border-radius:var(--r-sm);
   letter-spacing:0;text-transform:none;
 }
 body.mode-paper .post-row .meta .tag-cluster{
   color:var(--ink-dim);
   font-size:12px;font-weight:500;
-  background:rgba(184,169,140,0.18);
-  padding:2.5px 8px;border-radius:3px;border:0;
+  background:rgb(from var(--line-2) r g b / 0.18);
+  padding:2.5px 8px;border-radius:var(--r-sm);border:0;
 }
 
 /* selected work — editorial credential cards.
@@ -346,15 +345,11 @@ body.mode-paper .prose ul.elsewhere-list strong{
 }
 body.mode-paper .prose ul.elsewhere-list a{color:var(--ink-dim);background:transparent}
 body.mode-paper .prose ul.elsewhere-list a:hover{
-  background:linear-gradient(180deg, transparent 64%, rgba(91,110,63,0.28) 64%, rgba(91,110,63,0.28) 92%, transparent 92%);
+  background:linear-gradient(180deg, transparent 64%, rgb(from var(--green) r g b / 0.28) 64%, rgb(from var(--green) r g b / 0.28) 92%, transparent 92%);
 }
 
 /* article doc — editorial post template */
 body.mode-paper .doc{padding:64px 0 36px}
-body.mode-paper .doc .crumbs{font-family:var(--sans);font-size:13px;color:var(--ink-mute)}
-body.mode-paper .doc .crumbs a{color:var(--ink-dim)}
-body.mode-paper .doc .crumbs a:hover{color:var(--green)}
-body.mode-paper .doc .crumbs .sep{color:var(--line-2)}
 body.mode-paper .doc .post-prompt{display:none}
 body.mode-paper .doc h1{
   font-family:var(--sans);
@@ -384,11 +379,11 @@ body.mode-paper .doc .meta-row span b{
 /* Hex post-id (Id 0x04) is engineer-only cataloguing — drop it in paper.
    The slug page emits id as the first meta cell, so :first-child is stable. */
 body.mode-paper .doc .meta-row span:first-child{display:none}
-body.mode-paper .doc .tag{font-family:var(--sans);font-size:12px;color:var(--ink-mute);border:1px solid var(--line-2);padding:2px 8px;border-radius:2px;letter-spacing:0;text-transform:capitalize}
+body.mode-paper .doc .tag{font-family:var(--sans);font-size:12px;color:var(--ink-mute);border:1px solid var(--line-2);padding:2px 8px;border-radius:var(--r-sm);letter-spacing:0;text-transform:capitalize}
 
 body.mode-paper .cover img,
 body.mode-paper .cover svg{
-  border:1px solid var(--line-2);background:#fff8e8;
+  border:1px solid var(--line-2);background:var(--bg-3);
   box-shadow:none;
 }
 body.mode-paper .cover figcaption{
@@ -406,8 +401,8 @@ body.mode-paper .bio-head{
   float:none;clear:both;
 }
 body.mode-paper .bio-head .avatar{
-  width:104px;height:104px;border-radius:50%;overflow:hidden;flex:0 0 auto;
-  border:1px solid var(--line-2);background:#fff8e8;box-shadow:none;
+  width:104px;height:104px;border-radius:var(--r-pill);overflow:hidden;flex:0 0 auto;
+  border:1px solid var(--line-2);background:var(--bg-3);box-shadow:none;
   margin:0;
 }
 body.mode-paper .bio-head .avatar img{width:100%;height:100%;object-fit:cover;display:block}
@@ -436,13 +431,13 @@ body.mode-paper .prose ul.bio-contact li::before{display:none}
 body.mode-paper .prose ul.bio-contact a{
   font-family:var(--sans);font-size:13.5px;font-weight:500;
   color:var(--ink-dim);background:transparent;
-  border:1px solid var(--line-2);border-radius:999px;
+  border:1px solid var(--line-2);border-radius:var(--r-pill);
   padding:5px 13px;letter-spacing:0;
   transition:color .14s ease, border-color .14s ease, background .14s ease;
 }
 body.mode-paper .prose ul.bio-contact a:hover{
   color:var(--green-2);border-color:var(--green-2);
-  background:rgba(91,110,63,0.06);
+  background:rgb(from var(--green) r g b / 0.06);
 }
 @media (max-width:560px){
   body.mode-paper .bio-head{gap:18px;margin-bottom:24px}
@@ -473,12 +468,12 @@ body.mode-paper .prose strong{color:var(--ink)}
 body.mode-paper .prose em{color:var(--ink-dim);font-style:italic}
 body.mode-paper .prose a{
   color:var(--ink);text-decoration:none;
-  background:linear-gradient(180deg, transparent 64%, rgba(91,110,63,0.28) 64%, rgba(91,110,63,0.28) 92%, transparent 92%);
+  background:linear-gradient(180deg, transparent 64%, rgb(from var(--green) r g b / 0.28) 64%, rgb(from var(--green) r g b / 0.28) 92%, transparent 92%);
   padding:0 1px;
   transition:background .12s ease;
 }
 body.mode-paper .prose a:hover{
-  background:linear-gradient(180deg, transparent 50%, rgba(91,110,63,0.45) 50%, rgba(91,110,63,0.45) 96%, transparent 96%);
+  background:linear-gradient(180deg, transparent 50%, rgb(from var(--green) r g b / 0.45) 50%, rgb(from var(--green) r g b / 0.45) 96%, transparent 96%);
 }
 body.mode-paper .prose ul{padding-left:0;list-style:none}
 body.mode-paper .prose ul li{position:relative;padding-left:22px;margin:8px 0}
@@ -491,12 +486,12 @@ body.mode-paper .prose blockquote{
 }
 body.mode-paper .prose code{
   font-family:var(--mono);font-size:0.92em;
-  background:rgba(184,169,140,0.18);border:0;
-  padding:1px 5px;border-radius:2px;color:var(--ink);
+  background:rgb(from var(--line-2) r g b / 0.18);border:0;
+  padding:1px 5px;border-radius:var(--r-sm);color:var(--ink);
 }
 body.mode-paper .prose pre{
   font-family:var(--mono);font-size:14.5px;line-height:1.6;
-  background:#fff8e8;border:1px solid var(--line-2);
+  background:var(--bg-3);border:1px solid var(--line-2);
   color:var(--ink);
   padding:16px 18px;
 }
@@ -517,11 +512,11 @@ body.mode-paper .prose hr{border-top:1px solid var(--line)}
 body.mode-paper .prose img{border:1px solid var(--line-2)}
 
 /* code block bar — soft paper version */
-body.mode-paper .prose .codeblock.has-bar{background:#fff8e8;border:1px solid var(--line-2)}
-body.mode-paper .prose .codeblock-bar{background:#efe6d4;border-bottom:1px solid var(--line);font-family:var(--mono)}
+body.mode-paper .prose .codeblock.has-bar{background:var(--bg-3);border:1px solid var(--line-2)}
+body.mode-paper .prose .codeblock-bar{background:var(--bg-2);border-bottom:1px solid var(--line);font-family:var(--mono)}
 body.mode-paper .prose .cb-name{color:var(--ink-dim)}
 body.mode-paper .prose .cb-lang{color:var(--ink-mute)}
-body.mode-paper .prose .copy-btn{font-family:var(--sans);color:var(--ink-mute);border:1px solid var(--line-2);background:rgba(255,248,232,0.85)}
+body.mode-paper .prose .copy-btn{font-family:var(--sans);color:var(--ink-mute);border:1px solid var(--line-2);background:rgb(from var(--bg-3) r g b / 0.85)}
 body.mode-paper .prose .copy-btn:hover{color:var(--green);border-color:var(--green)}
 body.mode-paper .prose .copy-btn.ok{color:var(--green);border-color:var(--green)}
 
@@ -542,7 +537,7 @@ body.mode-paper .edit-link a{
 body.mode-paper .edit-link a:hover{color:var(--green-2);border-color:var(--green-2);background:none}
 
 /* callouts — soft sage / stone instead of neon */
-body.mode-paper .prose .callout{font-family:var(--sans);background:rgba(184,169,140,0.10);border:1px solid var(--line-2);border-left-width:3px}
+body.mode-paper .prose .callout{font-family:var(--sans);background:rgb(from var(--line-2) r g b / 0.10);border:1px solid var(--line-2);border-left-width:3px}
 body.mode-paper .prose .callout-head{font-family:var(--sans);color:var(--ink-mute);font-size:12.5px;letter-spacing:.04em;text-transform:uppercase}
 body.mode-paper .prose .callout-bracket{color:var(--ink-mute)}
 body.mode-paper .prose .callout-label{color:var(--ink-dim)}
@@ -551,12 +546,12 @@ body.mode-paper .prose .callout-note{border-left-color:var(--green)}
 body.mode-paper .prose .callout-note .callout-bracket,body.mode-paper .prose .callout-note .callout-label{color:var(--green)}
 body.mode-paper .prose .callout-tip{border-left-color:var(--green)}
 body.mode-paper .prose .callout-tip .callout-bracket,body.mode-paper .prose .callout-tip .callout-label{color:var(--green)}
-body.mode-paper .prose .callout-warn{border-left-color:#a07a2a}
-body.mode-paper .prose .callout-warn .callout-bracket,body.mode-paper .prose .callout-warn .callout-label{color:#8a6d2c}
+body.mode-paper .prose .callout-warn{border-left-color:var(--amber)}
+body.mode-paper .prose .callout-warn .callout-bracket,body.mode-paper .prose .callout-warn .callout-label{color:var(--amber)}
 body.mode-paper .prose .callout-info{border-left-color:var(--ink-mute)}
 
 /* figures */
-body.mode-paper .prose .post-figure img{border:1px solid var(--line-2);background:#fff8e8}
+body.mode-paper .prose .post-figure img{border:1px solid var(--line-2);background:var(--bg-3)}
 body.mode-paper .prose .post-figure figcaption{font-family:var(--sans);font-style:italic;color:var(--ink-mute);font-size:13.5px;letter-spacing:0}
 
 /* heading anchor */
@@ -604,16 +599,10 @@ body.mode-paper .pn a span{
 }
 body.mode-paper .pn a:hover span{color:var(--green-2)}
 
-/* footer */
+/* footer — color rules already in chrome.css use tokens that paper
+   reskins automatically. Only paper-specific tweaks live here. */
 body.mode-paper footer{border-top:1px solid var(--line);margin-top:72px;padding:36px 0 60px}
 body.mode-paper .foot{font-family:var(--sans);font-size:14px;color:var(--ink-mute)}
-body.mode-paper .foot .l{color:var(--ink-dim)}
-body.mode-paper .foot a{color:var(--ink-dim)}
-body.mode-paper .foot a:hover{color:var(--green)}
-body.mode-paper .foot .links .sep{color:var(--line-2)}
-/* drop the `// ` prefix-feel by overriding the literal text via CSS isn't
-   reliable — Footer.astro hardcodes it. Leaving it as is; reads fine
-   in paper mode as a stylistic flourish. */
 
 /* ascii-div is engineer-only visual chrome — collapse in paper mode */
 body.mode-paper .ascii-div{display:none}
@@ -642,8 +631,8 @@ body.mode-paper .panic-lede{
 }
 body.mode-paper .panic-lede kbd{
   font-family:var(--mono);font-size:13px;
-  background:rgba(184,169,140,0.18);border:1px solid var(--line-2);
-  padding:1px 6px;border-radius:2px;color:var(--ink);
+  background:rgb(from var(--line-2) r g b / 0.18);border:1px solid var(--line-2);
+  padding:1px 6px;border-radius:var(--r-sm);color:var(--ink);
 }
 body.mode-paper .panic-meta{
   font-family:var(--sans);font-size:13.5px;color:var(--ink-mute);
@@ -651,7 +640,7 @@ body.mode-paper .panic-meta{
 }
 body.mode-paper .panic-meta span{
   font-family:var(--mono);font-style:normal;color:var(--ink-dim);
-  background:rgba(184,169,140,0.12);padding:1px 6px;border-radius:2px;
+  background:rgb(from var(--line-2) r g b / 0.12);padding:1px 6px;border-radius:var(--r-sm);
 }
 body.mode-paper .panic .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
 body.mode-paper .panic .btn{
@@ -659,9 +648,9 @@ body.mode-paper .panic .btn{
   padding:11px 18px;border:1px solid var(--ink-dim);
   color:var(--ink);background:transparent;letter-spacing:0;
 }
-body.mode-paper .panic .btn:hover{background:rgba(91,110,63,0.06);color:var(--ink);border-color:var(--ink)}
-body.mode-paper .panic .btn-primary{background:var(--ink);color:#fff8e8;border-color:var(--ink)}
-body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e8;border-color:var(--green-2)}
+body.mode-paper .panic .btn:hover{background:rgb(from var(--green) r g b / 0.06);color:var(--ink);border-color:var(--ink)}
+body.mode-paper .panic .btn-primary{background:var(--ink);color:var(--bg-3);border-color:var(--ink)}
+body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:var(--bg-3);border-color:var(--green-2)}
 @media (max-width:560px){
   body.mode-paper .panic{padding:48px 24px}
   body.mode-paper .panic h1{font-size:clamp(28px,9vw,38px)}
@@ -673,6 +662,9 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e
 @media (max-width:720px){
   body.mode-paper{font-size:16px}
   body.mode-paper nav.top .row{height:56px}
+  /* match the eng-mode brand ramp (14→13 at narrow widths) so toggling
+     modes on a phone doesn't shift the brand's size. */
+  body.mode-paper .brand{font-size:14px}
   body.mode-paper .page-head h1{font-size:clamp(24px,7vw,32px);line-height:1.18}
   body.mode-paper .page-head h1.prompt{font-size:clamp(24px,7vw,32px)}
   body.mode-paper .doc{padding:36px 0 24px}
@@ -697,6 +689,7 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:#fff8e
   body.mode-paper .work-frame{font-size:15px}
 }
 @media (max-width:480px){
+  body.mode-paper .brand{font-size:13px;letter-spacing:0}
   body.mode-paper .page-head h1{font-size:clamp(22px,6vw,28px)}
   body.mode-paper .doc h1,
   body.mode-paper .doc h1.size-short,

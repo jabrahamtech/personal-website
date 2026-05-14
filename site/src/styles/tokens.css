@@ -1,6 +1,42 @@
 /* design tokens — single source of palette + type primitives.
    themes swap palette by overriding these vars on a body class.
-   components consume vars only; they never hardcode colour. */
+   components consume vars only; they never hardcode colour.
+
+   Naming
+   ------
+   --bg / --bg-2 / --bg-3
+     Three surface depths. --bg is the page; --bg-2 is a slightly
+     darker raised surface (nav bar, code chip, codeblock title);
+     --bg-3 is the deepest inset (terminal body, prose <pre>, status
+     strip). Paper mode inverts: --bg is the warm cream page, --bg-2
+     is a slightly cooler card colour, --bg-3 is the brightest cream
+     used for raised editorial surfaces.
+
+   --ink / --ink-dim / --ink-mute / --ink-term
+     Text scale. --ink-term is the greenish off-white used for
+     in-terminal text in engineer mode; paper aliases it to --ink.
+
+   --green / --green-2 / --accent / --amber / --red
+     Semantic colours. --accent replaces the older --cyan name —
+     paper mode's "cyan" was actually a sage green, so the name now
+     describes the role (highlight accent) rather than the engineer
+     hue. --cyan stays as a deprecated alias for backward compat.
+
+   --r-sm / --r-md / --r-pill
+     Border radii. Engineer mode forces 0 across the board for the
+     terminal aesthetic; paper mode uses these. Three values is the
+     cap — anything else is a smell.
+
+   --nav-h
+     Sticky-offset for things that pin under the nav (toc-mobile).
+     Different per mode and per viewport size; consumers just read
+     the variable and stay correct.
+
+   Green/sage tints (rgb(from var(--green) r g b / α))
+     Use CSS relative color syntax for alpha variants. Avoids the
+     `--green-rgb: 125 255 138` duplication pattern and adapts
+     automatically when paper mode swaps --green to sage. Baseline
+     in all browsers since Sept 2024. */
 
 :root {
   /* type primitives — shared across modes */
@@ -9,18 +45,28 @@
 
   /* palette — engineer / terminal mode (default) */
   --bg: #0b0e0c;
-  --bg-2: #0f1411;
-  --panel: #10150f;
+  --bg-2: #0a0e0b;
+  --bg-3: #070a08;
   --line: #1d2820;
   --line-2: #2a3a2d;
   --ink: #ecebe4;
   --ink-dim: #c7c6bc;
   --ink-mute: #8b9286;
+  --ink-term: #cfe9d3;
   --green: #7dff8a;
   --green-2: #46c463;
+  --accent: #6ee7ff;
   --cyan: #6ee7ff;
   --amber: #f5b860;
   --red: #ff7a7a;
+
+  /* radii — engineer mode keeps everything sharp */
+  --r-sm: 0;
+  --r-md: 0;
+  --r-pill: 0;
+
+  /* sticky-offset under the nav */
+  --nav-h: 58px;
 }
 
 /* palette — paper / editorial mode. Overrides only the palette vars;
@@ -28,17 +74,33 @@
 body.mode-paper {
   --bg: #f4ede0;
   --bg-2: #efe6d4;
-  --panel: #ffffff;
+  --bg-3: #fff8e8;
   --line: #d8cdb8;
   --line-2: #b8a98c;
   --ink: #1a1612;
   --ink-dim: #3a342c;
   --ink-mute: #8a7d68;
+  --ink-term: var(--ink);
   --green: #5b6e3f;
   --green-2: #3f5028;
+  --accent: #4a5d3a;
   --cyan: #4a5d3a;
   --amber: #8a6d2c;
   --red: #a04030;
+
+  /* paper has soft radii — sm for chips, md for inputs, pill for tags */
+  --r-sm: 2px;
+  --r-md: 6px;
+  --r-pill: 999px;
+
+  --nav-h: 64px;
+}
+
+/* mobile nav heights — keeps sticky-offset consumers correct without
+   per-component media queries. */
+@media (max-width: 720px) {
+  :root { --nav-h: 52px; }
+  body.mode-paper { --nav-h: 56px; }
 }
 
 /* mode visibility utilities — content can opt in to a single mode.

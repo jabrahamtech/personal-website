@@ -159,6 +159,8 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
       );
     })()}
 
+    <p class="post-status" id="post-status" hidden aria-live="polite"></p>
+
     <ul class="post-list" id="post-list">
       {sorted.map((post) => {
         const posted = fmt(post);
@@ -194,11 +196,13 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
       const root = document.getElementById('post-filters');
       const list = document.getElementById('post-list');
       const empty = document.getElementById('post-empty');
+      const status = document.getElementById('post-status');
       if (!root || !list) return;
       const items = Array.from(list.querySelectorAll('li'));
       const filterSelects = Array.from(root.querySelectorAll('.filter-select[data-filter-kind]'));
       const orderSelect = root.querySelector('[data-order-control]');
       const storageKey = 'ja_post_filter_v3';
+      const total = items.length;
 
       function sortItems(order) {
         const normalised = order === 'asc' ? 'asc' : 'desc';
@@ -221,6 +225,19 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
         items.forEach((li) => list.appendChild(li));
       }
 
+      function describeFilter(kind, value) {
+        if (kind === 'all' || value === 'all') return null;
+        // Pull the human label off the option so the status reads the same
+        // way the user picked it — "Showing 2 of 7 · Guide" rather than
+        // the raw schema value "Learning Journey Guide".
+        const select = filterSelects.find((s) => s.getAttribute('data-filter-kind') === kind);
+        if (!select) return value;
+        const option = Array.from(select.options).find((o) => o.value === value);
+        if (!option) return value;
+        // Option labels embed the count (e.g. "Guide (2)") — strip it.
+        return option.textContent.replace(/\s*\(\d+\)\s*$/, '').trim();
+      }
+
       function apply(kind, value, order) {
         const normalisedOrder = order === 'asc' ? 'asc' : 'desc';
         sortItems(normalisedOrder);
@@ -240,21 +257,37 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
         });
         if (orderSelect) orderSelect.value = normalisedOrder;
         if (empty) empty.hidden = shown !== 0;
+        if (status) {
+          // Visible count makes the type/cluster mutual-exclusion obvious:
+          // if a user picks one filter while another was active, they see
+          // the count change AND the second select snap to "all".
+          const label = describeFilter(kind, value);
+          if (label) {
+            status.hidden = false;
+            status.textContent = 'Showing ' + shown + ' of ' + total + ' · ' + label;
+          } else {
+            status.hidden = true;
+            status.textContent = '';
+          }
+        }
         try { localStorage.setItem(storageKey, JSON.stringify({ kind, value, order: normalisedOrder })); } catch (_) {}
       }
 
       let initial = { kind: 'all', value: 'all', order: 'desc' };
       try {
         const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
-        if (
-          saved
+        // Validation has to check `value` even when `kind === 'all'`, or
+        // a stale value (e.g. a cluster name that no longer exists in
+        // the content collection) would pass through unchecked.
+        const validAllShape = saved && saved.kind === 'all' && saved.value === 'all';
+        const validFilterShape = saved
           && typeof saved.kind === 'string'
           && typeof saved.value === 'string'
-          && (
-            saved.kind === 'all'
-            || filterSelects.some((select) => select.getAttribute('data-filter-kind') === saved.kind && Array.from(select.options).some((option) => option.value === saved.value))
-          )
-        ) {
+          && filterSelects.some((select) =>
+            select.getAttribute('data-filter-kind') === saved.kind
+            && Array.from(select.options).some((option) => option.value === saved.value)
+          );
+        if (validAllShape || validFilterShape) {
           initial = {
             kind: saved.kind,
             value: saved.value,

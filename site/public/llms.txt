@@ -31,6 +31,8 @@ Technical language for the same work:
 
 ## Posts
 
+- [Most 'human-in-the-loop' is escalation done badly](https://jabrahamtech.com/posts/most-hitl-is-escalation-done-badly): Upcoming POV on why putting humans in the default decision path of an AI system is the worst of all worlds, and how calibrated escalation is the pattern that actually delivers oversight. *(prioritised draft)*
+- [When to Force the LLM, and When to Use a Button](https://jabrahamtech.com/posts/when-to-force-the-llm-and-when-to-use-a-button): A decision guide for founders and ops leaders on which parts of a product the model should own and which belong to a button. Voice AI as the worked example, back-channel UI as the named pattern.
 - [Why AI Is Starting to Sound Like You](https://jabrahamtech.com/posts/why-ai-is-starting-to-sound-like-you): Upcoming draft on micro-training, user data, and the personalisation layer that makes AI products feel like they are adapting to your own style and decisions. *(prioritised draft)*
 - [When You Should Use Traditional Solutions in Your AI Agent](https://jabrahamtech.com/posts/when-you-should-use-traditional-solutions-in-your-ai-agent): Upcoming decision guide on when to use rules, queues, database constraints, and conventional software instead of model reasoning. *(prioritised draft)*
 - [How We Reduced Broker Quote Processing Time by 70% With an AI Intake Workflow](https://jabrahamtech.com/posts/how-we-reduced-broker-quote-processing-time-with-an-ai-intake-workflow): Upcoming business outcome case study on AI intake workflows for broker quote processing. *(prioritised draft)*

@@ -12,8 +12,8 @@ input,textarea,.term-body,.prose p,.prose li,code,pre{cursor:text}
 @media (hover:none){html{cursor:auto}a,button{cursor:auto}}
 body{
   background:
-    radial-gradient(1200px 600px at 80% -10%, rgba(125,255,138,0.035), transparent 60%),
-    radial-gradient(900px 500px at -10% 30%, rgba(110,231,255,0.03), transparent 60%),
+    radial-gradient(1200px 600px at 80% -10%, rgb(from var(--green) r g b / 0.035), transparent 60%),
+    radial-gradient(900px 500px at -10% 30%, rgb(from var(--accent) r g b / 0.03), transparent 60%),
     var(--bg);
   min-height:100vh;
 }
@@ -44,6 +44,9 @@ a{color:inherit;text-decoration:none}
 ::view-transition-new(root){
   animation-duration:220ms;animation-timing-function:cubic-bezier(.4,0,.2,1);
 }
+/* The global `*` reduced-motion rule in global.css does NOT match the
+   ::view-transition pseudo-element family, so we need to disable the
+   crossfade animation explicitly here. */
 @media (prefers-reduced-motion: reduce){
   ::view-transition-old(root),
   ::view-transition-new(root){animation:none}

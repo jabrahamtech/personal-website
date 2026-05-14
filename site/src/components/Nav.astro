@@ -19,7 +19,7 @@ const links: Link[] = [
       ))}
     </div>
     <div class="nav-actions">
-      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="toggle engineer mode" aria-pressed="false" title="engineer mode">
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="switch to engineer mode" aria-pressed="false" title="engineer mode">
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
           <rect x="0.5" y="1.5" width="15" height="13" fill="none" stroke="currentColor"/>
           <path d="M3 5l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -78,15 +78,25 @@ const links: Link[] = [
     }
     btn.addEventListener('click', open);
     close && close.addEventListener('click', shut);
+    // <dialog> ESC closes the dialog without firing our own shut(), so the
+    // kebab's aria-expanded would otherwise desync. The native `close`
+    // event fires after every close path (ESC, .close(), form method=dialog).
+    sheet.addEventListener('close', shut);
 
     // Theme toggle — paper (default, soft cream/sage) ↔ eng (dark/green/mono).
     // The pre-paint script in Base.astro sets the initial body class so we
     // never see a wrong-theme flash. Here we just react to user input.
     const themeBtn = document.getElementById('theme-toggle');
-    function syncTogglePressed() {
+    // syncToggleState owns every UI attribute that derives from current mode:
+    // aria-pressed (a11y state), aria-label/title (action prompt that flips
+    // with state — "switch to X" reads correctly to screen readers in both
+    // directions instead of the previous static label).
+    function syncToggleState() {
       if (!themeBtn) return;
       const isEng = document.body.classList.contains('mode-eng');
       themeBtn.setAttribute('aria-pressed', isEng ? 'true' : 'false');
+      themeBtn.setAttribute('aria-label', isEng ? 'switch to paper mode' : 'switch to engineer mode');
+      themeBtn.setAttribute('title', isEng ? 'paper mode' : 'engineer mode');
     }
     // Pick the element nearest the top of the viewport (skipping fixed nav)
     // so we can pin its on-screen position across the mode swap. Without
@@ -115,7 +125,12 @@ const links: Link[] = [
       try { localStorage.setItem('ja_mode', m); } catch (_) {}
       const icon = document.getElementById('favicon-svg');
       if (icon) icon.href = m === 'eng' ? '/favicon.svg' : '/favicon-paper.svg';
-      syncTogglePressed();
+      // theme-color meta tints the browser address bar on mobile. Without
+      // this, paper-mode users get an engineer-dark tint that mismatches
+      // the cream surface they're looking at.
+      const themeMeta = document.getElementById('theme-color-meta');
+      if (themeMeta) themeMeta.content = m === 'eng' ? '#0b0e0c' : '#f4ede0';
+      syncToggleState();
       if (wasAtTop) {
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         return;
@@ -152,15 +167,19 @@ const links: Link[] = [
         applyMode(m, wasAtTop, anchor);
       }
     }
-    syncTogglePressed();
+    syncToggleState();
     themeBtn && themeBtn.addEventListener('click', () => {
       const isEng = document.body.classList.contains('mode-eng');
       // /terminal hard-locks eng. A toggle there has nowhere to go in
       // place, so route the click into "exit terminal": persist paper
-      // mode, then navigate to /posts so the next paint lands there.
+      // mode, then trigger the same internal-nav pathway as the posts
+      // link — that lets the page-loader intercept fire and matches
+      // every other engineer-mode navigation in the site.
       if ((location.pathname.replace(/\/$/, '') || '/') === '/terminal') {
         try { localStorage.setItem('ja_mode', 'paper'); } catch (_) {}
-        location.href = '/';
+        const homeLink = document.querySelector('nav.top .nav-links a[href="/"]');
+        if (homeLink) homeLink.click();
+        else location.href = '/';
         return;
       }
       setMode(isEng ? 'paper' : 'eng');

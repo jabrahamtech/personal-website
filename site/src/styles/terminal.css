@@ -33,13 +33,13 @@
 .term {
   font-family: var(--mono);
   font-size: 13.5px;
-  background: #070a08;
+  background: var(--bg-3);
   border: 1px solid var(--line-2);
   box-shadow:
     0 0 0 1px var(--bg) inset,
     6px 6px 0 0 rgba(0, 0, 0, 0.55),
     6px 6px 0 1px var(--line),
-    0 0 60px rgba(125, 255, 138, 0.06);
+    0 0 60px rgb(from var(--green) r g b / 0.06);
   position: relative;
 }
 
@@ -49,7 +49,7 @@
   gap: 8px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--line);
-  background: #0a0e0b;
+  background: var(--bg-2);
 }
 .term-bar .lights { display: flex; gap: 6px }
 .term-bar .lights i {
@@ -93,14 +93,14 @@
 .term-bar .audio[data-on="true"] {
   color: var(--green);
   border-color: var(--green-2);
-  box-shadow: 0 0 6px rgba(125, 255, 138, 0.18) inset;
+  box-shadow: 0 0 6px rgb(from var(--green) r g b / 0.18) inset;
 }
 
 .term-body {
+  /* cursor: text is set globally in base.css for .term-body */
   padding: 18px 18px 22px;
   min-height: 420px;
-  color: #cfe9d3;
-  cursor: text;
+  color: var(--ink-term);
   max-height: 560px;
   overflow-y: auto;
 }
@@ -108,7 +108,7 @@
   display: block;
   white-space: pre-wrap;
   word-break: break-word;
-  color: #cfe9d3;
+  color: var(--ink-term);
   margin: 1px 0;
   animation: tlineIn 160ms ease-out both;
 }
@@ -121,7 +121,7 @@
 .term-line.heading { color: var(--green); font-weight: 500; margin-top: 14px }
 .term-line.teach {
   color: var(--ink-dim);
-  background: rgba(125, 255, 138, 0.04);
+  background: rgb(from var(--green) r g b / 0.04);
   border-left: 2px solid var(--green-2);
   padding: 8px 12px;
   margin: 8px 0;
@@ -149,7 +149,7 @@
   background: transparent;
   border: 0;
   outline: 0;
-  color: #cfe9d3;
+  color: var(--ink-term);
   font-family: var(--mono);
   font-size: 13.5px;
   caret-color: var(--green);
@@ -166,7 +166,7 @@
   font-family: var(--mono);
   font-size: 11.5px;
   color: var(--ink-mute);
-  background: #0a0e0b;
+  background: var(--bg-2);
   gap: 10px;
   flex-wrap: wrap;
 }

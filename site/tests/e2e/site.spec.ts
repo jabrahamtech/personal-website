@@ -1,12 +1,22 @@
 import { test, expect } from '@playwright/test';
 
-const upcomingSlugs = [
+/* Posts in newest-first `posted` order. The live post is "when-to-force",
+   everything else is a draft. The test suite uses three views of this
+   list: all slugs (for assertions about per-page rendering), draft
+   slugs (for draft-only count assertions), and live slugs (for the
+   handful of assertions that only apply to published posts). */
+const allPostSlugs = [
+  'most-hitl-is-escalation-done-badly',
+  'when-to-force-the-llm-and-when-to-use-a-button',
   'why-ai-is-starting-to-sound-like-you',
   'when-you-should-use-traditional-solutions-in-your-ai-agent',
   'how-we-reduced-broker-quote-processing-time-with-an-ai-intake-workflow',
   'cut-recruitment-agency-work-week-two-hour-ai-call',
   'polymarket-bot-what-i-learned-about-eda',
 ];
+
+const liveSlugs = ['when-to-force-the-llm-and-when-to-use-a-button'];
+const draftSlugs = allPostSlugs.filter((s) => !liveSlugs.includes(s));
 
 const examplePost = '/posts/polymarket-bot-what-i-learned-about-eda';
 
@@ -24,12 +34,12 @@ test.describe('home (posts list)', () => {
     await expect(page.locator('.links-row')).toHaveCount(0);
 
     const rows = page.locator('.post-list .post-row');
-    await expect(rows).toHaveCount(5);
+    await expect(rows).toHaveCount(allPostSlugs.length);
     const hrefs = await rows.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')));
-    expect(hrefs).toEqual(upcomingSlugs.map((slug) => `/posts/${slug}`));
+    expect(hrefs).toEqual(allPostSlugs.map((slug) => `/posts/${slug}`));
 
-    await expect(page.locator('.post-list .draft')).toHaveCount(5);
-    await expect(rows.first()).toContainText('Why AI Is Starting to Sound Like You');
+    await expect(page.locator('.post-list .draft')).toHaveCount(draftSlugs.length);
+    await expect(rows.first()).toContainText("Most 'human-in-the-loop' is escalation done badly");
     await expect(page.locator('main')).not.toContainText('Building this site with Astro');
   });
 
@@ -38,13 +48,22 @@ test.describe('home (posts list)', () => {
 
     await expect(page.locator('#post-filters .filter-select')).toHaveCount(3);
     await expect(page.locator('#post-filters .chip')).toHaveCount(0);
+    /* Counts derived from the content collection (newest-first):
+         most-hitl              → Opinion
+         when-to-force          → Decision
+         why-ai                 → Guide + Opinion
+         when-you-should        → Decision
+         how-we-reduced         → Case study
+         cut-recruitment        → Case study + Opinion
+         polymarket-bot         → Build + Guide
+       Therefore: Guide=2, Build=1, Case study=2, Decision=2, Opinion=3. */
     await expect(page.locator('#filter-type option')).toHaveText([
-      'all types (5)',
+      'all types (7)',
       'Guide (2)',
       'Build (1)',
       'Case study (2)',
-      'Decision (1)',
-      'Opinion (2)',
+      'Decision (2)',
+      'Opinion (3)',
     ]);
 
     await page.locator('#filter-type').selectOption({ label: 'Guide (2)' });
@@ -58,9 +77,15 @@ test.describe('home (posts list)', () => {
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(1);
     await expect(page.locator('.post-list li:not([hidden]) h2')).toHaveText("How I Cut 80% of a Recruitment Agency's Work Week in a 2-Hour AI Call");
     await expect(page.locator('#filter-type')).toHaveValue('all');
+    // Status line appears whenever a non-all filter is active.
+    await expect(page.locator('#post-status')).toBeVisible();
+    await expect(page.locator('#post-status')).toContainText('Recruitment Automation');
+    await expect(page.locator('#post-status')).toContainText('1 of 7');
 
     await page.locator('#filter-cluster').selectOption('all');
-    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(5);
+    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(allPostSlugs.length);
+    // Status line is hidden when no filter is active.
+    await expect(page.locator('#post-status')).toBeHidden();
   });
 
   test('sorts newest first by default and can switch to oldest first', async ({ page }) => {
@@ -69,6 +94,8 @@ test.describe('home (posts list)', () => {
     const visibleTitles = page.locator('.post-list li:not([hidden]) h2');
     await expect(page.locator('#filter-order')).toHaveValue('desc');
     await expect(visibleTitles).toHaveText([
+      "Most 'human-in-the-loop' is escalation done badly",
+      'When to Force the LLM, and When to Use a Button',
       'Why AI Is Starting to Sound Like You',
       'When You Should Use Traditional Solutions in Your AI Agent',
       'How We Reduced Broker Quote Processing Time by 70% With an AI Intake Workflow',
@@ -83,6 +110,8 @@ test.describe('home (posts list)', () => {
       'How We Reduced Broker Quote Processing Time by 70% With an AI Intake Workflow',
       'When You Should Use Traditional Solutions in Your AI Agent',
       'Why AI Is Starting to Sound Like You',
+      'When to Force the LLM, and When to Use a Button',
+      "Most 'human-in-the-loop' is escalation done badly",
     ]);
 
     await page.locator('#filter-type').selectOption({ label: 'Guide (2)' });
@@ -105,9 +134,11 @@ test.describe('home (posts list)', () => {
     expect(order[2]).toMatch(/^div\.meta/);
 
     const meta = first.locator('.meta');
+    // The newest post (most-hitl) is a draft in the "Agents and Workflows"
+    // cluster with a single content-type tag (Opinion).
     await expect(meta).toContainText('draft');
-    await expect(meta).toContainText('Adaptive AI / Voice AI');
-    await expect(meta.locator('.tag-cat')).toHaveText(['Guide', 'Opinion']);
+    await expect(meta).toContainText('Agents and Workflows');
+    await expect(meta.locator('.tag-cat')).toHaveText(['Opinion']);
 
     const visibleListText = (await page.locator('.post-list').textContent()) || '';
     for (const noisy of [
@@ -167,9 +198,14 @@ test.describe('about page', () => {
     await expect(page).toHaveTitle(/About — Jonathan Abraham/);
     await expect(page.locator('.page-head h1')).toHaveText('./about');
     await expect(page.locator('.prose')).toContainText('Brokerloop');
-    await expect(page.locator('.prose')).toContainText('New work is by referral');
+    // Author softened "New work is by referral" → "is usually by referral" —
+    // match the current bio copy.
+    await expect(page.locator('.prose')).toContainText('usually by referral');
     await expect(page.locator('.prose a[href^="mailto:jabrahamtech@gmail.com"]').first()).toBeVisible();
-    await expect(page.locator('.prose a[href*="github.com/jabrahamtech"]')).toBeVisible();
+    /* The paper bio-head and the elsewhere-list both link GitHub; .first()
+       avoids the strict-mode duplicate violation while still proving the
+       page exposes at least one GitHub link. */
+    await expect(page.locator('.prose a[href*="github.com/jabrahamtech"]').first()).toBeVisible();
   });
 
   test('about link is marked current', async ({ page }) => {
@@ -189,7 +225,9 @@ test.describe('about page', () => {
 });
 
 test.describe('post pages', () => {
-  for (const slug of upcomingSlugs) {
+  /* Iterates draftSlugs only — the assertion below checks for the "draft"
+     marker in the meta row, which doesn't appear on live posts. */
+  for (const slug of draftSlugs) {
     test(`/posts/${slug} renders the draft shell with H1, prompt path, and the draft meta`, async ({ page }) => {
       const response = await page.goto(`/posts/${slug}`);
       expect(response?.status()).toBe(200);
@@ -213,6 +251,71 @@ test.describe('post pages', () => {
   test('drafts without an image dont render a figure.cover', async ({ page }) => {
     await page.goto('/posts/why-ai-is-starting-to-sound-like-you');
     await expect(page.locator('figure.cover')).toHaveCount(0);
+  });
+
+  test('live posts emit a BlogPosting JSON-LD; drafts without `posted` do not', async ({ page }) => {
+    // A live post (when-to-force) must emit the BlogPosting with a valid
+    // datePublished — that's the schema.org/Google Article requirement.
+    await page.goto(`/posts/${liveSlugs[0]}`);
+    let blocks = await page.$$eval('script[type="application/ld+json"]', (els) =>
+      els.map((e) => JSON.parse(e.textContent || 'null')),
+    );
+    const livePost = blocks.find((b) => b && b['@type'] === 'BlogPosting');
+    expect(livePost, 'live post must emit BlogPosting').toBeTruthy();
+    expect(livePost.datePublished, 'datePublished must be a real ISO date, never undefined').toMatch(/^\d{4}-\d{2}-\d{2}/);
+  });
+});
+
+test.describe('mode-state controller', () => {
+  test('theme toggle flips aria-pressed, aria-label, and title with state', async ({ page }) => {
+    // Start fresh in paper mode.
+    await page.addInitScript(() => localStorage.setItem('ja_mode', 'paper'));
+    await page.goto('/');
+    const toggle = page.locator('#theme-toggle');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle).toHaveAttribute('aria-label', /engineer/i);
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toHaveAttribute('aria-label', /paper/i);
+    await expect(toggle).toHaveAttribute('title', /paper/i);
+  });
+
+  test('theme-color meta tracks the current mode', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('ja_mode', 'paper'));
+    await page.goto('/');
+    const meta = page.locator('meta[name="theme-color"]');
+    // Paper bg colour.
+    await expect(meta).toHaveAttribute('content', '#f4ede0');
+    await page.locator('#theme-toggle').click();
+    // Engineer bg colour.
+    await expect(meta).toHaveAttribute('content', '#0b0e0c');
+  });
+
+  test('nav-sheet ESC close keeps the kebab aria-expanded in sync', async ({ page }) => {
+    // The kebab is only visible at narrow widths.
+    await page.setViewportSize({ width: 400, height: 800 });
+    await page.goto('/');
+    const kebab = page.locator('#nav-kebab');
+    await kebab.click();
+    await expect(kebab).toHaveAttribute('aria-expanded', 'true');
+    // Native <dialog> ESC handler fires close on the dialog without
+    // calling our shut() — the wired-in `close` event listener bridges it.
+    await page.keyboard.press('Escape');
+    await expect(kebab).toHaveAttribute('aria-expanded', 'false');
+  });
+});
+
+test.describe('rss enclosure', () => {
+  test('enclosure MIME type matches the file extension on the cover image', async ({ page }) => {
+    const r = await page.request.get('/rss.xml');
+    const body = await r.text();
+    // The live post ships a .jpg cover. Previous behaviour hardcoded
+    // type="image/png" regardless of file extension — that's the bug
+    // this test guards against.
+    const jpgEnclosureRe = /<enclosure\b[^>]*url="[^"]*\.jpg[^"]*"[^>]*type="image\/jpeg"/;
+    const jpgAsPngRe = /<enclosure\b[^>]*url="[^"]*\.jpg[^"]*"[^>]*type="image\/png"/;
+    expect(jpgAsPngRe.test(body), 'feed must not advertise a JPG cover as image/png').toBe(false);
+    expect(jpgEnclosureRe.test(body), 'live post enclosure should declare image/jpeg').toBe(true);
   });
 });
 
@@ -574,8 +677,8 @@ test.describe('AEO — llms.txt + AI crawler robots', () => {
     // Sections we care about
     expect(body).toMatch(/##\s+Posts/);
     expect(body).toMatch(/##\s+Identity/);
-    // Each post should be linked
-    for (const slug of upcomingSlugs) {
+    // Each post should be linked (live posts included alongside drafts).
+    for (const slug of allPostSlugs) {
       expect(body, `${slug} missing from llms.txt`).toContain(`/posts/${slug}`);
     }
   });
@@ -595,7 +698,7 @@ test.describe('copy style', () => {
   test('site copy uses Australian spelling for common variants', async ({ page }) => {
     const forbidden = /\b(personalization|personalized|personalize|behavior|behaviors|optimize|optimizes|optimized)\b/i;
 
-    for (const path of ['/', '/about', '/terminal', ...upcomingSlugs.map((slug) => `/posts/${slug}`)]) {
+    for (const path of ['/', '/about', '/terminal', ...allPostSlugs.map((slug) => `/posts/${slug}`)]) {
       await page.goto(path);
       const visible = await page.locator('body').innerText();
       expect(visible, `${path} contains US spelling`).not.toMatch(forbidden);

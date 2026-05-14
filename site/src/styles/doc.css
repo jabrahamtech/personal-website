@@ -19,7 +19,7 @@
   height: 100%;
   width: 0;
   background: var(--green);
-  box-shadow: 0 0 8px rgba(125, 255, 138, 0.6);
+  box-shadow: 0 0 8px rgb(from var(--green) r g b / 0.6);
   transition: width 80ms linear;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -33,19 +33,6 @@
    column edge is the measure: everything (text, figures, code) aligns
    to it, so there's no asymmetric right-gutter on paragraphs. */
 .doc .doc-main { max-width: 640px; margin: 0 auto; min-width: 0 }
-.doc .crumbs {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--ink-mute);
-  margin-bottom: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-}
-.doc .crumbs a { color: var(--ink-dim) }
-.doc .crumbs a:hover { color: var(--green) }
-.doc .crumbs .sep { color: var(--line-2) }
 .doc .post-prompt {
   font-family: var(--mono);
   color: var(--green);
@@ -98,7 +85,7 @@
   aspect-ratio: 16 / 9;
   object-fit: cover;
   border: 1px solid var(--line-2);
-  background: #070a08;
+  background: var(--bg-3);
   box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.4), 4px 4px 0 1px var(--line);
 }
 .cover figcaption {
@@ -118,7 +105,7 @@
   width: 160px;
   height: 160px;
   border: 1px solid var(--line-2);
-  background: #070a08;
+  background: var(--bg-3);
   box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.45), 4px 4px 0 1px var(--line);
 }
 .avatar img { display: block; width: 100%; height: 100%; object-fit: cover }
@@ -146,7 +133,7 @@
   margin: 18px 0;
   padding: 14px 18px;
   border-left: 2px solid var(--green-2);
-  background: rgba(125, 255, 138, 0.04);
+  background: rgb(from var(--green) r g b / 0.04);
   font-family: var(--mono);
   font-size: 14px;
   color: var(--ink-dim);
@@ -154,21 +141,21 @@
 .prose code {
   font-family: var(--mono);
   font-size: 13.5px;
-  background: #0a0e0b;
+  background: var(--bg-2);
   border: 1px solid var(--line);
   padding: 1px 6px;
-  color: var(--cyan);
+  color: var(--accent);
   overflow-wrap: break-word;
   word-break: break-word;
 }
 .prose pre {
   font-family: var(--mono);
   font-size: 13px;
-  background: #070a08;
+  background: var(--bg-3);
   border: 1px solid var(--line-2);
   padding: 16px 18px;
   overflow-x: auto;
-  color: #cfe9d3;
+  color: var(--ink-term);
   margin: 0 0 22px;
   position: relative;
 }
@@ -192,11 +179,13 @@
 }
 .prose h3::before { content: ">> "; color: var(--green-2) }
 .prose hr { border: 0; border-top: 1px solid var(--line); margin: 36px 0 }
-.prose img { max-width: 100%; height: auto; border: 1px solid var(--line) }
+/* Match .prose .post-figure img — both use --line-2 so raw <img> and
+   <Figure> share the same border weight inside a post. */
+.prose img { max-width: 100%; height: auto; border: 1px solid var(--line-2) }
 
 /* code block — terminal-style filename header */
 .prose .codeblock { margin: 0 0 22px }
-.prose .codeblock.has-bar { border: 1px solid var(--line-2); background: #070a08 }
+.prose .codeblock.has-bar { border: 1px solid var(--line-2); background: var(--bg-3) }
 .prose .codeblock.has-bar pre { border: 0; margin: 0; background: transparent }
 .prose .codeblock-bar {
   display: flex;
@@ -204,7 +193,7 @@
   gap: 6px;
   padding: 8px 10px;
   border-bottom: 1px solid var(--line);
-  background: #0a0e0b;
+  background: var(--bg-2);
   font-family: var(--mono);
 }
 .prose .cb-dot {
@@ -295,10 +284,10 @@
 .prose .callout-tip { border-left-color: var(--green-2) }
 .prose .callout-tip .callout-bracket,
 .prose .callout-tip .callout-label { color: var(--green) }
-.prose .callout-warn { border-left-color: #f5b860 }
+.prose .callout-warn { border-left-color: var(--amber) }
 .prose .callout-warn .callout-bracket,
-.prose .callout-warn .callout-label { color: #f5b860 }
-.prose .callout-info { border-left-color: #8b9286 }
+.prose .callout-warn .callout-label { color: var(--amber) }
+.prose .callout-info { border-left-color: var(--ink-mute) }
 .prose .callout-info .callout-bracket,
 .prose .callout-info .callout-label { color: var(--ink-dim) }
 
@@ -309,7 +298,7 @@
   width: 100%;
   height: auto;
   border: 1px solid var(--line-2);
-  background: #070a08;
+  background: var(--bg-3);
 }
 .prose .post-figure figcaption {
   margin: 8px 0 0;
@@ -371,7 +360,6 @@
   font-size: 12px;
 }
 .toc-desktop ul { list-style: none; margin: 0; padding: 0 }
-.toc-desktop li { margin: 0; line-height: 1.5 }
 .toc-desktop a {
   display: flex;
   gap: 6px;
@@ -457,7 +445,7 @@
   border: 1px solid var(--line-2);
   transition: border-color .12s ease, background .12s ease;
 }
-.pn a:hover { border-color: var(--green-2); background: rgba(125, 255, 138, 0.03) }
+.pn a:hover { border-color: var(--green-2); background: rgb(from var(--green) r g b / 0.03) }
 .pn a small { font-size: 11px; color: var(--ink-mute); letter-spacing: .05em; text-transform: uppercase }
 .pn a span { font-size: 13.5px; color: var(--ink); line-height: 1.35 }
 .pn a.next { text-align: right; align-items: flex-end }
@@ -501,14 +489,15 @@
     background: var(--bg);
     border: 1px solid var(--line-2);
     position: sticky;
-    top: 58px;
+    /* --nav-h is set per mode + viewport in tokens.css. Eng nav is
+       58px desktop / 52px mobile; paper nav is 64px / 56px. */
+    top: var(--nav-h);
     z-index: 30;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   }
 }
 @media (max-width: 720px) {
   .doc { padding: 32px 0 24px }
-  .doc .crumbs { font-size: 11.5px; margin-bottom: 14px }
   /* All size variants need to be listed so the size-short/medium/long
      class selectors (more specific than .doc h1) get overridden too. */
   .doc h1,
@@ -529,7 +518,6 @@
 }
 @media (max-width: 560px) {
   .avatar { width: 130px; height: 130px }
-  .doc.has-toc .toc-mobile { top: 52px }
 }
 @media (max-width: 480px) {
   .prose .codeblock-bar { padding: 6px 8px }
