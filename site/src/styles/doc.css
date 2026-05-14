@@ -185,9 +185,11 @@
 
 /* Tables — markdown pipe-tables render to a bare <table>. Block-level
    with overflow-x:auto lets wide tables scroll on narrow viewports
-   without a wrapper element. Inside the block the inner table layout
-   still does its thing; min-width:100% keeps the table at column width
-   when it would otherwise shrink to content. */
+   without a wrapper element. Headers wrap (no nowrap) so multi-word
+   column titles don't inflate their column. The mask-image fade on
+   the right edge signals scrollability when content does overflow —
+   it stays attached to the scroll container so the cue moves out of
+   the way once the user scrolls to the end. */
 .prose table {
   display: block;
   width: 100%;
@@ -200,6 +202,8 @@
   margin: 0 0 24px;
   border-top: 1px solid var(--line-2);
   border-bottom: 1px solid var(--line-2);
+  scrollbar-width: thin;
+  mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%);
 }
 .prose table thead { background: rgb(from var(--green) r g b / 0.06) }
 .prose table th {
@@ -210,7 +214,7 @@
   letter-spacing: 0.02em;
   padding: 10px 14px;
   border-bottom: 1px solid var(--line-2);
-  white-space: nowrap;
+  text-wrap: balance;
 }
 .prose table td {
   padding: 10px 14px;

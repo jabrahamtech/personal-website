@@ -499,7 +499,7 @@ body.mode-paper .prose table th{
   text-transform:uppercase;letter-spacing:0.06em;font-size:12px;
   padding:10px 14px;
   border-bottom:1px solid var(--line-2);
-  white-space:nowrap;
+  text-wrap:balance;
 }
 body.mode-paper .prose table td{
   padding:12px 14px;color:var(--ink-dim);
