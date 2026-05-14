@@ -55,8 +55,8 @@
 
   <!-- DEEP-RUST DESCENDING DROP ARROW (the punchline) -->
   <path d="M 640 350 Q 800 430 880 560" stroke="#A14A2A" stroke-width="4" fill="none" stroke-dasharray="9 6" marker-end="url(#arrow-rust)" filter="url(#wobble)"/>
-  <!-- Descent label on the arrow -->
-  <text x="785" y="475" class="lbl" font-size="28" fill="#A14A2A" font-style="italic" transform="rotate(28 785 475)">−11.3pp</text>
+  <!-- Descent label, offset perpendicular off the arrow so it doesn't sit on the dashed line -->
+  <text x="767" y="383" class="lbl" font-size="28" fill="#A14A2A" font-style="italic" transform="rotate(28 767 383)">−11.3pp</text>
 
   <!-- BIG NUMBER 2: 61.7% lower-right, slightly tilted -->
   <g transform="rotate(-1.5 1100 620)">
