@@ -158,6 +158,23 @@ const titleSizeClass =
       var COPY = '[copy]';
       var OK = '[ok]';
       var ERR = '[err]';
+      // Stamp each <td> with its column header so the mobile stacked-card
+      // layout (see doc.css @media max-width:560px) can render a label via
+      // td::before { content: attr(data-label) }. Skipped if the table has
+      // no <thead> or the cell already carries an authored data-label.
+      document.querySelectorAll('article.prose table').forEach(function (table) {
+        var headRow = table.tHead && table.tHead.rows[0];
+        if (!headRow) return;
+        var labels = Array.prototype.map.call(headRow.cells, function (c) { return c.textContent.trim(); });
+        Array.prototype.forEach.call(table.tBodies, function (tbody) {
+          Array.prototype.forEach.call(tbody.rows, function (row) {
+            Array.prototype.forEach.call(row.cells, function (cell, i) {
+              if (!cell.dataset.label && labels[i]) cell.dataset.label = labels[i];
+            });
+          });
+        });
+      });
+
       document.querySelectorAll('article.prose pre').forEach(function (pre) {
         if (pre.querySelector('.copy-btn')) return;
         var btn = document.createElement('button');

@@ -682,6 +682,21 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:var(--
   body.mode-paper .panic{padding:48px 24px}
   body.mode-paper .panic h1{font-size:clamp(28px,9vw,38px)}
   body.mode-paper .panic-lede{font-size:16px}
+
+  /* Stacked-card tables — match the eng-mode mobile pattern but use
+     paper's editorial palette (no green accent; uppercase Inter label). */
+  body.mode-paper .prose table{font-size:15px}
+  body.mode-paper .prose table tr{border-bottom:1px solid var(--line-2)}
+  body.mode-paper .prose table tbody tr:last-child{border-bottom:0}
+  body.mode-paper .prose table td::before{
+    font-family:var(--sans);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-mute);
+    font-weight:600;
+  }
+  body.mode-paper .prose table td:first-child::before{color:var(--ink-mute)}
 }
 
 /* mobile paper tweaks — tighter rhythm, comfortable reading scale,

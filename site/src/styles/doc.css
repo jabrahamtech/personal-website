@@ -568,3 +568,50 @@
   .prose .cb-lang { display: none }
 }
 
+/* Mobile tables — stack each row vertically with a tiny uppercase label
+   pulled from the column header (stamped onto each td as data-label by
+   DocLayout's inline script). Avoids horizontal scrolling on phones for
+   content-dense comparison tables. */
+@media (max-width: 560px) {
+  .prose table {
+    display: block;
+    overflow: visible;
+    mask-image: none;
+    font-size: 14px;
+    margin: 0 0 22px;
+  }
+  .prose table thead { display: none }
+  .prose table tbody,
+  .prose table tr,
+  .prose table td { display: block; width: 100%; max-width: 100%; box-sizing: border-box }
+  .prose table tr {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line-2);
+  }
+  .prose table tbody tr:first-child { padding-top: 4px }
+  .prose table tbody tr:last-child { border-bottom: 0; padding-bottom: 4px }
+  .prose table td {
+    padding: 4px 0;
+    border: 0;
+    color: var(--ink-dim);
+  }
+  .prose table td::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    color: var(--green);
+    margin-bottom: 2px;
+  }
+  .prose table td:first-child {
+    color: var(--ink);
+    font-weight: 500;
+    padding-top: 0;
+  }
+  .prose table td:first-child::before { color: var(--green) }
+  .prose table td:last-child { color: var(--ink) }
+}
+
+
