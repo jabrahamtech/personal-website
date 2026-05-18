@@ -1,9 +1,8 @@
 ---
 title: "What Polymarket taught me about event-driven"
 summary: "Building a Polymarket market-making bot taught me that 'event-driven architecture' is at least four different patterns sold as one. The shape that survives production is a hybrid, and most automation systems get it wrong the same way."
-posted: 2026-05-14
-draft: true
-pipelineStatus: "Draft"
+posted: 2026-05-19
+pipelineStatus: "Published"
 contentTypes:
   - "Technical Build Breakdown"
 cluster: "Agents and Workflows"
@@ -36,9 +35,9 @@ import Figure from '../../components/Figure.astro';
         but venue mechanics change. Re-check before flipping draft=false
         if the post sits in draft for more than a few weeks. */}
 
-I built a Polymarket market-making bot. The pitch in 2025 was that event-driven architecture is the future of automated systems, especially AI ones. I bought it. Then I built the thing and watched my own architecture disagree with the marketing in detail. The codebase that shipped is a hybrid: an async bus for facts, a synchronous hot path for decisions, an append-only log off to the side for memory. None of the three pieces is optional, and none of them lives inside a single pattern.
+I built a Polymarket market-making bot. The pitch I'd bought was that event-driven would simplify it. It did the opposite. The bus helped at the edges, but every decision that actually had to be right wanted to be boring, synchronous, and explicit.
 
-The honest read of the literature says this was always the right answer. Martin Fowler said it in 2017. Bernd Ruecker has been arguing it since 2019. LMAX's architecture writeup said it in 2011. The vendor narrative selling "event-driven" as a single thing to AI and automation teams is incomplete in a way that costs production systems money and adoption.
+The codebase that shipped is a hybrid: an async bus for facts, a synchronous hot path for decisions, an append-only SQLite log off to the side for memory. None of the three is optional. None of them lives inside a single pattern. The literature has been saying this since at least 2011 (LMAX) and 2017 (Fowler). The 2025 vendor pitch — Kafka shape for everything — quietly drops the middle layer.
 
 This post walks the build. The point is not that prediction-market bots are interesting (they are, modestly). The point is that the architecture I had to settle into is the architecture most automation builders need and most articles paper over.
 
@@ -66,7 +65,7 @@ The other relevant detail: most of the code was written with heavy AI assistance
 
 At the centre of the system is an in-memory message bus. One process, one bus, multiple async tasks reading and publishing. The bus is unremarkable except for two policies: coalescing on high-volume topics, and unbounded queues on critical ones. Feeds publish market data and user data. Strategies consume market data and publish orders. The executor consumes orders, runs risk checks, submits to a backend, and publishes fills. The reconciliation service consumes the user-fills feed in live mode and corrects the executor's optimistic view of the world. A boundary service publishes typed interval-boundary events that drive resolution and redemption.
 
-That sentence sounds tidy. The code is not. There are five long-running supervised tasks at startup, three of them optional depending on mode, and the bus is injected into roughly a dozen components. The boundary cases are most of the engineering: what happens when a feed disconnects, what happens when the bus drops an update under load, what happens when the executor's optimistic fill diverges from what the venue reports.
+That sentence sounds tidy. The code is not. Five core supervised tasks at boot — `FeedManager`, `ExecutionEngine`, `Cache`, `BoundaryPriceService`, `ResolutionService` — plus `MarketFinder`, `RedemptionSweeper`, and `ReconciliationService` in live mode. Each runs under a supervisor that restarts on crash with exponential backoff capped at thirty seconds and trips a circuit breaker after three crashes in five minutes. The bus is injected into roughly a dozen components. The boundary cases are most of the engineering: what happens when a feed disconnects, what happens when the bus drops an update under load, what happens when the executor's optimistic fill diverges from what the venue reports.
 
 Here is the diagram view of the main flow.
 
@@ -78,7 +77,17 @@ Here is the diagram view of the main flow.
   height={900}
 />
 
-The thing I want to draw attention to: the bus is not the whole system. The executor calls risk checks directly. The executor calls the backend submit directly. The metrics collector writes the event log directly into SQLite outside the bus. Three of the most consequential moves in the system are deliberately synchronous.
+The actual flow, with the topic names from the codebase:
+
+```
+book_update  →  strategy  →  orders  →  executor  →  risk  →  backend.submit  →  fills
+                                                                                  ↓
+                                                                              event_log (SQLite)
+                                                                                  ↑
+                                                                          user_fills  →  reconcile
+```
+
+The thing I want to draw attention to: the bus is not the whole system. The executor calls risk checks directly. The executor calls the backend submit directly. The position tracker is updated synchronously inside the executor before any fill event hits the bus. Three of the most consequential moves are deliberately synchronous.
 
 ## Key technical decisions
 
@@ -92,9 +101,44 @@ The strategy publishes orders to a topic called `orders`. By Ruecker's definitio
 
 The opposite case is `book_update`. There can be many consumers (cache, strategies, recorder). The producer does not care who responds. Stale messages can be dropped when consumers fall behind because only the latest book matters. That is an event. More specifically, it is the [event-carried state transfer pattern](https://itnext.io/the-event-carried-state-transfer-pattern-aae49715bb7f) with [compaction](https://www.innoq.com/en/blog/2024/02/compacted-state-feed/) layered on top. Coalescing high-volume topics is not a hack; it is a documented pattern that the vendor pitch decks rarely call by name.
 
+The whole policy is two screens of code:
+
+```python
+class CoalescingBuffer:
+    """Queue-compatible buffer that keeps only the latest value per key."""
+
+    def __init__(self, key_attr: str) -> None:
+        self._key_attr = key_attr
+        self._latest: dict[str, Any] = {}
+        self._event = asyncio.Event()
+
+    def put_nowait(self, item: Any) -> None:
+        key = getattr(item, self._key_attr)
+        self._latest[key] = item
+        self._event.set()
+```
+
+`book_update` is keyed by `token_id` — every new snapshot for a token overwrites the last one. `orders` and `fills` are not coalesced; they sit on `asyncio.Queue(maxsize=0)`, truly unbounded. That two-line policy difference *is* the architecture, written down.
+
 ### The hot path is synchronous on purpose
 
-Inside the executor the sequence is: receive an order command, run risk checks, submit to the backend, publish a fill or rejection. That sequence is in-process, blocking, single-threaded with respect to the order. Risk checks do not get published to a topic, awaited, and replied to. They are a function call.
+Inside the executor the sequence is: receive an order command, run risk checks, reserve capital, submit to the backend, apply the fill to the position tracker, publish a fill or rejection. Stripped to the load-bearing lines:
+
+```python
+# inside ExecutionEngine.execute()
+risk_result = await self.risk.check(orders)            # direct call, not a topic
+if not risk_result.passed:
+    await self._reject_orders(orders, f"risk: {risk_result.reason}")
+    return []
+
+self._backend.commit_capital(total_cost)               # sync reservation
+fills = await self._backend.submit_orders(orders)      # only real awaitable
+
+for fill in fills:
+    self.positions.on_fill(fill, ...)                  # sync position update
+```
+
+There is no `risk_check_requested` topic. Risk is a function call. Capital reservation is a function call. The position tracker is updated before the fill ever hits the bus. The only `await` in the path is the network round-trip to the venue.
 
 This is the same shape that [LMAX uses at very different scale](https://martinfowler.com/articles/lmax.html). The Business Logic Processor in their architecture handles roughly six million orders per second on a single thread, with the [single-writer principle](https://lmax-exchange.github.io/disruptor/) eliminating concurrency bugs. Their input and output are event-driven. Their hot path is not. The Polymarket bot is operating at a much smaller scale and a much higher level of language abstraction, but the design rhymes: events at the edges, deterministic synchronous code in the middle.
 
@@ -128,9 +172,11 @@ None of those is novel. Each one has a name in the literature. The work was know
 
 The system did not fall over in production in any spectacular way. The thing that broke was the development process itself, and it is the most useful lesson I have to share from this build.
 
-Most of the code was written with heavy AI assistance. The default the model kept reaching for was direct function calls between modules. When I asked for a strategy that should publish an order, the first draft would import the executor and call it directly. When I asked for a risk check, the first draft would hard-wire it into the strategy. When I asked for reconciliation, the first draft would mutate the executor's state object in place.
+The first version looked clean because every file was readable in isolation. The problem only surfaced when I tried to add paper trading and a second strategy. Suddenly the strategy knew too much about the executor, the executor owned too much risk logic, and swapping one part meant touching three others.
 
-This is the AI-assistant failure mode I now watch for: the model optimises for the local readable change because it is looking at one file at a time. It does not have a reason to enforce architectural seams. It produces code that works in the small and tangles in the large. By the time you notice, you have a call graph where every component knows about every other component, the strategy can only be tested by spinning up the executor, the executor cannot be swapped from paper to live without touching the strategy, and risk checks are riding inside whatever module first asked for them.
+Most of the code was written with heavy AI assistance. The default the model kept reaching for was direct function calls between modules. Strategies imported the executor and called it directly. Risk checks lived as methods on the executor itself. Reconciliation mutated the executor's state object in place. Every diff was locally readable, and the call graph was a tarball.
+
+This is the AI-assistant failure mode I now watch for: the model optimises for the local readable change because it is looking at one file at a time. It does not have a reason to enforce architectural seams. It produces code that works in the small and tangles in the large.
 
 ## How it was fixed
 
@@ -139,6 +185,22 @@ The fix was discipline, not cleverness.
 I split the system into explicit engines: a feed engine, a cache, a strategy engine, an execution engine, a reconciliation service, a boundary service, a resolution service, and a metrics collector. Each engine has a single responsibility and a clean interface. They communicate through the bus by default, and where they communicate directly (executor calling risk checks, executor calling backend submit) the dependency is explicit and injected at construction time.
 
 Dependency injection is the lever. The trading node owns one message bus and one set of engines, and it injects them into each other at startup. Strategies do not import the executor. The executor does not import the venue's HTTP client; it gets handed a backend object. Risk checks are a separate engine with their own state, not a method on the executor.
+
+The `ReconciliationService` is the cleanest example of what this discipline buys you. The executor still applies fills optimistically the moment it submits, but the reconciliation service holds onto each one and matches it against the venue's `user_fills` topic when the truth arrives:
+
+```python
+def register_fill(self, fill: Fill, order: OrderRequest) -> None:
+    """Register an assumed fill for future reconciliation."""
+    if not fill.clob_order_id:
+        return
+    buffered = self._buffered.pop(fill.clob_order_id, None)
+    if buffered:                                    # venue beat us
+        asyncio.create_task(self.reconcile(fill, buffered, order))
+    else:                                            # we beat the venue
+        self._pending[fill.clob_order_id] = (fill, order, self._clock.now())
+```
+
+Most of the time both buffers are empty within milliseconds. The interesting bugs live in the times they aren't.
 
 What this does in practice:
 
@@ -201,13 +263,9 @@ If you are building automation that has to make decisions in production (agents,
 
 ## Caveats and claim-safety notes
 
-- The bot is a personal project, not a production system at LMAX-class scale. The architecture lesson generalises; the throughput numbers do not. I have not run benchmarks I would publish.
-- No PnL, latency, or fill-rate figures are claimed in this post. The reliability claims are qualitative, based on observation across several months of operation.
-- "Most automation systems land in the same architectural shape" is a generalisation from my own consulting work and reading. It is a strong claim and I hold it loosely. Counter-examples exist (pure analytics pipelines, fan-out notification systems) where pure event-driven is genuinely the right whole-system answer.
-- The Polymarket-specific details (CLOB structure, complete-set arbitrage) are correct as of public documentation at the time of writing, but venue mechanics change.
-- The "AI-assisted development biases toward function calls" claim is an observation from my own work, not a controlled study. I believe it; I cannot prove it the way I could prove something with benchmarks. Treat it as a hypothesis worth testing on your own builds.
-- Topic names and module names in the post are illustrative of the codebase's structure but have been generalised for readability. No proprietary logic is exposed.
-- Primary citation verification status (as of 2026-05-14): Fowler 2017, Fowler LMAX, Ruecker InfoQ 2019, Confluent / Falconer 2025 verified directly. Ruecker QCon NY 2019 pitfalls presentation page reached but transcript not fully searched; the cited content is consistent with Ruecker's broader 2019 InfoQ piece which is verified. Greg Young's original CodeBetter 2010 post URL was found to be unreachable; the cited substance is preserved through his 2014 Code on the Beach transcript, which is verified.
+- Personal project, not exchange-scale infrastructure. The architecture lesson generalises; the throughput numbers do not.
+- No PnL, latency, or fill-rate figures are claimed. The reliability claims are qualitative.
+- The "AI-assisted development biases toward function calls" claim is an observation from this build, not a controlled study. Treat it as a hypothesis worth testing on your own.
 
 ## References
 
