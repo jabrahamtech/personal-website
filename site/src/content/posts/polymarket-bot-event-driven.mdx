@@ -80,11 +80,13 @@ Here is the diagram view of the main flow.
 The actual flow, with the topic names from the codebase:
 
 ```
-book_update  →  strategy  →  orders  →  executor  →  risk  →  backend.submit  →  fills
-                                                                                  ↓
-                                                                              event_log (SQLite)
-                                                                                  ↑
-                                                                          user_fills  →  reconcile
+book_update  →  strategy  →  orders  →  executor
+                                            ↓
+                  risk  →  backend.submit  →  fills
+                                                ↓
+                                       event_log (SQLite)
+                                                ↑
+                      user_fills  →  reconcile
 ```
 
 The thing I want to draw attention to: the bus is not the whole system. The executor calls risk checks directly. The executor calls the backend submit directly. The position tracker is updated synchronously inside the executor before any fill event hits the bus. Three of the most consequential moves are deliberately synchronous.

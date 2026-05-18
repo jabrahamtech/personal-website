@@ -521,6 +521,8 @@ body.mode-paper .prose pre{
   background:var(--bg-3);border:1px solid var(--line-2);
   color:var(--ink);
   padding:16px 18px;
+  overflow-x:auto;
+  max-width:100%;
 }
 body.mode-paper .prose pre code{background:transparent;color:inherit}
 body.mode-paper .prose h2{
@@ -720,6 +722,8 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:var(--
   body.mode-paper .prose p{margin:0 0 16px}
   body.mode-paper .prose h2{font-size:20px;margin:32px 0 12px;padding-top:0}
   body.mode-paper .prose h3{font-size:17px;margin:24px 0 8px}
+  body.mode-paper .prose pre{padding:12px 14px;font-size:13px;line-height:1.55}
+  body.mode-paper .prose code{font-size:13.5px}
   body.mode-paper .prose blockquote{padding:6px 0 6px 14px;margin:18px 0}
   body.mode-paper .post-row{padding:18px 0}
   body.mode-paper .post-row h2{font-size:16.5px}
