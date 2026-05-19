@@ -41,6 +41,14 @@ The codebase that shipped is a hybrid: an async bus for facts, a synchronous hot
 
 This post walks the build. The point is not that prediction-market bots are interesting (they are, modestly). The point is that the architecture I had to settle into is the architecture most automation builders need and most articles paper over.
 
+A production trading bot should be event-driven at the edges and synchronous at the decision point, with durable memory kept separate.
+
+The shape that survived in this Polymarket bot is the three-layer hybrid: facts, decisions, memory. Facts move through the async bus: order-book updates, user fills, boundary events, the stream of things that happened or changed. Decisions run through the executor's hot path: strategy intent, risk checks, capital reservation, backend submit, position update. Memory sits off to the side as an append-only event log of decisions, fills, errors, and reconciliations.
+
+Pure event-driven architecture fails at the moment the bot has to decide, because risk and submit cannot be a loose chain of passive handlers. Pure synchronous architecture fails at the inputs, because market data, fills, reconnects, and resolution signals arrive as streams. The hybrid is what survived contact with production.
+
+The rule is simple: stream the facts, synchronize the decision, append the memory.
+
 ## Problem and requirements
 
 The bot's job is to make markets on Polymarket. That means quoting both sides of an outcome, capturing the spread, and unwinding cleanly when the underlying event resolves. The strategy I focused on is complete-set market-making, where the price of the YES and NO tokens for a given outcome should sum to one dollar because every pair is fully collateralised by USDC in a smart contract. When the market drifts away from that sum, there is a small risk-free margin to capture if you can act before someone else does. [Polymarket's CLOB trading docs](https://docs.polymarket.com/developers/market-makers/trading) describe the order book, and the [NautilusTrader Polymarket integration docs](https://nautilustrader.io/docs/latest/integrations/polymarket/) are a useful neutral reference for how the venue behaves.
@@ -90,6 +98,14 @@ book_update  →  strategy  →  orders  →  executor
 ```
 
 The thing I want to draw attention to: the bus is not the whole system. The executor calls risk checks directly. The executor calls the backend submit directly. The position tracker is updated synchronously inside the executor before any fill event hits the bus. Three of the most consequential moves are deliberately synchronous.
+
+**Polymarket bot three-layer hybrid: facts, decisions, memory**
+
+| Layer | What it owns | Implementation in the bot |
+|---|---|---|
+| Facts | Streaming inputs and things that happened: market data, user fills, boundary events, fills, rejections. | The in-memory bus carries topics including `book_update`, `orders`, `fills`, and `user_fills`. `FeedManager` publishes feed data; `BoundaryPriceService` publishes typed interval-boundary events; `ResolutionService` reacts to resolution state. |
+| Decisions | The synchronous decision hot path where strategy intent becomes risk-checked action. | The executor / `ExecutionEngine` consumes `orders`, calls risk directly, reserves capital, calls `backend.submit_orders`, updates positions synchronously, then publishes `fills` or rejections. The `execution-engine` box is deliberately not a choreographed event chain. |
+| Memory | The durable record used to explain, audit, reconcile, and replay what happened after the fact. | A separate append-only event log records decisions, fills, errors, and reconciliations. `ReconciliationService` compares optimistic executor state against the live `user_fills` feed and writes corrections into the durable history. |
 
 ## Key technical decisions
 
@@ -269,6 +285,23 @@ If you are building automation that has to make decisions in production (agents,
 - Personal project, not exchange-scale infrastructure. The architecture lesson generalises; the throughput numbers do not.
 - No PnL, latency, or fill-rate figures are claimed. The reliability claims are qualitative.
 - The "AI-assisted development biases toward function calls" claim is an observation from this build, not a controlled study. Treat it as a hypothesis worth testing on your own.
+
+## Terminology
+
+**Three-layer hybrid**
+The architecture that separates facts, decisions, and memory instead of forcing them into one event-driven pattern. Facts stream through the bus, decisions run synchronously in the hot path, and memory is stored as an append-only record.
+
+**Synchronous decision hot path**
+The executor-owned path where strategy intent becomes an order: receive command, run risk, reserve capital, submit to the backend, update position. This path is synchronous because correctness matters more than loose coupling at the moment of action.
+
+**Append-only event log as memory**
+A durable record of decisions, fills, errors, and reconciliations that exists beside the bus, not inside it. The log is for explanation, audit, and replay; the bus is for moving live facts through the process.
+
+**Supervisor + circuit breaker pattern**
+The runtime pattern that keeps long-lived engines alive without pretending crashes are harmless. Supervised tasks restart with backoff, and the circuit breaker trips when repeated failures show the system is no longer healthy.
+
+**Boundary price service**
+The service that turns time and market boundaries into typed events the rest of the bot can consume. It keeps resolution and redemption logic driven by explicit boundary signals instead of scattered timers.
 
 ## References
 
