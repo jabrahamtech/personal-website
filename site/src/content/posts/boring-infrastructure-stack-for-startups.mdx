@@ -62,7 +62,7 @@ The minimum: Sentry for errors, structured logs, and one LLM observability tool 
 
 Concrete example. I built an RFID linen tracking system for SPL where Grafana was doing the heavy lifting from day one. The dashboards caught bad reads and offline scanners before the ops team did. The system felt more reliable than it was, because we saw issues first.
 
-For AI features, three things matter: LLM call logging, cost tracking per feature or per tenant, and eval scores sampled from production traffic. You don't have to build any of that yourself in 2026. My shortlist: Helicone (fastest setup — change one base URL), Langfuse (open-source MIT, the full-featured free option), Braintrust (commercial, used by Stripe, Notion, Vercel, Perplexity). Pick one and wire it in the day you ship the AI feature, not the day the bill confuses you.
+For AI features, three things matter: LLM call logging, cost tracking per feature or per tenant, and eval scores sampled from production traffic. You don't have to build any of that yourself in 2026. My shortlist: Helicone (fastest setup, change one base URL), Langfuse (open-source MIT, the full-featured free option), Braintrust (commercial, used by Stripe, Notion, Vercel, Perplexity). Pick one and wire it in the day you ship the AI feature, not the day the bill confuses you.
 
 The eval pipeline is the one founders skip. Sample production traffic, run it through evaluators (LLM-as-judge, regex, human review), store the results, alert on regressions. Langfuse and Braintrust handle this as a core feature — you usually don't need a separate evals stack. Without it, you don't know if your last prompt change made things better or worse.
 
@@ -138,19 +138,19 @@ You rip the PaaS out and rebuild on bespoke infrastructure when revenue justifie
 
 Written out, the stack I'd actually pick before Series B:
 
-- **API**: REST.
-- **Database**: Postgres, with pgvector if you need vectors.
-- **Object storage**: R2 for AI-heavy workloads (no egress), S3 otherwise.
-- **Queue**: Postgres-backed (Oban, River). SQS if you're on AWS.
-- **Containers**: Docker.
-- **CI/CD**: GitHub Actions.
-- **Deploy**: Railway, Render, or Fly until revenue justifies something else.
-- **Auth**: Clerk. WorkOS if B2B SSO is core.
-- **Errors**: Sentry.
-- **Logs**: structured, into whatever APM you grow into.
-- **CDN**: Cloudflare in front of everything.
-- **AI gateway**: LiteLLM or Portkey. Don't call providers directly.
-- **AI observability**: Helicone, Langfuse, or Braintrust. One of them, wired in day one.
+- API: REST.
+- Database: Postgres, with pgvector if you need vectors.
+- Object storage: R2 for AI-heavy workloads (no egress), S3 otherwise.
+- Queue: Postgres-backed (Oban, River). SQS if you're on AWS.
+- Containers: Docker.
+- CI/CD: GitHub Actions.
+- Deploy: Railway, Render, or Fly until revenue justifies something else.
+- Auth: Clerk. WorkOS if B2B SSO is core.
+- Errors: Sentry.
+- Logs: structured, into whatever APM you grow into.
+- CDN: Cloudflare in front of everything.
+- AI gateway: LiteLLM or Portkey. Don't call providers directly.
+- AI observability: Helicone, Langfuse, or Braintrust. One of them, wired in day one.
 
 Boring on purpose. Hard to beat at this stage.
 
