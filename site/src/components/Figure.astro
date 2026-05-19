@@ -6,14 +6,27 @@ interface Props {
   /** Force a specific intrinsic width/height for layout stability. */
   width?: number;
   height?: number;
+  /** Extra class names to merge with `post-figure` on the root <figure>. */
+  class?: string;
+  /** Prioritise this image for LCP (hero/cover): eager + fetchpriority high. */
+  eager?: boolean;
 }
-const { src, alt, caption, width, height } = Astro.props;
+const { src, alt, caption, width, height, class: extraClass, eager = false } = Astro.props;
+const figureClass = extraClass ? `post-figure ${extraClass}` : 'post-figure';
 const hasCaptionSlot = Astro.slots.has('caption');
 const showCaption = !!caption || hasCaptionSlot;
 ---
-<figure class="post-figure">
+<figure class={figureClass}>
   <button type="button" class="post-figure-trigger" aria-haspopup="dialog" aria-label={`Open figure for closer look: ${alt}`}>
-    <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+    <img
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+      fetchpriority={eager ? 'high' : undefined}
+    />
   </button>
   {showCaption && (
     <figcaption>

@@ -1,6 +1,7 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import DocLayout from '../../layouts/DocLayout.astro';
+import Figure from '../../components/Figure.astro';
 import { stripImports } from '../../lib/postBody';
 import { computeReadTime, computeWordCount } from '../../lib/readTime';
 import { postUrl } from '../../lib/urls';
@@ -143,18 +144,16 @@ const jsonLdNodes: Record<string, unknown>[] = blogPosting
   sourcePath={sourcePath}
 >
   {data.image && (
-    <figure class="cover" slot="hero">
-      <img
-        src={data.image.src}
-        alt={data.image.alt}
-        width={data.image.width ?? 1600}
-        height={data.image.height ?? 900}
-        loading="eager"
-        decoding="async"
-        fetchpriority="high"
-      />
-      {data.image.caption && <figcaption>{data.image.caption}</figcaption>}
-    </figure>
+    <Figure
+      slot="hero"
+      class="cover"
+      src={data.image.src}
+      alt={data.image.alt}
+      width={data.image.width ?? 1600}
+      height={data.image.height ?? 900}
+      caption={data.image.caption}
+      eager
+    />
   )}
   <Content />
   {(newer || older) && (
