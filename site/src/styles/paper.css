@@ -524,6 +524,12 @@ body.mode-paper .prose pre{
   overflow-x:auto;
   max-width:100%;
 }
+/* Wrap soft on language-tagged code so long Python/JS lines don't force a
+   horizontal scrollbar. Plaintext blocks (ASCII diagrams) keep no-wrap. */
+body.mode-paper .prose pre[data-language]:not([data-language="plaintext"]),
+body.mode-paper .prose pre[data-language]:not([data-language="plaintext"]) code{
+  white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere;
+}
 body.mode-paper .prose pre code{background:transparent;color:inherit}
 body.mode-paper .prose h2{
   font-family:var(--sans);font-size:28px;font-weight:500;color:var(--ink);

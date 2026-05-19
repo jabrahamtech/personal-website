@@ -107,7 +107,7 @@ The whole policy is two screens of code:
 
 ```python
 class CoalescingBuffer:
-    """Queue-compatible buffer that keeps only the latest value per key."""
+    """Drop-in queue that keeps only the latest value per key."""
 
     def __init__(self, key_attr: str) -> None:
         self._key_attr = key_attr
@@ -128,16 +128,16 @@ Inside the executor the sequence is: receive an order command, run risk checks, 
 
 ```python
 # inside ExecutionEngine.execute()
-risk_result = await self.risk.check(orders)            # direct call, not a topic
+risk_result = await self.risk.check(orders)        # direct call
 if not risk_result.passed:
-    await self._reject_orders(orders, f"risk: {risk_result.reason}")
+    await self._reject_orders(orders, risk_result.reason)
     return []
 
-self._backend.commit_capital(total_cost)               # sync reservation
-fills = await self._backend.submit_orders(orders)      # only real awaitable
+self._backend.commit_capital(total_cost)           # sync reservation
+fills = await self._backend.submit_orders(orders)  # only awaitable
 
 for fill in fills:
-    self.positions.on_fill(fill, ...)                  # sync position update
+    self.positions.on_fill(fill, ...)              # sync update
 ```
 
 There is no `risk_check_requested` topic. Risk is a function call. Capital reservation is a function call. The position tracker is updated before the fill ever hits the bus. The only `await` in the path is the network round-trip to the venue.
@@ -196,10 +196,11 @@ def register_fill(self, fill: Fill, order: OrderRequest) -> None:
     if not fill.clob_order_id:
         return
     buffered = self._buffered.pop(fill.clob_order_id, None)
-    if buffered:                                    # venue beat us
+    if buffered:  # venue beat us
         asyncio.create_task(self.reconcile(fill, buffered, order))
-    else:                                            # we beat the venue
-        self._pending[fill.clob_order_id] = (fill, order, self._clock.now())
+    else:  # we beat the venue
+        pending = (fill, order, self._clock.now())
+        self._pending[fill.clob_order_id] = pending
 ```
 
 Most of the time both buffers are empty within milliseconds. The interesting bugs live in the times they aren't.
