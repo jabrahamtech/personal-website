@@ -57,17 +57,22 @@ Before
     Mappers/ServiceRequestMapper.cs
 
 After
-    Features/
-      CreateServiceRequest/
-        Endpoint.cs
-        Request.cs
-        Response.cs
-        Validator.cs
-        Handler.cs
-        Tests.cs
+    src/MyService/
+      Features/
+        CreateServiceRequest/
+          Endpoint.cs
+          Request.cs
+          Response.cs
+          Validator.cs
+          Handler.cs
+    tests/MyService.Tests/
+      Features/
+        CreateServiceRequest/
+          HandlerTests.cs
+          EndpointTests.cs
 ```
 
-One folder, in business language, with everything the feature needs to run sitting alongside everything the feature needs to test.
+One folder per feature in business language, with everything the feature needs to run sitting in the production project, and a mirror folder of the same name in a parallel test project. The slice convention shows up twice: once in `src/`, once in `tests/`. A change to one feature is still one folder open in each project, not seven folders across the codebase.
 
 The migration discipline was simple. Any new feature went into a vertical slice. Any feature already touched by a bug fix or a small change moved to a slice on the way out. The MVC controllers stayed alive next to the slices for as long as anything depended on them. At no point was there a flag day. After about three months, the slices outnumbered the controllers, and the team's mental model had flipped.
 
@@ -159,7 +164,7 @@ Shared infrastructure is shared, deliberately. Auth, logging, persistence primit
 
 Shared domain is small and extracted from patterns. The first version of a feature is allowed to duplicate a little. The second similar feature is allowed to duplicate a little more. By the third, you extract the shared concept and name it. You do not extract pre-emptively, because pre-emptive extraction is what pulls the codebase back toward the layered shape.
 
-Tests live with the slice. The unit test for the create-service-request handler lives in the same folder as the handler. The fact that the folder is the unit of change shows up in the test layout, which is the place that confirms it.
+Tests live alongside the slice, but in .NET that usually means a parallel test project — `MyService.Tests/Features/CreateServiceRequest/` mirroring `MyService/Features/CreateServiceRequest/` — rather than test classes physically inside the production folder. The matching shape preserves the property that everything for one feature is in one place, while a separate project keeps test-only dependencies (Testcontainers, a Respawn-managed integration test database, fixture builders, WebApplicationFactory plumbing) out of the production assembly. The same rule applies in other stacks where a separate test target is idiomatic: mirror the slice structure, do not collapse it into a flat `tests/` folder organised by test type.
 
 CLAUDE.md and AGENTS.md files describe the slice convention explicitly. The agent's effectiveness depends on knowing the convention without having to infer it from the source tree. A two-sentence note that says "this codebase organises one folder per feature; add new features as new folders; do not introduce shared service layers without justification" is the cheapest context-engineering move available.
 
