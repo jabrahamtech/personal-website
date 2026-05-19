@@ -1,4 +1,21 @@
-# Jonathan Abraham
+import { getCollection } from 'astro:content';
+import type { APIContext } from 'astro';
+
+export async function GET(context: APIContext) {
+  const all = await getCollection('posts');
+
+  // Drafts never appear in generated public indexes. Posts with no `posted`
+  // date are excluded to match the RSS feed's live-post definition.
+  const live = all
+    .filter((p) => !p.data.draft && p.data.posted)
+    .sort((a, b) => (b.data.posted!.getTime() - a.data.posted!.getTime()));
+
+  const siteOrigin = (context.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
+  const posts = live
+    .map((p) => `- [${p.data.title}](${siteOrigin}/posts/${p.id}): ${p.data.summary}`)
+    .join('\n');
+
+  const body = `# Jonathan Abraham
 
 > Notes from Jonathan Abraham on the parts of building AI that don't fit on a slide. Voice agents, intake automation, and the backend they run on. About 5 years building production systems; the last 2 on AI. Founder of Brokerloop, an Australian insurtech in Melbourne. Posts come from actually shipping this stuff — voice agents handling real callers, intake flows brokers use, and the engineering it takes to keep them running.
 
@@ -31,8 +48,7 @@ Technical language for the same work:
 
 ## Posts
 
-- [Most 'human-in-the-loop' is escalation done badly](https://jabrahamtech.com/posts/most-hitl-is-escalation-done-badly): A POV on why putting humans in the default decision path of an AI system is the worst of all worlds, and how calibrated escalation is the pattern that actually delivers oversight.
-- [When to Force the LLM, and When to Use a Button](https://jabrahamtech.com/posts/when-to-force-the-llm-and-when-to-use-a-button): A decision guide for founders and ops leaders on which parts of a product the model should own and which belong to a button. Voice AI as the worked example, back-channel UI as the named pattern.
+${posts}
 
 ## Interactive
 
@@ -47,4 +63,9 @@ Technical language for the same work:
 ## Optional
 
 - [Sitemap](https://jabrahamtech.com/sitemap-index.xml): full URL list
-- [RSS feed](https://jabrahamtech.com/rss.xml): published posts in RSS 2.0; subscribe in any feed reader
+- [RSS feed](https://jabrahamtech.com/rss.xml): published posts in RSS 2.0; subscribe in any feed reader`;
+
+  return new Response(body, {
+    headers: { 'content-type': 'text/plain; charset=utf-8' },
+  });
+}
