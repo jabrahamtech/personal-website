@@ -100,7 +100,7 @@ const blogJsonLd = {
   isPartOf: { '@id': siteId },
   author: { '@id': personId },
   publisher: { '@id': personId },
-  blogPost: sorted.map((p) => ({
+  blogPost: sorted.filter((p) => !p.data.draft && p.data.posted).map((p) => ({
     '@type': 'BlogPosting',
     '@id': `${siteOrigin}/posts/${p.id}#post`,
     url: `${siteOrigin}/posts/${p.id}`,
@@ -110,7 +110,6 @@ const blogJsonLd = {
     datePublished: p.data.posted?.toISOString(),
     keywords: [...p.data.tags, ...p.data.contentTypes, p.data.cluster].filter(Boolean).join(', '),
     author: { '@id': personId },
-    ...(p.data.draft ? { creativeWorkStatus: 'Draft' } : {}),
   })),
 };
 

@@ -131,6 +131,7 @@ const jsonLdNodes: Record<string, unknown>[] = blogPosting
   publishedAt={data.posted}
   modifiedAt={data.posted}
   jsonLd={jsonLdNodes}
+  noindex={data.draft ?? false}
   postId={postId}
   headings={headings}
   editUrl={editUrl}

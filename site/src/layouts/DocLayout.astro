@@ -22,6 +22,8 @@ interface Props {
   modifiedAt?: Date;
   /** Optional pre-built JSON-LD (BlogPosting/BreadcrumbList) for posts. */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** If true, advise crawlers not to index this page. */
+  noindex?: boolean;
   /** Optional hex post identifier (e.g. "0x03") rendered in meta + EOF. */
   postId?: string;
   /** Headings extracted from MDX render() — used to build the right-rail TOC. */
@@ -47,6 +49,7 @@ const {
   publishedAt,
   modifiedAt,
   jsonLd,
+  noindex = false,
   postId,
   headings = [],
   editUrl,
@@ -80,6 +83,7 @@ const titleSizeClass =
   modifiedAt={modifiedAt}
   tags={tags}
   jsonLd={jsonLd}
+  noindex={noindex}
 >
   <div class="reading-progress" id="reading-progress" aria-hidden="true"><span></span></div>
   <main id="content" class={`doc${showToc ? ' has-toc' : ''}`}>
