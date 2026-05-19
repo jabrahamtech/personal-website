@@ -1,6 +1,7 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import DocLayout from '../../layouts/DocLayout.astro';
+import { stripImports } from '../../lib/postBody';
 import { computeReadTime, computeWordCount } from '../../lib/readTime';
 import { postUrl } from '../../lib/urls';
 
@@ -86,6 +87,7 @@ const blogPosting: Record<string, unknown> | null = data.posted
       publisher: { '@id': personId },
       keywords: [...data.tags, ...data.contentTypes, data.cluster].filter(Boolean).join(', ') || undefined,
       wordCount: computeWordCount(post.body),
+      articleBody: stripImports(post.body),
       articleSection: data.cluster || undefined,
       datePublished: data.posted.toISOString(),
       /* dateModified mirrors datePublished here because the site has no
