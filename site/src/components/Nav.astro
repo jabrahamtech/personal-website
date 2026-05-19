@@ -150,7 +150,7 @@ const links: Link[] = [
     function setMode(mode) {
       const m = mode === 'eng' ? 'eng' : 'paper';
       // Near the top of the page, preserving raw scroll position is the
-      // wrong behavior: paper has no status strip, so toggling to eng
+      // wrong behaviour: paper has no status strip, so toggling to eng
       // adds ~28px above the fold and the anchor preserve would scroll
       // past the strip the user just summoned. Skip the anchor and pin
       // to top instead.
