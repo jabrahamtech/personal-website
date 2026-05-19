@@ -1,0 +1,173 @@
+---
+title: "The boring infrastructure stack I'd actually pick for a startup"
+summary: "Most startup infrastructure advice is written for companies you aren't. This is the boring, opinionated stack I'd actually pick — REST, Postgres, a queue, a PaaS, observability — with the small AI layer on top for what people are building right now."
+posted: 2026-05-19
+draft: true
+pipelineStatus: "Draft"
+contentTypes:
+  - "POV / Strategic Opinion Post"
+cluster: "Engineering Practice"
+tags: ['infrastructure', 'startup', 'paas', 'ai-stack', 'observability']
+image:
+  src: "/posts/boring-infrastructure-stack-for-startups/hero.jpg"
+  alt: "Handwritten title — the boring infrastructure stack I'd actually pick for a startup — on a cream notebook page, with a small upper-right vignette of a stacked server pointing at a rocket, and a stick figure holding up the title from below."
+  caption: "The boring stack, drawn boringly."
+  width: 1200
+  height: 675
+---
+
+import Figure from '../../components/Figure.astro';
+
+Most startup infrastructure advice is written for companies you are not. It's borrowed from talks by engineers running a thousand customers per second of traffic, or it's whichever framework Twitter is hyped about this month. Neither tells you what to actually build when you need to ship, test in production, and survive until Series B without pretending you're already a hyperscaler.
+
+This is the stack I'd choose. Opinionated, boring in places, with a slight tilt towards AI features because most products being built right now have an LLM call, an eval, or an embedding somewhere in the workflow. Credit to Arjay the Dev, whose [system design tier list video on YouTube](https://www.youtube.com/watch?v=UWNDvomXKEg) got me thinking about how I'd order all this for a builder rather than a learner. He also built an [interactive version](https://tier.arjaythedev.com/) you can sort yourself. Watch his original if you want the broader picture.
+
+<Figure
+  src="/posts/boring-infrastructure-stack-for-startups/figure-01.png"
+  alt="A boring-stack diagram with five connected boxes labelled api, postgres, queue, paas, observability, rendered as handwritten boxes on cream paper. A small face peeks up from the bottom margin."
+  caption="Fig. 1 — five blocks that get you to Series B."
+  width={1600}
+  height={900}
+/>
+
+## The non-negotiable foundation: REST and Postgres
+
+Start every project here. REST APIs and a Postgres database. The two most boring picks on the list and the two I'd defend the hardest.
+
+REST is the thing every developer you'll ever hire already understands. Don't reach for GraphQL unless you have a specific reason: mobile clients pulling deeply nested data, or a public API where consumers genuinely need flexible querying. Most startups are neither. JSON over HTTP with predictable endpoints will get you to Series A without breaking a sweat.
+
+Postgres is the same call. My rule: Postgres everything until something proves you need otherwise. Transactions, JSON, full-text search, geospatial, time-series with extensions, vector with pgvector, queues if you want them, audit logs, analytics tables. The number of AI startups I've seen reach for Pinecone or Weaviate when they had 10,000 vectors is depressing. pgvector handles that. It can take you into the millions if you index and query properly. If you outgrow vanilla pgvector but want to stay in Postgres, Timescale's pgvectorscale extension stretches the runway into the tens of millions. Beyond that, dedicated tools like Turbopuffer have picked up real traction in 2026, used by teams like Cursor and Notion's AI. The point holds either way: do not pre-empt the move.
+
+The upgrade path looks like this: read replicas first, usually around the point where read queries are visibly affecting write performance. Then connection pooling with PgBouncer. Then partitioning for time-series or tenant data. Sharding is a thing you do at Series C, not Series A.
+
+## Shipping speed: containers and CI/CD
+
+These two belong together. The fastest startups I've worked with have a Dockerfile, a CI pipeline that runs tests on every push, and a deploy that runs on merge to main. That's it. No tickets, no approvals, no Friday deploy freeze.
+
+Practically: Docker for everything. Local dev, CI, prod. The "but my container is so much slower than running it natively" argument is mostly noise at startup scale. The consistency is worth the 200ms.
+
+For CI/CD, GitHub Actions is fine. You don't need Jenkins. You don't need a platform team. A Dockerfile, a workflow file, a deploy target (Fly, Railway, Render, Vercel, ECS, whatever fits) and you're done. The first version can be ugly. Iterate when it breaks.
+
+Concrete example. I built a [Polymarket market-making bot](/posts/polymarket-bot-event-driven) recently and the only reason I could validate the strategy fast was the CI/CD setup. Push, deploy, watch the next round of trades, tweak the logic, push again. Tight feedback loop. Without that, the bot would have died half-finished on my laptop like every side project that doesn't have a deploy pipeline.
+
+For an AI startup specifically, your CI pipeline should be running your evals. If you're not running evals against your prompts and model calls on every PR, you're going to ship a regression and find out from a customer. Evals are the new tests.
+
+Later, this becomes staging environments, canary deploys, and feature flags. Feature flags are worth pulling in earlier for an AI startup than for most other companies. The pace of model and prompt iteration means you want to ship dark, test on a slice, and roll back fast. LaunchDarkly is overkill early. PostHog or a simple flag table in Postgres works.
+
+## Don't roll your own auth
+
+Rule here is simple: use a provider. Auth0, Clerk, Supabase Auth, WorkOS. Pick one and move on.
+
+The amount of founder time I've seen burned on custom JWT implementations and password reset flows is absurd. Every one of those flows has a security failure mode. The providers have spent millions on these. You haven't. Pay the bill.
+
+The trap people fall into is "but we have weird auth requirements." Usually you don't. Usually you have a fairly standard email/password or SSO requirement with maybe a custom claim or two. All the providers handle that.
+
+When custom auth actually makes sense: unusual requirements like multi-tenant federation, weird compliance constraints, or you're building auth itself. Otherwise, no.
+
+## Monitoring before you need it
+
+Instrument before launch, not after. That's the whole rule.
+
+The pattern I've seen too many times is a startup ships, gets traction, then spends two weeks adding observability while production is on fire. Don't do that. Sentry for errors, a basic APM (Datadog, New Relic, or OpenTelemetry into Grafana Cloud), and structured logs. That's the minimum.
+
+Concrete example. I built an RFID linen tracking system for SPL where Grafana was doing the heavy lifting from day one. The dashboards caught bad reads and offline scanners before the ops team did. That meant we were fixing problems instead of being told about them by a frustrated client. The system felt more reliable than it actually was at that stage, simply because we saw issues first.
+
+For AI features, add three things specifically. LLM call logging with input, output, latency, and token counts. Cost tracking per feature or per tenant. And eval scores in production, sampled.
+
+You don't have to build any of that yourself in 2026. The LLM observability tools I'd shortlist are Helicone (fastest setup — change one base URL and you get logging plus cost tracking), Langfuse (open source MIT, the most full-featured free option), and Braintrust (commercial, used in production by Stripe, Notion, Vercel, Perplexity). Pick one and wire it in the day you ship the AI feature, not the day the bill confuses you.
+
+The cost tracking is the one founders forget until the bill arrives. Anthropic, OpenAI, and the rest will happily charge you $50k in a month if a customer finds a way to loop your agent. You want a dashboard that tells you which feature is burning which dollars, and an alert if any one customer exceeds a threshold.
+
+You'll outgrow whatever you start with. That's fine. The cost of switching observability vendors is much smaller than the cost of flying blind for six months.
+
+## Object storage: cheaper and more reliable than you think
+
+Underrated, particularly for AI startups.
+
+S3, R2, or GCS. Pick one. Anything that's a file goes there: user uploads, generated artefacts, model outputs, embeddings dumps, eval datasets, training data, fine-tune snapshots.
+
+The mistake I see is people storing files on the server's local disk because it's faster to wire up. Scale horizontally, the file lives on one server, the next request hits a different one, and you've got a "we lost a customer's upload" bug. Use object storage from day one.
+
+R2 deserves a specific mention for AI startups because it has no egress fees. If you're serving model outputs or large generated files, S3 egress costs will eat your margins.
+
+Once volume justifies it: lifecycle policies (move cold data to cheaper tiers), CDN in front of public assets, signed URLs for private ones. Most of this is configuration, not code.
+
+## Queues: not optional for AI
+
+Queues are not optional for an AI startup. Two reasons.
+
+First, LLM calls are slow. A complex agent run can take 30+ seconds. You cannot block an HTTP request for 30 seconds. You need a job queue, a worker process, and a way to poll or push the result back to the client. This is the basic shape of every serious AI feature in production.
+
+Second, every LLM provider has rate limits. When you hit them, you need to back off and retry, not throw a 500 at your user. A queue with retry logic is part of the answer. The other part is an AI gateway in front of the providers — Portkey, LiteLLM, Cloudflare AI Gateway, or OpenRouter — that handles multi-provider routing, retries, response caching, and cost attribution before your queue ever sees a problem. If you're calling OpenAI or Anthropic directly from your API handler with no gateway and no queue in between, you have a bug waiting to happen.
+
+What to use: Redis with BullMQ or Sidekiq if you're already on Redis. Postgres-backed queues like Oban or River if you want one less moving part. SQS if you're on AWS and want managed. All fine. Pick based on the language you write in.
+
+Later you add dead letter queues, separate worker pools for different job types, autoscaling workers based on queue depth. The pattern stays the same, the tooling gets more sophisticated.
+
+## Load balancers and CDNs: the moment you have more than one server
+
+Both relevant the day you go from one server to two.
+
+Load balancers are usually free from your hosting provider (ALB on AWS, the equivalent on other clouds, or built into Fly/Render/Railway). Configure health checks. Make your app handle SIGTERM properly so deploys don't drop requests. Move on.
+
+CDNs are where founders under-invest. Cloudflare in front of most things is cheap enough that founders usually have no good excuse to ignore it, and it makes your app feel faster everywhere in the world. For an AI startup serving generated images, audio, or video, it's the difference between a 4-second load and an instant one.
+
+The less obvious CDN play for AI: cache common LLM responses. If 80% of your users are asking the same five questions of your support agent, cache the answers in front of the model. Cloudflare Workers KV or a similar edge cache saves a lot of model calls.
+
+## Data pipelines: the AI startup multiplier
+
+If your product touches AI, you have data pipelines whether you've named them that or not. You're moving user data into prompts, model outputs into databases, feedback into eval sets, and logs into a warehouse for analysis. That's a pipeline.
+
+The thing to set up early is the eval pipeline specifically. You want a process that pulls a sample of production traffic, runs it through whatever evaluators you have (LLM-as-judge, regex, human review queue), stores results somewhere you can chart over time, and alerts on regressions. The LLM observability tools mentioned above (Langfuse, Braintrust) handle this as a core feature, so you usually don't need a separate evals stack. Without an eval pipeline of some kind, you don't know if your last prompt change made things better or worse. You're flying blind.
+
+## The boring safety layer people skip
+
+There's another category that doesn't sound like system design until it fails. Backups, migrations, secrets, hard usage limits, idempotency, tenant boundaries.
+
+Backups are not real until you've restored from one. Schedule a quarterly drill where someone pulls last night's backup into a scratch environment and brings the app up against it. You'll find something broken in the process, which is the point.
+
+Migrations belong in your deployment story, not in a Slack DM at 11pm. Wire your migration tool (Prisma, Flyway, Alembic, Rails migrations, sqitch, whichever you're using) into CI/CD so schema changes ship with the code that needs them. Manual production migrations are how teams lose data.
+
+Secrets should live in a real secrets manager. AWS Secrets Manager, Doppler, Infisical, or your PaaS's built-in store. Not in a `.env` file passed around Slack. This matters double for AI startups, where you're typically wiring together six third-party APIs with their own keys and their own blast radius if leaked.
+
+Hard usage limits, not just dashboards. A cost dashboard tells you the bill is bad. A per-user, per-tenant, or per-job ceiling stops the bill getting bad in the first place. For LLM features specifically, set a daily token cap per tenant and a circuit breaker per job. Then test the limits actually fire.
+
+Idempotency belongs in your queue design from day one. Anything that can retry can run twice. If a job sends an email, charges a customer, generates a document, writes to a CRM, or calls a model, assume it will eventually be retried at the worst possible time. Idempotency keys, dedupe tables, or natural-key checks. Pick one and apply it consistently.
+
+Tenant boundaries need to be deliberate from the first table if you're building B2B SaaS. A `tenant_id` column on every relevant table and a query-layer guard that refuses to run without one is the floor. It doesn't need to be sophisticated. It needs to be impossible to forget.
+
+None of this is glamorous. It's the difference between "we shipped fast" and "we shipped fast and didn't wake up to a production incident we could have prevented."
+
+## What to defer
+
+A few honest opinions on what's safe to skip early.
+
+Microservices. Don't. One service, one repo, one deploy until you have a real team-size reason to split. Team scaling is the only good reason, and you don't have that yet.
+
+Kubernetes. Don't, unless you've already outgrown the simpler platforms. Fly, Railway, ECS Fargate, and Cloud Run get you a long way without the operational tax.
+
+Elaborate caching. Add a cache when you have a measured performance problem, not before. Cache invalidation is genuinely hard and the complexity is real.
+
+Websockets. Use them only when you need bidirectional real-time. Server-sent events handle most "stream tokens from the model to the user" cases just fine and are much simpler.
+
+A custom vector database, until your embeddings volume actually justifies it. pgvector or even SQLite with sqlite-vss will hold you for a long time.
+
+## One last thing: just use a PaaS
+
+Here's the bit that doesn't get said loudly enough. For most startup validation work, a Platform-as-a-Service deploy will carry you all the way to your first thousand paying users. Fly, Railway, Render, Vercel. Pick one. Point it at your repo. Ship.
+
+The reason this matters: validation is the only thing that matters before product-market fit. Not your stack. Not your infrastructure choices. Whether anyone actually wants this thing you're building.
+
+I leaned on this hard in the early days of Brokerloop. The whole point was to put something real in front of my cofounder and a handful of brokers, fast, to test whether the GTM thesis held. If I'd spent two weeks setting up Kubernetes and a service mesh, the conversations that actually mattered would have died before they started. PaaS deploy, working product, real signal back inside a week. The cofounder buy-in came from seeing the thing work, not from a deck.
+
+You rip the PaaS out and rebuild on bespoke infrastructure when revenue justifies the move. By that point you'll have learned what you actually need, instead of guessing in week one. Almost everything startups over-engineer at the start gets thrown out by month six anyway.
+
+## The boring conclusion
+
+The honest read is that the boring things are still the right things. REST, Postgres, containers, CI/CD, monitoring, object storage, queues, load balancers, CDNs, a PaaS to deploy onto. That's the stack. AI features sit on top of that stack, not in place of it.
+
+Written out, my default stack before Series B: REST API, Postgres (with pgvector if needed), object storage, a queue, Docker, GitHub Actions, a PaaS, Sentry, structured logs, a basic APM, Cloudflare in front. For AI features specifically: an AI gateway like Portkey or LiteLLM in front of the model providers, plus an LLM observability tool like Helicone, Langfuse, or Braintrust handling logging, cost tracking, and evals. Boring on purpose. Hard to beat at this stage.
+
+Startup velocity comes from not being clever in places where clever isn't required. Save your cleverness for the product. Use the boring infrastructure that the rest of the industry has already debugged for you.
+
+Watch [Arjay's original tier list video on YouTube](https://www.youtube.com/watch?v=UWNDvomXKEg) if you want to compare orderings. The [interactive tier list](https://tier.arjaythedev.com/) lets you sort it yourself.
