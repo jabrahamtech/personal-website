@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
+import { postUrl } from '../lib/urls';
 
 export async function GET(context: APIContext) {
   const all = await getCollection('posts');
@@ -12,7 +13,7 @@ export async function GET(context: APIContext) {
 
   const siteOrigin = (context.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
   const posts = live
-    .map((p) => `- [${p.data.title}](${siteOrigin}/posts/${p.id}): ${p.data.summary}`)
+    .map((p) => `- [${p.data.title}](${postUrl(siteOrigin, p.id)}): ${p.data.summary}`)
     .join('\n');
 
   const body = `# Jonathan Abraham

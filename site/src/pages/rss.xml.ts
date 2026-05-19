@@ -1,6 +1,7 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
+import { postUrl } from '../lib/urls';
 
 /* Derive MIME type from the file extension. Same logic Base.astro:54
    uses for og:image:type — kept inline here so the RSS feed module
@@ -82,7 +83,7 @@ export async function GET(context: APIContext) {
       return {
         title: p.data.title,
         description: p.data.summary,
-        link: `${site}/posts/${p.id}`,
+        link: postUrl(site, p.id),
         pubDate: p.data.posted!,
         categories: [...p.data.tags, ...p.data.contentTypes, p.data.cluster].filter((value): value is string => Boolean(value)),
         author: 'jabrahamtech@gmail.com (Jonathan Abraham)',

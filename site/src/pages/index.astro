@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { postUrl } from '../lib/urls';
 
 type Post = CollectionEntry<'posts'>;
 
@@ -102,8 +103,8 @@ const blogJsonLd = {
   publisher: { '@id': personId },
   blogPost: sorted.filter((p) => !p.data.draft && p.data.posted).map((p) => ({
     '@type': 'BlogPosting',
-    '@id': `${siteOrigin}/posts/${p.id}#post`,
-    url: `${siteOrigin}/posts/${p.id}`,
+    '@id': `${postUrl(siteOrigin, p.id)}#post`,
+    url: postUrl(siteOrigin, p.id),
     headline: p.data.title,
     description: p.data.summary,
     image: imageFor(p),

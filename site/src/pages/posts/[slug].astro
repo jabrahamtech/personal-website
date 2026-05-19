@@ -2,6 +2,7 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import DocLayout from '../../layouts/DocLayout.astro';
 import { computeReadTime } from '../../lib/readTime';
+import { postUrl } from '../../lib/urls';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('posts')).sort((a, b) => {
@@ -60,7 +61,7 @@ if (data.cluster) metaRow.push({ label: 'cluster', value: data.cluster });
 metaRow.push({ label: 'read', value: data.readTime ?? computeReadTime(post.body) });
 
 const siteOrigin = (Astro.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
-const url = `${siteOrigin}/posts/${post.id}`;
+const url = postUrl(siteOrigin, post.id);
 const personId = `${siteOrigin}/#jonathan`;
 const siteId = `${siteOrigin}/#site`;
 
