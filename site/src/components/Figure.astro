@@ -229,13 +229,17 @@ const showCaption = !!caption || hasCaptionSlot;
     flex: 1;
     min-height: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
     padding: clamp(12px, 4vmin, 56px);
     /* Symmetric padding keeps the image centered. The toolbar is absolute-
        positioned at top-right with its own opaque pill backgrounds, so it
        overlays the image's corner cleanly without needing extra top padding. */
+    /* Centering is done via `margin: auto` on the image, NOT
+       align-items/justify-content. Panzoom reads getComputedStyle().margin
+       to compute the wheel/pinch focal point — with flex alignment the
+       computed margin is 0 and panzoom thinks the image starts at the
+       parent's content-box origin, so zoom focuses on the wrong spot. With
+       auto margins, the resolved pixel values capture the real offset. */
     touch-action: none;
   }
 
@@ -249,6 +253,7 @@ const showCaption = !!caption || hasCaptionSlot;
     width: auto;
     height: auto;
     display: block;
+    margin: auto;
     user-select: none;
     -webkit-user-drag: none;
     transition: transform 220ms ease;
