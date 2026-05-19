@@ -1,0 +1,232 @@
+---
+title: "From MVC to vertical slice, and why it stuck for both humans and agents"
+summary: "Why I stopped writing layered MVC and switched to vertical slice, and how the same property that helped my team now helps coding agents read the code."
+posted: 2026-05-19
+draft: true
+pipelineStatus: "Draft"
+contentTypes:
+  - "Learning Journey Guide"
+cluster: "Engineering Practice"
+tags: ['architecture', 'vertical-slice', 'coding-agents', 'dotnet', 'context-engineering']
+image:
+  src: "/posts/from-mvc-to-vertical-slice/hero.png"
+  alt: "Hero card with the title written by hand, a deep-rust underline beneath 'vertical slice', and a small vignette comparing a layered folder tree to a feature-folder tree."
+  width: 2000
+  height: 1125
+---
+
+import Figure from '../../components/Figure.astro';
+
+I spent a long time writing layered MVC. Controllers in one folder, services in another, repositories under that, view models off to the side, validators in a fourth place. It was tidy on a slide. It was painful in practice. Adding one feature meant editing five files in three folders, and the only thing holding the feature together was the developer's memory.
+
+At SPL, our team moved a customer-facing .NET service from that shape to [FastEndpoints](https://fast-endpoints.com/) and vertical slices. Each endpoint became one folder. Request, validator, handler, response, all sitting next to each other. Onboarding got faster. Code reviews got smaller. The number of accidental cross-feature changes dropped sharply. I had read [Jimmy Bogard's 2018 essay](https://www.jimmybogard.com/vertical-slice-architecture/) earlier and thought it was a niche taste. After a couple of months on the migrated service I stopped thinking of it as a taste and started defaulting to it on every new project.
+
+Two years on, the same property has paid out a second time. The codebases I now write with [Claude Code](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start) and [Codex](https://openai.com/codex/) read better when they're sliced by feature than when they're sliced by layer. In my experience, the agents need less context to make a useful change, and they make fewer confident mistakes. The reason is the same reason humans got faster: the unit of work and the unit of code shape are the same.
+
+Below is the migration, the principle that turned out to be doing the work all along, and why that principle now pays a second dividend on every codebase a model has to read.
+
+## The starting point: layered MVC, the default that nobody chose on purpose
+
+The service I inherited at SPL was a routine .NET MVC project. The folders matched the framework defaults. `Controllers/`. `Services/`. `Repositories/`. `Models/`. `DTOs/`. A `Validators/` folder once we added FluentValidation. A `Mappers/` folder once we added AutoMapper. A `Helpers/` folder, because every long-lived MVC codebase has a `Helpers/` folder.
+
+A new endpoint touched all of them. The controller signature, the request DTO, the service method, the repository method, the entity, the validator, the mapper. Seven files across seven folders for an action that, in business terms, was one thing: create a service request for a customer. The seven files were not bound together by anything stronger than "the developer who wrote this remembered they all needed to change."
+
+The cost was not visible in the small. A senior engineer who already knew the codebase moved through those seven files fast. The cost showed up in onboarding. New contractors took a week to ship a small endpoint, not because the endpoint was hard, but because the search-and-stitch step across all the folders was hard.
+
+It also showed up in code review. A pull request for one feature looked like changes to seven unrelated parts of the system. Reviewers had to mentally re-assemble the slice from the layered diff every time.
+
+None of this was a new problem. David Parnas's 1972 paper [On the Criteria to Be Used in Decomposing Systems into Modules](https://dl.acm.org/doi/10.1145/361598.361623) argued that systems should be decomposed by what each module hides, meaning the design decisions most likely to change, not by sequential steps in the processing chain. Larry Constantine called the well-decomposed shape functional cohesion. Robert C. Martin later called it [Screaming Architecture](https://www.oreilly.com/library/view/clean-architecture-a/9780134494272/ch21.xhtml). The names differ. The rule is the same: organise code around the thing that changes.
+
+Layered MVC does the opposite. Controllers, services, and repositories are grouped because they share a kind of work, not because they share a purpose. It feels organised. It is the lower-ranked decomposition. It was easy to ignore that while the framework defaults kept pointing the other way.
+
+## The migration: FastEndpoints, one folder per feature
+
+The move was not a rewrite. It was incremental.
+
+The new pattern was a folder per feature, modelled on Bogard's essay and the [REPR pattern (Request, Endpoint, Response)](https://github.com/FastEndpoints/FastEndpoints) that FastEndpoints encourages. Each endpoint became its own class in its own folder, with the request type, the validator, the response type, and the handler logic all sitting alongside it. The folder names matched the use case: `CreateServiceRequest`, `AssignTechnician`, `CompleteJob`, `GetServiceHistory`. The structure read like the business, not like the framework.
+
+The change is easiest to see in the source tree.
+
+```text
+Before
+    Controllers/CreateServiceRequestController.cs
+    Services/CustomerService.cs
+    Repositories/ServiceRequestRepository.cs
+    DTOs/CreateServiceRequestDto.cs
+    Validators/CreateServiceRequestValidator.cs
+    Mappers/ServiceRequestMapper.cs
+
+After
+    Features/
+      CreateServiceRequest/
+        Endpoint.cs
+        Request.cs
+        Response.cs
+        Validator.cs
+        Handler.cs
+        Tests.cs
+```
+
+One folder, in business language, with everything the feature needs to run sitting alongside everything the feature needs to test.
+
+The migration discipline was simple. Any new feature went into a vertical slice. Any feature already touched by a bug fix or a small change moved to a slice on the way out. The MVC controllers stayed alive next to the slices for as long as anything depended on them. At no point was there a flag day. After about three months, the slices outnumbered the controllers, and the team's mental model had flipped.
+
+Tim Deschryver's [argument that the minimal-API endpoint is the application layer](https://timdeschryver.dev/blog/treat-your-net-minimal-api-endpoint-as-the-application-layer) was the conceptual move I had to make. The endpoint is not a thin shell that calls down into the "real" code in a service. The endpoint owns the feature's flow. Validation, orchestration, the calls into the domain, the response shaping. All of it. The shared domain still exists, but it is small, deliberate, and reached into from a slice rather than wrapped around the slice.
+
+A handful of things changed quickly.
+
+Code reviews stopped being archaeology. A pull request was one folder. Reviewers loaded the whole feature into their head in one read.
+
+Onboarding got dramatically faster. New engineers shipped a small endpoint in days, not weeks. They did not need a tour of the architecture. They needed to be shown one slice and told "the next feature lives in a new folder next to this one".
+
+Tests got easier. Each slice was tested as a unit because the inputs and outputs were obvious from the folder. There was no service mock to fabricate, no repository fake to wire into a DI container for an endpoint test. Each handler did its work explicitly.
+
+Cross-feature accidents dropped. Layered architectures push you toward shared services that quietly accumulate responsibilities. A `CustomerService` that started as a thin wrapper around a repository becomes the place where five features stash their logic, because the next feature is always one method away. Vertical slices make that move visible. If two slices need the same thing, you extract it deliberately, into a clearly named utility or a small domain object. The default is no sharing. The exception is named.
+
+The trade-off was real and worth naming honestly. Some duplication appeared, mainly in the request and response DTOs, and in small pieces of orchestration that two slices both needed. The discipline Milan Jovanović writes about in [Vertical Slice Architecture: Structuring Vertical Slices](https://www.milanjovanovic.tech/blog/vertical-slice-architecture-structuring-vertical-slices) is what prevents the duplication from turning into incoherent state: shared concepts get extracted as patterns become visible, not pre-emptively. We pulled out a handful of small shared types over the first six months. None of them were layers.
+
+## The principle underneath it: code shape should match the unit of change
+
+What I had quietly absorbed by the end of the migration was not "FastEndpoints is good". It was a much older principle, restated for the framework I happened to be working in.
+
+Code shape should match the unit of change.
+
+The unit of change in a typical application is not "all controllers" or "all services". It is a feature. Customers ask for a new feature, or a change to a feature. The codebase should be organised so that the surface area of that change is small, local, and obvious from the folder structure.
+
+This is Parnas's information hiding restated for application code. It is Constantine's functional cohesion restated for HTTP endpoints. It is Martin's screaming architecture restated for a folder layout. Most layered MVC apps scream their framework. A well-cut vertical slice screams the product.
+
+The reason vertical slice is not "just renamed feature folders" is that the principle includes how shared code is treated. Vertical slice does not say "no abstractions". It says no shared abstractions by default. When a pattern recurs across slices in a way that earns extraction, you extract it, name it, and put it somewhere reusable. The asymmetry is what protects the codebase from drifting back into a layered shape under the weight of shared utilities.
+
+Milan Jovanović makes this point well in [Vertical Slice Architecture Is Easier Than You Think](https://www.milanjovanovic.tech/blog/vertical-slice-architecture-is-easier-than-you-think) and the rest of his series.
+
+## This is not a .NET-only problem
+
+The same mistake shows up across stacks. Different folder names, same smell.
+
+A React app can be layered badly too. `components/`, `hooks/`, `api/`, `types/`, `stores/`, and `utils/` looks tidy until one product change touches all six. The shape I prefer for product code is feature-first: `features/create-service-request/` with the form, schema, mutation, API client, state, and tests sitting together. Shared UI primitives still belong in a shared place. Feature-specific UI should stay with the feature. SolidJS rewards the same arrangement when you lean on route-level composition, with a route, its server function, validation, data loading, and tests sitting beside the use case instead of being scattered by technical category.
+
+Python has the same failure mode. A FastAPI app with top-level `routers/`, `schemas/`, `services/`, and `repositories/` can become layered MVC under different names. For small services that is fine. For product code with many distinct use cases, I prefer `features/create_service_request/` with the router, request schema, handler, response schema, and tests together. The shared database session, auth, logging, and domain primitives stay shared. The feature flow does not hide across five folders.
+
+Java got here a long time ago. The [package by feature, not by layer](http://www.javapractices.com/topic/TopicAction.do?Id=205) argument has been circulating in Spring and Java communities for years, and DZone's [Package by Layer is Obsolete](https://dzone.com/articles/package-by-layer-for-spring-projects-is-obsolete) puts the same point bluntly.
+
+The rule survives the stack change. Organise around the thing that changes.
+
+## Why this compounded when AI coding agents arrived
+
+This is the part I did not see coming.
+
+When I started using Claude Code and Codex on side projects, the codebases that read the cleanest for me as a human read the cleanest for the agents too. The agents appeared to make smaller, more reliable changes on vertical slices than they did on layered ones.
+
+It is not a benchmark. It is the kind of feel-the-difference observation that anyone who has paired with an agent on two different codebases of the same age will recognise. It also maps onto a structural property of how these tools work.
+
+Coding agents do not load a whole codebase into a single context window. They retrieve. Cursor builds a [semantic index of the codebase using embeddings cached in a Merkle tree](https://cursor.com/blog/secure-codebase-indexing) so that only modified files get reprocessed, then pulls the relevant chunks into context per task. Sourcegraph's [Cody pipeline](https://sourcegraph.com/blog/how-cody-understands-your-codebase) combines a BM25-style code search across all selected repositories with local IDE context and a ranking step that picks the most relevant snippets for the prompt. Anthropic's [account of how Claude Code works in large codebases](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start) says the agent navigates a codebase the way a software engineer would: traversing the file system, reading files, running grep, and following references. None of these are exhaustive readers. They are guided ones.
+
+In every one of these systems, the agent's view of the world for a given change is a small subset of the codebase. The retrieval system has to guess which files are relevant. The agent then has to reason over what it gets.
+
+<Figure
+  src="/posts/from-mvc-to-vertical-slice/figure-01.png"
+  alt="Two-column diagram. On the left, a 'layered' codebase: the agent's retrieval node fans out to controllers, services, repositories, validators, and mappers, with the DTOs file dashed and marked 'missed'. On the right, a 'sliced' codebase: the agent retrieves a single CreateServiceRequest folder containing endpoint, request, response, validator, handler, mapper, and tests."
+  caption="Fig. 1 — the retrieval surface of one feature change across two codebase shapes."
+  width={2000}
+  height={1125}
+/>
+
+Now layer this on the retrieval evidence we have from research. Liu et al.'s 2023 paper [Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172) showed that models perform best when relevant information sits at the start or the end of context, and significantly worse when the relevant information sits in the middle, even for explicitly long-context models. Hsieh et al.'s 2024 [RULER benchmark](https://arxiv.org/abs/2404.06654), published at COLM 2024, showed that models can ace simple needle-in-a-haystack retrieval and still fall apart on harder retrieval, multi-hop tracing, and aggregation tasks at the same length. Of the seventeen long-context models the authors tested, only about half could maintain satisfactory performance at 32K tokens, despite every one of them advertising context windows that size or larger. Anthropic's own [context engineering writeup](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) frames the discipline as a step beyond prompt engineering, asking which configuration of context most reliably produces the behaviour you want rather than how many tokens you can fit.
+
+Two facts compose.
+
+First, agents always see a subset.
+
+Second, the chance of mistakes rises as the relevant context gets larger and more scattered.
+
+A vertical slice is a small, local subset by construction. A layered MVC change requires a subset that spans seven folders. The same agent, asked to change "the create service request endpoint", retrieves one folder on a sliced codebase and seven on a layered one. On the layered codebase, even if every relevant file is technically in context, the model has to track the cross-references between them, the cohesion is lower, and the surface area for a confident-but-wrong refactor is larger.
+
+The failure modes I have watched are predictable in retrospect. The agent rewrites a controller and forgets the validator that lives in a separate folder. It modifies a service method and misses that a different controller depends on the old shape. It introduces a new DTO that almost matches an existing one because it did not retrieve the existing one. None of these are agent bugs. They are codebase-shape bugs that the agent surfaces faster than a human would.
+
+Code structure has quietly become a context-engineering decision as much as a developer-ergonomics one. The shape of the source tree is what the retrieval system has to work with. A codebase organised by feature gives that retrieval system a unit that maps onto the unit of work. A codebase organised by layer asks it to reconstruct the unit of work from fragments, every time.
+
+## What I do now
+
+For new services I default to vertical slice. In .NET that means FastEndpoints or Minimal APIs with the endpoint as the application layer. In Node and TypeScript projects it means a folder per feature with the request validation, handler, and response co-located. In Python it means the same shape: a directory per use case, with the FastAPI router or the worker entry point sitting next to the schemas and the handler.
+
+There are a few practical rules I lean on.
+
+One folder per feature, named after the business operation, not after the HTTP shape. `CreateServiceRequest` rather than `ServiceRequestPostController`.
+
+All the artefacts for the feature live in the folder. Request, validator, response, handler, any feature-specific types. The folder is the unit you load into your head and the unit the agent retrieves.
+
+Shared infrastructure is shared, deliberately. Auth, logging, persistence primitives, the database context, the common error-handling middleware. These live in shared modules with clear names. They are not slices.
+
+Shared domain is small and extracted from patterns. The first version of a feature is allowed to duplicate a little. The second similar feature is allowed to duplicate a little more. By the third, you extract the shared concept and name it. You do not extract pre-emptively, because pre-emptive extraction is what pulls the codebase back toward the layered shape.
+
+Tests live with the slice. The unit test for the create-service-request handler lives in the same folder as the handler. The fact that the folder is the unit of change shows up in the test layout, which is the place that confirms it.
+
+CLAUDE.md and AGENTS.md files describe the slice convention explicitly. The agent's effectiveness depends on knowing the convention without having to infer it from the source tree. A two-sentence note that says "this codebase organises one folder per feature; add new features as new folders; do not introduce shared service layers without justification" is the cheapest context-engineering move available.
+
+A pull request reviewer can load one folder and have the whole feature in context. The agent can retrieve one folder and have the whole feature in context. The same property serves both readers.
+
+## Where this bends
+
+Vertical slice is not a free architecture. It has failure modes worth naming honestly.
+
+It can degenerate into copy-pasted near-duplicates if the discipline lapses on extraction. A codebase with sixty handlers that all repeat the same validation idiom is not a vertical-sliced codebase; it is a manual macro. The discipline is to extract patterns after they have appeared three times, and to put the extraction somewhere clearly named.
+
+It fits some shapes of system better than others. A web service with many independent use cases is the canonical fit. A library, an SDK, a long-running pipeline with a small surface area, or a CRUD admin tool with mostly homogeneous endpoints are cases where layered or hexagonal architectures often read more cleanly, because the "feature" axis is degenerate. Rico Fritzsche makes a related point in [Why Vertical Slices Won't Evolve from Clean Architecture](https://ricofritzsche.me/why-vertical-slices-wont-evolve-from-clean-architecture/): the two architectures answer different questions, and they do not converge as the codebase ages.
+
+The agent-readability claim is structurally well-supported by the retrieval-degradation literature, but I have not run a controlled A/B benchmark of identical features rendered both ways. The claim is "the structural property compounds when context is finite, here is the literature that says so, here is what I observe in practice". Treat it as a strong inference, not as a measured number.
+
+And the framework matters less than the discipline. FastEndpoints is the cleanest .NET expression I have used, but vertical slice predates it and works in plain Minimal APIs, in classic ASP.NET controllers if you structure the folders right, in Spring with `@RestController` packages, in FastAPI routers, in Express handler files. The principle is the shape of the source tree and the rule about where shared abstractions live. The library is a productivity multiplier on top.
+
+## The shorter version
+
+One thing to take away if nothing else.
+
+The unit of change in your codebase should match the unit of organisation. For most applications most of the time, that unit is a feature. Slicing by feature is what helped my team at SPL onboard faster, review more honestly, and break fewer unrelated things on the way through. It is also what helps coding agents make smaller, more reliable changes, because the context they need to load is the size of a feature, not the size of an architecture.
+
+Bogard named this in 2018. Parnas and the cohesion researchers named it in the 1970s. The agent tooling vendors are now naming it again, indirectly, by building retrieval pipelines around the assumption that source-tree shape matters. The principle did not change. We just kept rediscovering reasons to take it seriously.
+
+## What I'm not claiming
+
+- The SPL migration is described from memory, not from a measured time-and-motion study. Onboarding speed and review size are honest observations from a working team, not benchmarked figures. No internal SPL revenue, customer, or specific delivery numbers appear in this post.
+- The "FastEndpoints is 2–3× faster than MVC" framing that appears in some community write-ups originates with vendor benchmarks. This post deliberately avoids treating that as ground truth and does not lean on a performance claim.
+- The "AI coding agents read vertical slices more accurately than layered codebases" claim is supported by indirect evidence (the long-context retrieval literature, the agent tooling vendors' own descriptions of how they fetch context) and by my own observation across multiple projects. I have not run a controlled A/B experiment on identical features rendered both ways, and I would not trust a specific percentage figure on this. Treat the claim as a strong inference, not a measured number.
+- Constantine's 1970s cohesion vocabulary is cited as historical context from secondary academic literature, not the original Stevens, Myers & Constantine 1974 IBM Systems Journal paper, which I have not read directly. The substance of the cohesion ranking is well-attested across the secondary literature.
+- The cohesion advice in this post applies most cleanly to application services with many distinct use cases. Libraries, SDKs, infrastructure code, and small CRUD admin tools often read more cleanly in a layered or hexagonal shape. Pick the architecture the work asks for.
+
+## References
+
+Cohesion and modularity:
+
+- [Parnas, D.L. (1972). On the Criteria to Be Used in Decomposing Systems into Modules. Communications of the ACM, 15(12), 1053–1058.](https://dl.acm.org/doi/10.1145/361598.361623)
+- [Robert C. Martin — Screaming Architecture, Clean Architecture (2017).](https://www.oreilly.com/library/view/clean-architecture-a/9780134494272/ch21.xhtml)
+
+Vertical slice:
+
+- [Jimmy Bogard — Vertical Slice Architecture (2018).](https://www.jimmybogard.com/vertical-slice-architecture/)
+- [Milan Jovanović — Structuring Vertical Slices.](https://www.milanjovanovic.tech/blog/vertical-slice-architecture-structuring-vertical-slices)
+- [Milan Jovanović — Vertical Slice Architecture Is Easier Than You Think.](https://www.milanjovanovic.tech/blog/vertical-slice-architecture-is-easier-than-you-think)
+- [Tim Deschryver — Treat your .NET Minimal API Endpoint as the application layer.](https://timdeschryver.dev/blog/treat-your-net-minimal-api-endpoint-as-the-application-layer)
+- [Rico Fritzsche — Why Vertical Slices Won't Evolve from Clean Architecture.](https://ricofritzsche.me/why-vertical-slices-wont-evolve-from-clean-architecture/)
+
+FastEndpoints:
+
+- [FastEndpoints homepage.](https://fast-endpoints.com/)
+- [FastEndpoints GitHub repository.](https://github.com/FastEndpoints/FastEndpoints)
+
+Package by feature, across stacks:
+
+- [Java Practices — Package by feature, not layer.](http://www.javapractices.com/topic/TopicAction.do?Id=205)
+- [DZone — Package by Layer for Spring Projects Is Obsolete.](https://dzone.com/articles/package-by-layer-for-spring-projects-is-obsolete)
+
+Agent codebase navigation and context engineering:
+
+- [Anthropic — How Claude Code works in large codebases.](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start)
+- [Anthropic — Effective context engineering for AI agents.](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [OpenAI — Codex product page.](https://openai.com/codex/)
+- [Sourcegraph — How Cody understands your codebase.](https://sourcegraph.com/blog/how-cody-understands-your-codebase)
+- [Cursor — Securely indexing large codebases (cited as a third-party example of agent retrieval design).](https://cursor.com/blog/secure-codebase-indexing)
+
+Long-context retrieval evidence:
+
+- [Liu, N. F. et al. (2023). Lost in the Middle: How Language Models Use Long Contexts. arXiv:2307.03172.](https://arxiv.org/abs/2307.03172)
+- [Hsieh, C. et al. (2024). RULER: What's the Real Context Size of Your Long-Context Language Models? arXiv:2404.06654 (COLM 2024).](https://arxiv.org/abs/2404.06654)
