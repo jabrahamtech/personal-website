@@ -1,15 +1,22 @@
 import { test, expect } from '@playwright/test';
 
-/* Posts in newest-first `posted` order. Both posts are live as of
-   2026-05-14; draftSlugs is intentionally empty (kept as a constant so
-   any future draft-only tests have a stable place to plug in). */
-const allPostSlugs = [
+/* Every post in home-page render order. comparePosts (index.astro) sorts
+   all live posts ahead of drafts, then by `posted` desc, ties broken by
+   title. Drafts are built + listed on the home page, but excluded from
+   RSS, the sitemap, llms.txt, and the homepage Blog JSON-LD. */
+const liveSlugs = [
+  'polymarket-bot-event-driven',
   'most-hitl-is-escalation-done-badly',
   'when-to-force-the-llm-and-when-to-use-a-button',
 ];
-
-const liveSlugs = allPostSlugs.slice();
-const draftSlugs: string[] = [];
+const draftSlugs = [
+  'rpa-already-solved-this',
+  'agent-governance-au-insurtech',
+  'boring-infrastructure-stack-for-startups',
+  'from-mvc-to-vertical-slice',
+  'judgement-before-pmf',
+];
+const allPostSlugs = [...liveSlugs, ...draftSlugs];
 
 /* examplePost is the shared fixture for the rich-content tests (TOC,
    callouts, figures, JSON-LD). when-to-force has multiple h2 headings,
@@ -35,37 +42,38 @@ test.describe('home (posts list)', () => {
     expect(hrefs).toEqual(allPostSlugs.map((slug) => `/posts/${slug}`));
 
     await expect(page.locator('.post-list .draft')).toHaveCount(draftSlugs.length);
-    await expect(rows.first()).toContainText("Most 'human-in-the-loop' is escalation done badly");
+    await expect(rows.first()).toContainText('What Polymarket taught me about event-driven');
     await expect(page.locator('main')).not.toContainText('Building this site with Astro');
   });
 
   test('filters narrow by content type and surface a status line', async ({ page }) => {
     await page.goto('/');
 
-    /* With only two posts sharing the same cluster, the cluster select
-       is suppressed (clusterFilters.length > 1 is false in index.astro).
-       The visible selects are just type + sort. */
-    await expect(page.locator('#post-filters .filter-select')).toHaveCount(2);
+    /* Posts now span three clusters, so the cluster select is shown
+       alongside type + sort (clusterFilters.length > 1 in index.astro). */
+    await expect(page.locator('#post-filters .filter-select')).toHaveCount(3);
     await expect(page.locator('#post-filters .chip')).toHaveCount(0);
-    /* Content-type counts:
-         most-hitl     → Opinion
-         when-to-force → Decision
-       So Decision=1, Opinion=1, total=2. */
+    /* Content-type counts across the collection. Case Studies has zero
+       posts, so it is filtered out of the dropdown. */
     await expect(page.locator('#filter-type option')).toHaveText([
-      'all types (2)',
-      'Decision (1)',
-      'Opinion (1)',
+      'all types (8)',
+      'Learning Guides (1)',
+      'Technical Builds (1)',
+      'Decision/Diagnostic Guides (4)',
+      'Playbooks (2)',
     ]);
 
-    await page.locator('#filter-type').selectOption({ label: 'Decision (1)' });
+    // Technical Builds has exactly one post (polymarket) — a clean
+    // single-result filter to assert against.
+    await page.locator('#filter-type').selectOption({ label: 'Technical Builds (1)' });
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(1);
     await expect(page.locator('.post-list li:not([hidden]) h2')).toHaveText(
-      'When to Force the LLM, and When to Use a Button',
+      'What Polymarket taught me about event-driven',
     );
     // Status line appears whenever a non-all filter is active.
     await expect(page.locator('#post-status')).toBeVisible();
-    await expect(page.locator('#post-status')).toContainText('Decision');
-    await expect(page.locator('#post-status')).toContainText('1 of 2');
+    await expect(page.locator('#post-status')).toContainText('Technical Builds');
+    await expect(page.locator('#post-status')).toContainText('1 of 8');
 
     await page.locator('#filter-type').selectOption('all');
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(allPostSlugs.length);
@@ -76,21 +84,22 @@ test.describe('home (posts list)', () => {
   test('sorts newest first by default and can switch to oldest first', async ({ page }) => {
     await page.goto('/');
 
-    const visibleTitles = page.locator('.post-list li:not([hidden]) h2');
-    await expect(page.locator('#filter-order')).toHaveValue('desc');
-    await expect(visibleTitles).toHaveText([
-      "Most 'human-in-the-loop' is escalation done badly",
-      'When to Force the LLM, and When to Use a Button',
-    ]);
+    // Assert order by slug (stable) rather than by title (brittle).
+    const rowHrefs = () =>
+      page.locator('.post-list li:not([hidden]) .post-row').evaluateAll(
+        (els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')),
+      );
 
+    await expect(page.locator('#filter-order')).toHaveValue('desc');
+    expect(await rowHrefs()).toEqual(allPostSlugs.map((slug) => `/posts/${slug}`));
+
+    // Oldest-first reverses each group but keeps drafts after live posts.
+    const ascSlugs = [...[...liveSlugs].reverse(), ...[...draftSlugs].reverse()];
     await page.locator('#filter-order').selectOption('asc');
-    await expect(visibleTitles).toHaveText([
-      'When to Force the LLM, and When to Use a Button',
-      "Most 'human-in-the-loop' is escalation done badly",
-    ]);
+    await expect.poll(rowHrefs).toEqual(ascSlugs.map((slug) => `/posts/${slug}`));
   });
 
-  test('post cards use short type names and keep meta uncluttered', async ({ page }) => {
+  test('post cards render type tag and keep meta uncluttered', async ({ page }) => {
     await page.goto('/');
     const first = page.locator('.post-list .post-row').first();
     // DOM order: h2 → p (summary) → .meta
@@ -103,18 +112,16 @@ test.describe('home (posts list)', () => {
     expect(order[2]).toMatch(/^div\.meta/);
 
     const meta = first.locator('.meta');
-    // The newest post (most-hitl) is live in the "Agents and Workflows"
-    // cluster with a single content-type tag (Opinion). No draft badge.
+    // The newest post (polymarket) is live in the "Agents and Workflows"
+    // cluster with a single content-type tag (Technical Builds). No draft badge.
     await expect(meta).not.toContainText('draft');
     await expect(meta).toContainText('Agents and Workflows');
-    await expect(meta.locator('.tag-cat')).toHaveText(['Opinion']);
+    await expect(meta.locator('.tag-cat')).toHaveText(['Technical Builds']);
 
     const visibleListText = (await page.locator('.post-list').textContent()) || '';
     for (const noisy of [
       'Prioritised',
       'unpublished',
-      'Learning Journey Guide',
-      'POV / Strategic Opinion Post',
       'words',
       '~ ',
       'adaptive-ai',
@@ -323,9 +330,12 @@ test.describe('infrastructure', () => {
     const r = await page.request.get('/sitemap-0.xml');
     expect(r.status()).toBe(200);
     const body = await r.text();
-    // Every live post slug should be in the sitemap.
-    for (const slug of allPostSlugs) {
+    // Live posts are in the sitemap; drafts are excluded.
+    for (const slug of liveSlugs) {
       expect(body, `${slug} missing from sitemap`).toContain(`/posts/${slug}`);
+    }
+    for (const slug of draftSlugs) {
+      expect(body, `draft ${slug} must NOT be in the sitemap`).not.toContain(`/posts/${slug}`);
     }
     expect(body).toContain('/about');
     // Old route shape must not be present
@@ -575,8 +585,8 @@ test.describe('SEO / AEO — head + structured data', () => {
     const blog = blocks.find((b) => b && b['@type'] === 'Blog');
     expect(blog).toBeTruthy();
     expect(Array.isArray(blog.blogPost)).toBe(true);
-    // Tracks the content collection; updates automatically when posts are added.
-    expect(blog.blogPost.length).toBe(allPostSlugs.length);
+    // Homepage Blog graph lists live posts only (drafts are excluded).
+    expect(blog.blogPost.length).toBe(liveSlugs.length);
   });
 
   test('post page embeds BlogPosting + BreadcrumbList schemas', async ({ page }) => {
@@ -592,8 +602,8 @@ test.describe('SEO / AEO — head + structured data', () => {
   });
 
   test('every BlogPosting carries an image (Rich Results requirement)', async ({ page }) => {
-    // Page-level BlogPosting — every live post must surface an image,
-    // falling back to /og/default.png when no cover is declared.
+    // Page-level BlogPosting — every post (drafts included) must surface
+    // an image, falling back to /og/default.png when no cover is declared.
     for (const slug of allPostSlugs) {
       await page.goto(`/posts/${slug}`);
       const blocks = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent || 'null')));
@@ -608,7 +618,7 @@ test.describe('SEO / AEO — head + structured data', () => {
     await page.goto('/');
     const homeBlocks = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent || 'null')));
     const blog = homeBlocks.find((b) => b['@type'] === 'Blog');
-    expect(blog?.blogPost?.length).toBe(allPostSlugs.length);
+    expect(blog?.blogPost?.length).toBe(liveSlugs.length);
     for (const bp of blog.blogPost) {
       const v = typeof bp.image === 'string' ? bp.image : bp.image?.url;
       expect(v, `Blog.blogPost[].image missing for ${bp.url}`).toBeTruthy();
@@ -649,9 +659,12 @@ test.describe('AEO — llms.txt + AI crawler robots', () => {
     // Sections we care about
     expect(body).toMatch(/##\s+Posts/);
     expect(body).toMatch(/##\s+Identity/);
-    // Each post should be linked (live posts included alongside drafts).
-    for (const slug of allPostSlugs) {
+    // Live posts are linked from llms.txt; drafts are excluded.
+    for (const slug of liveSlugs) {
       expect(body, `${slug} missing from llms.txt`).toContain(`/posts/${slug}`);
+    }
+    for (const slug of draftSlugs) {
+      expect(body, `draft ${slug} must NOT be in llms.txt`).not.toContain(`/posts/${slug}`);
     }
   });
 

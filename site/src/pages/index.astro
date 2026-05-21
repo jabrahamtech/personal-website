@@ -26,25 +26,24 @@ function comparePosts(a: Post, b: Post, order: 'asc' | 'desc' = 'desc') {
 const sorted = [...all].sort((a, b) => comparePosts(a, b));
 
 const contentTypeOrder = [
-  'Learning Journey Guide',
-  'Technical Build Breakdown',
-  'Business Outcome Case Study',
-  'Decision / Comparison Guide',
-  'Diagnostic / Failure Mode Guide',
-  'Playbook / Checklist / SOP Guide',
-  'POV / Strategic Opinion Post',
+  'Learning Guides',
+  'Technical Builds',
+  'Case Studies',
+  'Decision/Diagnostic Guides',
+  'Playbooks',
 ] as const;
 
 type ContentType = typeof contentTypeOrder[number];
 
+// Labels are 1:1 with the schema values — the chip/filter text IS the
+// category name. Kept as an explicit map so a chip label can be shortened
+// later (e.g. on narrow viewports) without touching stored frontmatter.
 const contentTypeLabels: Record<ContentType, string> = {
-  'Learning Journey Guide': 'Guide',
-  'Technical Build Breakdown': 'Build',
-  'Business Outcome Case Study': 'Case study',
-  'Decision / Comparison Guide': 'Decision',
-  'Diagnostic / Failure Mode Guide': 'Diagnostic',
-  'Playbook / Checklist / SOP Guide': 'Checklist',
-  'POV / Strategic Opinion Post': 'Opinion',
+  'Learning Guides': 'Learning Guides',
+  'Technical Builds': 'Technical Builds',
+  'Case Studies': 'Case Studies',
+  'Decision/Diagnostic Guides': 'Decision/Diagnostic Guides',
+  'Playbooks': 'Playbooks',
 };
 
 const contentTypeFilters = contentTypeOrder
@@ -234,9 +233,9 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
 
       function describeFilter(kind, value) {
         if (kind === 'all' || value === 'all') return null;
-        // Pull the human label off the option so the status reads the same
-        // way the user picked it — "Showing 2 of 7 · Guide" rather than
-        // the raw schema value "Learning Journey Guide".
+        // Pull the label off the option so the status reads the way the
+        // user picked it (e.g. "Showing 2 of 7 · Playbooks"), with the
+        // trailing "(count)" stripped below.
         const select = filterSelects.find((s) => s.getAttribute('data-filter-kind') === kind);
         if (!select) return value;
         const option = Array.from(select.options).find((o) => o.value === value);

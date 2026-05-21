@@ -14,16 +14,14 @@ const posts = defineCollection({
     contentTypes: z
       .array(
         z.enum([
-          'Learning Journey Guide',
-          'Technical Build Breakdown',
-          'Business Outcome Case Study',
-          'Decision / Comparison Guide',
-          'Diagnostic / Failure Mode Guide',
-          'Playbook / Checklist / SOP Guide',
-          'POV / Strategic Opinion Post',
+          'Learning Guides',
+          'Technical Builds',
+          'Case Studies',
+          'Decision/Diagnostic Guides',
+          'Playbooks',
         ]),
       )
-      .default(['POV / Strategic Opinion Post']),
+      .default(['Decision/Diagnostic Guides']),
     cluster: z.string().optional(),
     readTime: z.string().optional(),
     /* image — width/height are REQUIRED when image is present so the OG
