@@ -265,7 +265,8 @@ body.mode-paper .post-row .meta > span:not(.tag):not(.draft){
 body.mode-paper .post-row .meta > span:not(.tag):not(.draft) + span:not(.tag):not(.draft)::before{
   content:"·";position:absolute;left:-12px;top:0;color:var(--line-2);
 }
-body.mode-paper .post-row .meta .draft{
+body.mode-paper .post-row .meta .draft,
+body.mode-paper .related .draft{
   color:var(--amber);
   background:rgb(from var(--amber) r g b / 0.08);
   border:1px solid rgb(from var(--amber) r g b / 0.28);

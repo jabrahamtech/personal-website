@@ -16,6 +16,19 @@ export async function getStaticPaths() {
     // Oldest gets 0x01 and the number grows as new posts ship — stable IDs
     // (renaming or reordering doesn't shuffle them backward over time).
     const postId = '0x' + (posts.length - i).toString(16).padStart(2, '0').toUpperCase();
+    // Related = same cluster, self excluded. Published siblings sort ahead of
+    // drafts (mirrors the home listing); within each group, newest first.
+    // Drafts stay in — the catalogue is mostly drafts today and the existing
+    // prev/next already links them — but get badged in the UI.
+    const related = post.data.cluster
+      ? posts
+          .filter((p) => p.id !== post.id && p.data.cluster === post.data.cluster)
+          .sort((a, b) => {
+            if (!!a.data.draft !== !!b.data.draft) return a.data.draft ? 1 : -1;
+            return (b.data.posted?.getTime() ?? 0) - (a.data.posted?.getTime() ?? 0);
+          })
+          .slice(0, 4)
+      : [];
     return {
       params: { slug: post.id },
       props: {
@@ -23,6 +36,7 @@ export async function getStaticPaths() {
         postId,
         newer: i > 0 ? posts[i - 1] : null,
         older: i < posts.length - 1 ? posts[i + 1] : null,
+        related,
       },
     };
   });
@@ -33,9 +47,10 @@ interface Props {
   postId: string;
   newer: CollectionEntry<'posts'> | null;
   older: CollectionEntry<'posts'> | null;
+  related: CollectionEntry<'posts'>[];
 }
 
-const { post, postId, newer, older } = Astro.props;
+const { post, postId, newer, older, related } = Astro.props;
 const { data } = post;
 const { Content, headings } = await render(post);
 
@@ -156,6 +171,24 @@ const jsonLdNodes: Record<string, unknown>[] = blogPosting
     />
   )}
   <Content />
+  {related.length > 0 && (
+    <nav class="related" slot="footer" aria-label={`More in ${data.cluster}`}>
+      <div class="related-head">
+        <span class="eng-only">&gt; more in {data.cluster}</span>
+        <span class="paper-only">More in {data.cluster}</span>
+      </div>
+      <ul>
+        {related.map((r) => (
+          <li>
+            <a href={`/posts/${r.id}`}>
+              <span class="related-title">{r.data.title}</span>
+              {r.data.draft && <span class="draft">draft</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )}
   {(newer || older) && (
     <div class="pn" slot="footer">
       {older ? (

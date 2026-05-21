@@ -396,6 +396,9 @@
    entirely there — the TOC + URL bar already cover deep-linking. */
 @media (hover: none) {
   .prose .heading-anchor { display: none }
+  /* No hover to reveal the copy button on touch — keep it visible so the
+     affordance exists at all. Still subtle (muted until tapped). */
+  .prose .copy-btn { opacity: 1 }
 }
 
 /* doc-grid — full-width by default, widens for posts with TOC at >=1320px */
@@ -501,6 +504,50 @@
 .pn a small { font-size: 11px; color: var(--ink-mute); letter-spacing: .05em; text-transform: uppercase }
 .pn a span { font-size: 13.5px; color: var(--ink); line-height: 1.35 }
 .pn a.next { text-align: right; align-items: flex-end }
+
+/* related-by-cluster — onward reading by topic, stronger than chronological
+   prev/next, so it sits above it. Mono in both modes, matching .pn. */
+.related {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.related-head {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-mute);
+  letter-spacing: .04em;
+  margin-bottom: 14px;
+}
+.related ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.related li { margin: 0 }
+.related a {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  color: var(--ink);
+  padding: 10px 14px;
+  border: 1px solid var(--line-2);
+  transition: border-color .12s ease, background .12s ease;
+}
+.related a:hover { border-color: var(--green-2); background: rgb(from var(--green) r g b / 0.03) }
+.related a::before { content: "→"; color: var(--ink-mute); flex: none }
+.related a:hover::before { color: var(--green-2) }
+.related .related-title { flex: 1; line-height: 1.35 }
+.related .draft {
+  align-self: center;
+  color: var(--amber);
+  border: 1px solid var(--line-2);
+  padding: 1px 6px;
+  font-size: 10.5px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+/* Two bordered onward-reading sections in a row; tighten the gap so the
+   second rule doesn't read as a large empty band. */
+.related + .pn { margin-top: 36px }
 
 /* desktop right-rail TOC kicks in only at >=1320px */
 @media (min-width: 1320px) {
