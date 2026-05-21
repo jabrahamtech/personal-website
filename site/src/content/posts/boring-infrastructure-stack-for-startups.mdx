@@ -10,17 +10,25 @@ cluster: "Engineering Practice"
 tags: ['infrastructure', 'startup', 'paas', 'ai-stack', 'observability']
 image:
   src: "/posts/boring-infrastructure-stack-for-startups/hero.jpg"
-  alt: "Handwritten title — the boring infrastructure stack I'd actually pick for a startup — on a cream notebook page, with a small upper-right vignette of a stacked server pointing at a rocket, and a stick figure holding up the title from below."
+  alt: "Handwritten cover on a cream notebook page reading the boring infrastructure stack I'd actually pick for a startup, with the subtitle the boring stack drawn boringly, the line five blocks to get you to series b underlined in orange, and a small smiling diamond in the lower corner."
   caption: "The boring stack, drawn boringly."
   width: 1200
   height: 675
 ---
+
+import Figure from '../../components/Figure.astro';
 
 Most startup infrastructure advice is written for companies you are not. Talks by engineers running a thousand customers per second of traffic, or whichever framework X is hyped about this month. Neither tells you what to build when you need to ship, test in production, and survive until Series B.
 
 This is the stack I'd pick. Slight tilt towards AI features because most products being built now have an LLM call, an eval, or an embedding somewhere in the workflow. Credit to [Arjay the Dev](https://www.youtube.com/watch?v=UWNDvomXKEg), whose system design tier list got me thinking about how I'd order this for a builder rather than a learner.
 
 None of this is a new argument. It sits in the tradition of Dan McKinley's ['Choose Boring Technology'](https://mcfunley.com/choose-boring-technology) and LeadDev's 'Boring Stack' piece. What's new here is the 2026 cut — fitting AI features into a stack that still has to be debuggable on a Sunday.
+
+<Figure
+  src="/posts/boring-infrastructure-stack-for-startups/figure-01.png"
+  alt="The boring stack drawn as five labelled blocks inside a dashed infrastructure box — api, postgres, queue, paas, observability — with a note that ai features sit on top, not in place of."
+  caption="Fig. 1 — the boring stack: five blocks to get you to Series B."
+/>
 
 ## The non-negotiable foundation: REST and Postgres
 
@@ -132,7 +140,19 @@ Validation is the only thing that matters before product-market fit. Not your st
 
 I leaned on this hard in the early days of Brokerloop. The whole point was to put something real in front of my cofounder and a handful of brokers, fast, to test whether the GTM thesis held. If I'd spent two weeks setting up Kubernetes and a service mesh, the conversations that actually mattered would have died before they started. PaaS deploy, working product, real signal back inside a week. The cofounder buy-in came from seeing the thing work, not from a deck.
 
-You rip the PaaS out and rebuild on bespoke infrastructure when revenue justifies the move. By then you'll have learned what you actually need, instead of guessing in week one. Almost everything startups over-engineer at the start gets thrown out by month six anyway.
+You move off the third-party managed platform when revenue actually justifies running your own infrastructure. The 2026 break-even for self-managed cloud sits around $2.5M of annual compute spend, before the savings cover the engineers you need to run it safely. Most startups never get close during PMF.
+
+(AWS itself has PaaS services too: Elastic Beanstalk, App Runner, Fargate. The move I'm describing is leaving someone else's fully-managed platform for your own AWS account, where you choose your level of abstraction and own the IaC. You're trading their opinions for your controls.)
+
+The escape plan nobody hands you: when you do make the move, go specifically to AWS, with Terraform as your IaC layer. Both for the same reason. Hiring pool.
+
+AWS has around 55,000 active cloud engineering postings globally, versus about 42,000 for Azure and 20,000 for GCP. 2.5x more candidates than the next-largest cloud when you're hiring your first infra engineer. Same logic as picking Postgres over the cool new database. Being able to hire matters more than which option is technically nicer.
+
+Terraform has the dominant IaC ecosystem. 4,800+ providers, around 26 million weekly downloads. Pulumi is genuinely better if your team writes TypeScript or Python daily and wants testable infra in a real language. OpenTofu is the safer licensing bet if you don't trust HashiCorp's BSL change. But for hiring leverage, Terraform still wins. You can re-platform later if you outgrow it.
+
+On AWS itself, start at App Runner for most apps. It's the closest equivalent to what Railway gave you: push a container, get a URL, autoscaling included. Climb to Fargate when you need orchestration — coordinated services, sidecars, scaling at the service level. Raw EC2 only when App Runner and Fargate genuinely can't do what you need (GPU workloads, specific networking, compliance constraints). Most startups never make it past App Runner.
+
+Almost everything startups over-engineer at the start gets thrown out by month six anyway. The escape plan is boring on purpose. PaaS until you feel the cost, then AWS via Terraform.
 
 ## The boring conclusion
 
@@ -144,7 +164,7 @@ Written out, the stack I'd actually pick before Series B:
 - Queue: Postgres-backed (Oban, River). SQS if you're on AWS.
 - Containers: Docker.
 - CI/CD: GitHub Actions.
-- Deploy: Railway, Render, or Fly until revenue justifies something else.
+- Deploy: Railway, Render, or Fly until revenue justifies AWS via Terraform.
 - Auth: Clerk. WorkOS if B2B SSO is core.
 - Errors: Sentry.
 - Logs: structured, into whatever APM you grow into.
