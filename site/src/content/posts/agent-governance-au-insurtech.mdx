@@ -1,0 +1,216 @@
+---
+title: "Your AI agent passes the demo and fails the audit — the whiteboard test for AU insurance"
+summary: "Ten agent governance primitives across two layers, mapped to Australian insurance regulation and supervisory expectations. The whiteboard test for AU insurance."
+posted: 2026-05-20
+draft: true
+pipelineStatus: "Final"
+contentTypes:
+  - "POV / Strategic Opinion Post"
+tags: ['agents', 'governance', 'insurance', 'compliance', 'australia']
+image:
+  src: "/posts/agent-governance-au-insurtech/hero.png"
+  alt: "Title card reading Your AI agent passes the demo, and fails the audit, with a subhead reading the whiteboard test for AU insurance, beside a two-layer diagram of a programme layer wrapping a per-decision layer of six primitives — task fit, action constraints, identity and perms, legibility, monitor and escalate, kill switch — annotated with Australian regulation tags CPS 230, CPS 234, RG 271, DDO, ICA code, and REP 798."
+  width: 2000
+  height: 1125
+---
+
+import Figure from '../../components/Figure.astro';
+
+A claims-triage agent goes through three internal reviews and a procurement gate before someone in second-line risk asks a small question: when the customer is unhappy with the outcome and writes in, can you produce, in order, what the system was told, what tools it called, what it decided, why, and which human signed off? The team has answers for some of those. Not all of them. The model is fine. The architecture cannot answer the audit.
+
+This is the most common failure mode I see when Australian insurers and insurtechs try to put agents into production. The model passes the demo. The system cannot pass [ASIC's RG 271 internal dispute resolution standard](https://download.asic.gov.au/media/3olo5aq5/rg271-published-2-september-2021.pdf), or [APRA's CPS 230 operational risk requirements](https://www.apra.gov.au/sites/default/files/2023-07/Prudential%20Standard%20CPS%20230%20Operational%20Risk%20Management%20-%20clean.pdf), or its own product-governance settings. Governance does not catch up with the build later. It either shaped the build, or the build has to be redone.
+
+## What changed in April and May 2026
+
+Since April this year, this is no longer an inference from older guidance. APRA and ASIC have both made AI governance an active supervisory issue in the last six weeks.
+
+[APRA's 30 April 2026 letter to industry on AI](https://www.apra.gov.au/apra-letter-to-industry-on-artificial-intelligence-ai) is APRA's first published, AI-specific set of expectations of boards and accountable executives, drawn from targeted supervisory engagements with large banks, insurers, and superannuation trustees. It calls out governance maturity lagging adoption, board literacy gaps that prevent effective challenge of AI risk, and the need for controls over agentic and autonomous workflows, post-deployment monitoring, supplier risk, AI use-case inventories, and human involvement for high-risk decisions. APRA has signalled proportionate prudential reviews, thematic activities, and AI supplier engagement, with further policy action available if needed.
+
+[ASIC's 8 May 2026 open letter (26-092MR)](https://www.asic.gov.au/about-asic/news-centre/find-a-media-release/2026-releases/26-092mr-asic-calls-for-urgent-cyber-uplift-as-ai-accelerates-cyber-threats/) is the companion warning on cyber resilience. ASIC has tied frontier AI directly to cyber risk, asked entities to confirm governance frameworks, identify and protect critical assets, strengthen patch management and incident response, run defence-in-depth, manage third-party risk, and table the letter at the ultimate board and risk committees. ASIC frames cyber resilience as a core licensing obligation, not an IT issue.
+
+The point is not that new AI law has arrived. The point is that existing obligations are now being applied more explicitly to AI systems, with named expectations and an active supervisory program behind them. Anything written about AI in financial services in Australia from May 2026 onward should be reading these two letters first.
+
+## The argument in one paragraph
+
+Agent governance has two layers, and Australian insurance regulation maps onto both. The programme layer is what the organisation around the agent does over time: lifecycle management, risk management, security, and observability. The per-decision layer is what the running agent does on each call: task fit, action constraints, identity and permissions, legibility, monitoring with escalation, and interruptibility. APRA prudential standards (binding on APRA-regulated insurers and other regulated entities), ASIC's licensing obligations (binding on AFS and credit licensees, with ASIC's regulatory guides explaining its interpretation and supervisory approach), the Privacy Act and Australian Privacy Principles (binding on APP entities, with OAIC guidance explaining the regulator's expectations), the ICA General Insurance Code of Practice (binding by contract on signatories), and the Voluntary AI Safety Standard (voluntary, but moving in the same direction as the September 2024 mandatory-guardrails consultation) collectively address both layers. The exact instrument depends on which entity you are; the architectural implications are the same. The work for product and engineering leads is to make those constraints shape the system at design time rather than appear as a compliance overlay after the demo.
+
+If you do that, the agent is shippable. If you don't, you are building something whose governance is structurally bolted on, and second-line risk will keep finding reasons to send it back.
+
+## The two layers
+
+It is worth being explicit about the split, because it is the source of most of the confusion when an engineering team and a risk team talk past each other.
+
+The programme layer is governance as an organisational function. Who owns this agent. What risks did we identify before approving it. What controls are on the data it touches. What telemetry are we keeping, for how long, in what form. This layer is what APRA CPS 220 (risk management), CPS 230 (operational risk and service providers), CPS 234 (information security), and the first three guardrails of the [Voluntary AI Safety Standard](https://www.industry.gov.au/publications/voluntary-ai-safety-standard) (accountability, risk management, security and data governance) explicitly require. NIST AI RMF's Govern-Map-Measure-Manage functions are the same idea expressed differently. So is [ISO/IEC 42001](https://www.iso.org/standard/42001), the AI management-system standard.
+
+The per-decision layer is governance as architectural property of the running agent. What the agent can do on this call. What it logs. Who it logs in as. Whether a human is in the path. Whether you can stop it. This is the layer that OpenAI's seven practices and Anthropic's four-layer responsibility model both speak to, and it is the layer that gets under-built when teams treat governance as paperwork.
+
+Neither layer is sufficient alone. A flawless ISO 42001-style management system around an agent that cannot answer "what did it decide and why for this customer" still fails RG 271. An agent with immaculate per-decision trace logging but no documented owner, no risk register entry, and no security review still fails CPS 230 and CPS 234. The argument is that both layers should be designed in together, which is mostly a claim about engineering practice: the trace pipeline the engineering team has to build for the product to work is the same trace pipeline the risk team needs for evidence.
+
+## The programme primitives
+
+For the programme layer, I am borrowing the four-pillar framing from the [DeepLearning.AI x Databricks *Governing AI Agents* short course](https://www.deeplearning.ai/short-courses/governing-ai-agents/) taught by Amber Roberts: lifecycle management, risk management, security, observability, each with a corresponding best practice (separation of duties, defence in depth, least-privilege access, audit everything). The course frames these as cross-cutting concerns wrapped around the prepare-data, build, evaluate, deploy stages, underpinned by Unity Catalog + MLflow as the tooling. The original contribution here is the Australian insurance mapping below and the per-decision architecture layer that follows.
+
+1. *Lifecycle management.* Who proposed this agent. Who approved it. Who owns it. How it gets updated, rolled back, retired. The named accountable human at each stage. Roberts' Databricks framing calls the best practice "separation of duties" across dev, staging, and production. [APRA CPS 220 Risk Management](https://www.apra.gov.au/sites/default/files/cps_220.pdf) requires a board-approved risk management framework with clear accountabilities. [Voluntary AI Safety Standard Guardrail 1](https://www.industry.gov.au/publications/voluntary-ai-safety-standard) requires the same for AI specifically.
+2. *Risk management.* The agent's use case, harm modes, and likelihood are identified before deployment, with explicit tolerances. Databricks' framing is "defence in depth", with PII detection, guardrails, compliance controls, and monitoring overlapping. [CPS 230](https://www.apra.gov.au/sites/default/files/2023-07/Prudential%20Standard%20CPS%20230%20Operational%20Risk%20Management%20-%20clean.pdf) requires critical operations identified and tolerance levels for severe disruption. Voluntary AI Safety Standard Guardrail 2 names the AI-specific equivalent. [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework) Map and Manage cover the international counterpart.
+3. *Security.* The data the agent reads, writes, and emits is governed under the same controls as any other production asset, including when third parties host it. The Databricks best practice is "least-privilege access" via encryption, authentication, and granular access controls (their concrete implementation lives in the [Databricks AI Security Framework v3.0 (DASF)](https://www.databricks.com/blog/agentic-ai-security-new-risks-and-controls-databricks-ai-security-framework-dasf-v30)). [CPS 234 Information Security](https://www.apra.gov.au/sites/default/files/cps_234_july_2019_for_public_release.pdf) extends explicitly to third-party-held assets. [OAIC's AI guidance](https://www.oaic.gov.au/privacy/privacy-guidance-for-organisations-and-government-agencies/guidance-on-privacy-and-the-use-of-commercially-available-ai-products) puts an explicit floor on what can be input to publicly available generative AI. Voluntary AI Safety Standard Guardrail 3 is the same idea.
+4. *Observability.* Production telemetry that is structured enough to feed risk reporting, IDR responses, and audit. Databricks' phrasing is "audit everything": logs of data access, model actions, and predictions, captured for traceability. The data pipeline is the governance, not the slide deck. Voluntary AI Safety Standard Guardrail 9 requires record-keeping. [ASIC REP 798 "Beware the gap"](https://download.asic.gov.au/media/mtllqjo0/rep-798-published-29-october-2024.pdf) named the absence of this as the single most common failure mode it found.
+
+These look like policy statements. They are not. Each of them requires concrete engineering: a service catalogue with named owners, a risk register that the agent appears in, an access-control model that includes the agent's identity, and a telemetry schema that downstream systems can actually consume. The policy document is downstream of these. Not upstream.
+
+## The per-decision primitives
+
+Six things, mapped to what each individual agent call has to satisfy.
+
+1. *Task fit.* Is the agent suitable for *this* task, on *this* population, at *this* level of stakes? Evidence, not vibes.
+2. *Action constraints.* What can the agent actually do, and what requires a human in the loop? A tool-permissions and call-signature question, not a prompt question.
+3. *Identity and permissions.* What does the agent log in as, what data can it see, and what can it do on whose behalf? Tied to your access model, not your model provider.
+4. *Legibility.* For any decision the agent made or contributed to, can you reconstruct what it saw, what it called, what it returned, and who reviewed it?
+5. *Monitoring with escalation.* Are you watching the agent in production, and is there a clean path from agent-only handling into human handling when watching says you should?
+6. *Interruptibility.* Can you turn it off for this case, this cohort, or globally, without orphaning state or breaking obligations you have already incurred?
+
+The international background is the same: [OpenAI's *Practices for Governing Agentic AI Systems*](https://cdn.openai.com/papers/practices-for-governing-agentic-ai-systems.pdf) named seven (evaluating suitability, constraining action space, setting default behaviours, ensuring legibility, automatic monitoring, attributability, interruptibility); [Anthropic's *Trustworthy agents in practice*](https://www.anthropic.com/research/trustworthy-agents) splits responsibility across four layers (model, harness, tools, environment) and lands on the same primitives by a different route, with three of the four layers owned by the deploying organisation; and [Anthropic's SHADE-Arena work](https://www.anthropic.com/research/shade-arena-sabotage-monitoring) is the empirical case for taking monitoring seriously.
+
+These are not policy statements either. They are architectural decisions that change the code.
+
+## The AU map, combined
+
+Both layers, each primitive against a specific Australian obligation.
+
+| Layer | Primitive | Australian regulation it lands in |
+|---|---|---|
+| Programme | Lifecycle management | [APRA CPS 220](https://www.apra.gov.au/sites/default/files/cps_220.pdf) risk management framework with board-approved accountabilities; Voluntary AI Safety Standard Guardrail 1 |
+| Programme | Risk management | [APRA CPS 230](https://www.apra.gov.au/sites/default/files/2023-07/Prudential%20Standard%20CPS%20230%20Operational%20Risk%20Management%20-%20clean.pdf) critical operations + tolerance levels; Voluntary AI Safety Standard Guardrail 2; NIST AI RMF Map + Manage |
+| Programme | Security | [APRA CPS 234](https://www.apra.gov.au/sites/default/files/cps_234_july_2019_for_public_release.pdf) information assets and third-party controls; [OAIC AI guidance](https://www.oaic.gov.au/privacy/privacy-guidance-for-organisations-and-government-agencies/guidance-on-privacy-and-the-use-of-commercially-available-ai-products); Voluntary AI Safety Standard Guardrail 3 |
+| Programme | Observability | Voluntary AI Safety Standard Guardrail 9 (record-keeping); [ASIC REP 798](https://download.asic.gov.au/media/mtllqjo0/rep-798-published-29-october-2024.pdf) governance-gap finding; ICA Code monitoring obligations |
+| Per-decision | Task fit | Claims-authority limits, policy wording, vulnerability and fraud flags, and complaint status are the day-to-day suitability inputs. [ASIC's DDO regime](https://www.asic.gov.au/regulatory-resources/financial-services/giving-financial-product-advice/faqs-design-and-distribution-obligations-for-advice-licensees-and-financial-advisers/) sits at the product-governance level above this (target market determinations, reasonable distribution steps); ASIC has been explicit that DDO is not an individual suitability test. [REP 798](https://download.asic.gov.au/media/mtllqjo0/rep-798-published-29-october-2024.pdf) called out a "black box" credit-risk model where suitability could not be explained. |
+| Per-decision | Action constraints | CPS 230 critical-operations actions sit inside the tolerance regime. Voluntary AI Safety Standard Guardrail 4 (testing) and Guardrail 5 (human oversight) name the AI-specific controls. |
+| Per-decision | Identity and permissions | CPS 234 information-asset controls, extended through to the third-party processes the agent runs in. |
+| Per-decision | Legibility | Eight AU [AI Ethics Principles](https://www.industry.gov.au/publications/australias-ai-ethics-principles) include transparency, explainability, and contestability. From 10 December 2026, [APP 1 ADM transparency obligations](https://www.oaic.gov.au/privacy/australian-privacy-principles/australian-privacy-principles-guidelines/chapter-1-app-1-open-and-transparent-management-of-personal-information) require APP entities to disclose where a computer program is used to make, or do something substantially and directly related to making, a decision that could reasonably be expected to significantly affect an individual's rights or interests. |
+| Per-decision | Monitoring with escalation | [ASIC RG 271](https://download.asic.gov.au/media/3olo5aq5/rg271-published-2-september-2021.pdf) enforceable 30-day complaints clock (45 for insurance in super). [REP 802 "Cause for complaint"](https://download.asic.gov.au/media/5p3axgd0/rep802-published-5-december-2024.pdf) reviewed general-insurance handling. [ICA General Insurance Code of Practice 2020](https://insurancecode.org.au/resources/general-insurance-code-of-practice-2020/) requires straightforward-claims decisions in 10 business days and updates every 20. |
+| Per-decision | Interruptibility | CPS 230 incident response and CPS 234 incident notification assume you can stop a process and recover within tolerance. Voluntary AI Safety Standard Guardrail 5 names human oversight as the explicit backstop. |
+
+Across the two layers, every primitive lines up with at least one Australian instrument, binding or voluntary, that an insurer or insurtech is exposed to through its own licence, its prudential regulation, its customer contracts, or its supplier relationships. The IAIS, in its 2025 [Application Paper on the supervision of artificial intelligence](https://www.iais.org/uploads/2025/07/Application-Paper-on-the-supervision-of-artificial-intelligence.pdf), explicitly chose not to write new AI-specific standards on top of the Insurance Core Principles, on the view that the existing principles are appropriate. APRA and ASIC have signalled the same posture: the regulatory framework is technology-neutral, and existing obligations apply to AI systems. The April and May 2026 letters above are the operational follow-through on that posture.
+
+Which means there is no waiting. The rules are here. The agent has to fit them.
+
+## Three places this changes what you build
+
+The abstractions matter when you can see them rewriting the architecture. Three places where the primitives clearly change the design.
+
+### Claims triage
+
+The default insurance-AI pilot is a claims-triage agent that ingests a claim, pulls policy data, classifies the claim type, and routes it. Easy demo.
+
+The shape it has to actually take in an Australian general insurer: the agent's task-fit definition has to include which claim types it is suitable for and which it must not touch, driven by claims-authority limits, policy wording, vulnerability flags, fraud indicators, complaint status, operational resilience tolerances, and product-governance data where relevant. (DDO sits at the product-governance layer above this; it is not a claim-by-claim suitability test, and ASIC has been explicit that DDO is not intended to operate as an individual product suitability assessment like personal financial advice.) Its action set has to be enumerated and human-approval-gated for anything that triggers a payment or a denial. Its decisions have to be legible enough that a customer dispute pulling on RG 271 within 30 days can be answered with the trace, not reconstructed after the fact. Its monitoring has to feed the ICA Code's 20-business-day update obligation, so a stuck case escalates before the clock expires. Its interruptibility has to handle the "stop processing all claims from cohort X" scenario after a severe-weather event without losing in-flight state.
+
+None of that is governance overlay. All of it changes table schemas, queue design, and the way you wrap the model calls.
+
+<Figure
+  src="/posts/agent-governance-au-insurtech/figure-02.png"
+  alt="Claims-triage flow with the six per-decision primitives labelled at the architectural points where they live."
+  caption="Fig. 2 — claims-triage flow with the six per-decision primitives labelled at the architectural points where they live."
+/>
+
+### Complaints handling under RG 271
+
+People underestimate how unforgiving RG 271 is. There are enforceable paragraphs. The 30-day clock is real. Complaint volumes after natural disasters are not theoretical. Suncorp [reported](https://www.insurancenews.com.au/daily/ai-poised-to-lift-customer-service-suncorp-says) processing more than 7,000 food spoilage claims from Cyclone Alfred with "zero manual intervention" (their figure, treat as company-reported), and that scale of automated decision generates a corresponding scale of complaint risk.
+
+For an agent in this path, legibility and attributability are the load-bearing primitives. If a customer asks "why was my claim denied", the answer has to be available in a form that the IDR team can use within the clock. That means structured logging of every input, every tool call, every output, every model version, every prompt revision, and the human accountable for each step. It also means a clean handover hook so that a complaint flips the case out of agent handling and into human handling without losing the trace.
+
+You can build this. It does require deciding, at design time, that the agent's output schema and your IDR system's input schema are not two separate problems.
+
+### Underwriting decisioning
+
+Underwriting is where the primitives bite hardest because the decisions are individually consequential and the [Privacy Act APP 1 ADM transparency requirements commence 10 December 2026](https://www.oaic.gov.au/privacy/australian-privacy-principles/australian-privacy-principles-guidelines/chapter-1-app-1-open-and-transparent-management-of-personal-information). They apply where an APP entity arranges for a computer program to use personal information to make, or do a thing substantially and directly related to making, a decision that could reasonably be expected to significantly affect an individual's rights or interests. Many underwriting workflows are likely to fall within that regime; the exact analysis depends on the workflow design, the role of human review, and the personal information used.
+
+A demo-quality underwriting agent fails at two primitives at once. Legibility is hard because the model's decision rationale is post-hoc, not the actual mechanism. Interruptibility is hard because once cover is bound at policy issue, "interrupt" stops being a clean operation — you cannot retract cover the customer already holds without a documented contractual mechanism.
+
+The way these get designed in: keep the agent in the position of producing structured factor weights and a recommendation, not the decision; surface those to a human underwriter for any segment outside an explicit "auto-approve" envelope defined by your TMD and loss experience; and version the decision logic so that a six-month-later challenge can be answered against the version live at the time. That is heavier than the demo. It is also the only version that passes audit.
+
+## What "designed in" looks like in practice
+
+I have spent enough time around production voice AI workflows to have a strong view about which bits of governance design pay rent at build time and which can wait.
+
+<Figure
+  src="/posts/agent-governance-au-insurtech/figure-01.png"
+  alt="Bolt-on governance versus designed-in governance, with the trace pipeline as the structural difference between them."
+  caption="Fig. 1 — bolt-on governance versus designed-in governance, with the trace pipeline as the structural difference."
+/>
+
+Pay rent at build time: the trace schema (what gets logged on every agent step, in a form that downstream complaints and audit systems can read directly); the action whitelist (every tool the agent can call, signed off by both engineering and a risk owner, with the human-approval predicate); the kill-switch surface (per-case, per-cohort, global, plus a documented recovery procedure for in-flight state); and the version pin on prompts, tools, and models, with the version stored on every decision row. None of those are exotic. All of them are easier in week one of the build than week twenty.
+
+Can wait, in practice: the formal model card, the slide-deck governance framework, the AI risk policy document. Those are produced from the system, not the other way around. If the schema above is correct, those documents almost write themselves.
+
+The trap to avoid: treating the [Voluntary AI Safety Standard](https://www.industry.gov.au/publications/voluntary-ai-safety-standard)'s ten guardrails as a compliance checklist filled out by a policy team that has never read the code. They are design inputs to the system. Read them with the architecture diagram open.
+
+## Where the advice bends
+
+A few honest limits.
+
+Most of the AU insurer "AI wins" reported publicly are workflow AI, not true agents. IAG's [claim](https://www.itnews.com.au/news/iag-drives-ai-more-deeply-across-its-operations-625817) of 92 production GenAI use cases is impressive but tells you nothing about how many of those have autonomous tool use. The primitives still apply to workflow AI, but the emphasis shifts: task fit and legibility carry most of the weight, interruptibility is comparatively cheaper because the system does less on its own.
+
+The mandatory AI guardrails position is unsettled. The Department of Industry, Science and Resources put out a [proposals paper](https://consult.industry.gov.au/ai-mandatory-guardrails) in September 2024 on mandatory guardrails for high-risk AI, with developer and deployer responsibilities. As of writing this in May 2026, mandatory guardrails are not yet legislated. Use the voluntary standard as the working specification and watch the policy track.
+
+Technology-neutral interpretation is not the same as well-designed governance. ASIC's [REP 798](https://download.asic.gov.au/media/mtllqjo0/rep-798-published-29-october-2024.pdf) is clear that existing obligations apply to AI. A compliance team can hand you a paper showing your agent is "covered" under existing obligations. That paper does not mean the system can actually meet those obligations when stressed. Compliance posture and engineering reality diverge under load.
+
+## What to avoid
+
+The four failure patterns I see most often in this space, ranked by how often I see them.
+
+Bolt-on governance is the worst. The agent gets built, the policy paper gets written afterward, the policy paper claims controls that the system does not actually have. Second-line risk eventually finds out. Don't do this.
+
+Tool-first procurement is next. Picking the LLM provider, the agent framework, the observability platform, and the guardrails platform before you have written the trace schema is buying answers to questions you haven't asked. The primitives drive the procurement. Not the other way around.
+
+Pure model-card theatre is third. A beautifully written model card with no working trace pipeline is not governance, it is documentation. The trace pipeline is the governance.
+
+Treating the ICA Code as outside the agent's design is fourth. The 10-business-day clock and the 20-business-day update obligation are real numbers that an agent's monitoring and escalation primitives have to be designed against. They are not background context.
+
+## The takeaway
+
+The agent governance primitives have converged across both layers. The Australian regulatory stack (APRA standards, ASIC licensing obligations and guides, OAIC Privacy Act guidance, the ICA Code, the Voluntary AI Safety Standard, and now the April and May 2026 APRA and ASIC letters) addresses every one of them through one instrument or another, with the exact binding depending on which entity you are. The job is to make those primitives shape the system at design time, so that the audit, the IDR response, and the regulator's REP 798-style review all draw from the same trace the engineering team already had to build for the product to work. That is what "from demo to product" looks like in Australian insurance.
+
+Call it the whiteboard test. If you are about to start an agent build and you cannot, right now, sketch the named owner, the risk-register entry, the access model, the trace schema, the action whitelist, and the kill-switch surface on a single whiteboard, the build is not ready. Six things, one whiteboard. If any of them is missing or hand-waved, the system is not ready for an APRA or ASIC question, and it is not ready for the customer dispute that will follow.
+
+## Caveats
+
+The four-pillar programme model (lifecycle management, risk management, security, observability, with separation of duties / defence in depth / least-privilege access / audit everything as the corresponding best practices) is the framing used in the [DeepLearning.AI x Databricks *Governing AI Agents* short course](https://www.deeplearning.ai/short-courses/governing-ai-agents/) taught by Amber Roberts. I am borrowing it because it is the clearest popular statement of that layer; the Australian insurance mapping is mine. Regulatory references in this post are directional rather than legal advice. APRA standards bind APRA-regulated entities. ASIC licensing obligations bind AFS and credit licensees, while ASIC regulatory guides explain ASIC's interpretation and approach. Privacy Act and APP obligations bind APP entities, while OAIC guidance explains the regulator's expectations. The ICA Code binds general-insurance signatories by contract. The Voluntary AI Safety Standard is voluntary at the time of writing. Where the same primitive appears under different instruments, the exact binding depends on which entity you are. The Suncorp 7,000-claims and IAG 92-use-cases figures are company-reported; treat them as directional, not verified. The mandatory AI guardrails consultation status is the September 2024 proposals position; if you are reading this six months later, re-check whether legislation has moved. APP 1 ADM transparency requirements commence on 10 December 2026 and apply going forward; whether a specific underwriting workflow falls within the regime depends on workflow design, human involvement, and the personal information used. The April and May 2026 APRA and ASIC letters are administrative supervisory communications, not new standards. Nothing in this post is legal advice.
+
+## References
+
+Standards and primary frameworks:
+
+- [DeepLearning.AI x Databricks — Governing AI Agents short course (Amber Roberts) — source of the four programme pillars used in this post](https://www.deeplearning.ai/short-courses/governing-ai-agents/)
+- [Databricks — Databricks AI Security Framework v3.0 (DASF) — concrete implementation of the security pillar referenced above](https://www.databricks.com/blog/agentic-ai-security-new-risks-and-controls-databricks-ai-security-framework-dasf-v30)
+- [NIST — AI Risk Management Framework (Generative AI Profile, AI 600-1)](https://www.nist.gov/itl/ai-risk-management-framework)
+- [OpenAI — Practices for Governing Agentic AI Systems (Shavit, Agarwal et al, 2023)](https://cdn.openai.com/papers/practices-for-governing-agentic-ai-systems.pdf)
+- [Anthropic — Our framework for developing safe and trustworthy agents](https://www.anthropic.com/news/our-framework-for-developing-safe-and-trustworthy-agents)
+- [Anthropic — Trustworthy agents in practice (source of the four-layer model/harness/tools/environment responsibility split)](https://www.anthropic.com/research/trustworthy-agents)
+- [Anthropic — Measuring AI agent autonomy in practice](https://www.anthropic.com/research/measuring-agent-autonomy)
+- [Anthropic — SHADE-Arena: Evaluating Sabotage and Monitoring in LLM Agents](https://www.anthropic.com/research/shade-arena-sabotage-monitoring)
+- [IAIS — Application Paper on the supervision of artificial intelligence (July 2025)](https://www.iais.org/uploads/2025/07/Application-Paper-on-the-supervision-of-artificial-intelligence.pdf)
+- [ISO/IEC 42001 — Artificial intelligence management system standard](https://www.iso.org/standard/42001)
+
+Australian regulation and guidance:
+
+- [APRA — Letter to industry on artificial intelligence (30 April 2026)](https://www.apra.gov.au/apra-letter-to-industry-on-artificial-intelligence-ai)
+- [ASIC — 26-092MR Open letter on AI-accelerated cyber threats (8 May 2026)](https://www.asic.gov.au/about-asic/news-centre/find-a-media-release/2026-releases/26-092mr-asic-calls-for-urgent-cyber-uplift-as-ai-accelerates-cyber-threats/)
+- [APRA — Prudential Standard CPS 220 Risk Management](https://www.apra.gov.au/sites/default/files/cps_220.pdf)
+- [APRA — Prudential Standard CPS 230 Operational Risk Management](https://www.apra.gov.au/sites/default/files/2023-07/Prudential%20Standard%20CPS%20230%20Operational%20Risk%20Management%20-%20clean.pdf)
+- [APRA — Prudential Standard CPS 234 Information Security](https://www.apra.gov.au/sites/default/files/cps_234_july_2019_for_public_release.pdf)
+- [ASIC — REP 798 Beware the gap (29 October 2024)](https://download.asic.gov.au/media/mtllqjo0/rep-798-published-29-october-2024.pdf)
+- [ASIC — REP 802 Cause for complaint (5 December 2024)](https://download.asic.gov.au/media/5p3axgd0/rep802-published-5-december-2024.pdf)
+- [ASIC — RG 271 Internal dispute resolution](https://download.asic.gov.au/media/3olo5aq5/rg271-published-2-september-2021.pdf)
+- [ASIC — Design and Distribution Obligations guidance](https://www.asic.gov.au/regulatory-resources/financial-services/giving-financial-product-advice/faqs-design-and-distribution-obligations-for-advice-licensees-and-financial-advisers/)
+- [Insurance Council of Australia — General Insurance Code of Practice 2020](https://insurancecode.org.au/resources/general-insurance-code-of-practice-2020/)
+- [DISR — Australia's AI Ethics Principles](https://www.industry.gov.au/publications/australias-ai-ethics-principles)
+- [DISR — Voluntary AI Safety Standard (August 2024)](https://www.industry.gov.au/publications/voluntary-ai-safety-standard)
+- [DISR — Introducing mandatory guardrails for AI in high-risk settings (consultation, September 2024)](https://consult.industry.gov.au/ai-mandatory-guardrails)
+- [OAIC — Guidance on privacy and the use of commercially available AI products](https://www.oaic.gov.au/privacy/privacy-guidance-for-organisations-and-government-agencies/guidance-on-privacy-and-the-use-of-commercially-available-ai-products)
+- [OAIC — APP 1 Open and transparent management of personal information (ADM transparency obligations commencing 10 December 2026)](https://www.oaic.gov.au/privacy/australian-privacy-principles/australian-privacy-principles-guidelines/chapter-1-app-1-open-and-transparent-management-of-personal-information)
+
+Industry reporting (treat as company-reported):
+
+- [Suncorp builds generative AI engine SunGPT (iTnews)](https://www.itnews.com.au/news/suncorp-builds-generative-ai-engine-sungpt-611306)
+- [AI poised to lift customer service, Suncorp says (insuranceNEWS)](https://www.insurancenews.com.au/daily/ai-poised-to-lift-customer-service-suncorp-says)
+- [QBE Ventures — geospatial + AI for Cyclone Jasper claims](https://www.qbe.com/ventures/news/qbe-uses-geospatial-technology-and-ai-to-support-the-claims-response-to-severe-weather-events)
+- [IAG drives AI more deeply across its operations (iTnews)](https://www.itnews.com.au/news/iag-drives-ai-more-deeply-across-its-operations-625817)
