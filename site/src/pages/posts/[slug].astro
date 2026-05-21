@@ -141,6 +141,7 @@ const jsonLdNodes: Record<string, unknown>[] = blogPosting
 <DocLayout
   title={`${data.title} — Jonathan Abraham`}
   description={data.summary}
+  subtitle={data.summary}
   promptPath={`./posts/${post.id}`}
   crumbs={[
     { href: '/', label: '~' },

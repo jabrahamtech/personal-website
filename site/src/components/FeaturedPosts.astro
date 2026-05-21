@@ -1,0 +1,190 @@
+---
+/**
+ * FeaturedPosts — the editorial lead for the posts index.
+ *
+ * Renders the newest published post as a large "Featured" card on the left,
+ * with the next few as compact "Recent" cards on the right. Self-contained:
+ * markup + scoped styling live here so the home page stays a thin shell and
+ * `pages.css` doesn't accumulate listing-specific rules.
+ */
+import type { CollectionEntry } from 'astro:content';
+import { computeReadTime } from '../lib/readTime';
+
+interface Props {
+  /** Already-filtered + ordered posts; [0] becomes the feature. */
+  posts: CollectionEntry<'posts'>[];
+}
+const { posts } = Astro.props;
+const [feature, ...recent] = posts;
+const fmtDate = (p: CollectionEntry<'posts'>) =>
+  p.data.posted ? p.data.posted.toISOString().slice(0, 10) : '';
+---
+{feature && (
+  <section class="featured" aria-label="Featured posts">
+    <div class="featured-layout">
+      <div class="feature-col">
+        <p class="col-head">
+          <span class="eng-only">&gt; ./featured</span>
+          <span class="paper-only">Featured</span>
+        </p>
+        <a class="feature-card" href={`/posts/${feature.id}`}>
+          <span class="feature-thumb">
+            <img
+              src={feature.data.image!.src}
+              alt={feature.data.image!.alt}
+              width={feature.data.image!.width}
+              height={feature.data.image!.height}
+              loading="eager"
+              decoding="async"
+            />
+          </span>
+          <span class="feature-body">
+            {feature.data.cluster && <span class="feature-eyebrow">{feature.data.cluster}</span>}
+            <span class="feature-title">{feature.data.title}</span>
+            <span class="feature-desc">{feature.data.summary}</span>
+            <span class="feature-meta">{fmtDate(feature)} · {feature.data.readTime ?? computeReadTime(feature.body)}</span>
+          </span>
+        </a>
+      </div>
+
+      {recent.length > 0 && (
+        <div class="recent-col">
+          <p class="col-head">
+            <span class="eng-only">&gt; ./recent</span>
+            <span class="paper-only">Recent</span>
+          </p>
+          {recent.map((post) => (
+            <a class="recent-card" href={`/posts/${post.id}`}>
+              <span class="recent-thumb">
+                <img
+                  src={post.data.image!.src}
+                  alt={post.data.image!.alt}
+                  width={post.data.image!.width}
+                  height={post.data.image!.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </span>
+              <span class="recent-body">
+                {post.data.cluster && <span class="recent-eyebrow">{post.data.cluster}</span>}
+                <span class="recent-title">{post.data.title}</span>
+                <span class="recent-date">{fmtDate(post)}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+)}
+
+<style>
+  .featured { margin: 0 0 8px }
+
+  .featured-layout {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* shared column label ("Featured" / "Recent") */
+  .col-head {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .05em;
+    color: var(--ink-mute);
+    margin: 0 0 16px;
+  }
+
+  .feature-card,
+  .recent-card { display: flex; text-decoration: none; color: inherit }
+  .feature-card { flex-direction: column; gap: 20px }
+
+  .feature-thumb,
+  .recent-thumb {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 1px solid var(--line-2);
+    background: var(--bg-3);
+    box-shadow: 6px 6px 0 0 rgba(0, 0, 0, 0.4), 6px 6px 0 1px var(--line);
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+  .feature-thumb img,
+  .recent-thumb img { display: block; width: 100%; height: 100%; object-fit: cover }
+  .feature-card:hover .feature-thumb {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 0 rgba(0, 0, 0, 0.4), 9px 9px 0 1px var(--line);
+  }
+
+  .feature-body { display: flex; flex-direction: column; gap: 12px }
+  .feature-eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .feature-title {
+    font-family: var(--mono);
+    font-size: clamp(22px, 2.4vw, 28px);
+    line-height: 1.22;
+    font-weight: 700;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .feature-card:hover .feature-title { color: var(--green) }
+  .feature-desc {
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--ink-dim);
+    max-width: 54ch;
+    text-wrap: pretty;
+  }
+  .feature-meta {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .03em;
+    color: var(--ink-mute);
+  }
+
+  /* recent column — smaller vertical cards (full-width thumb so the hero
+     stays legible), clearly secondary to the feature but recognisable. */
+  .recent-col { display: flex; flex-direction: column; gap: 28px }
+  .recent-card { flex-direction: column; gap: 12px }
+  .recent-thumb { width: 100% }
+  .recent-body { display: flex; flex-direction: column; gap: 7px; min-width: 0 }
+  .recent-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .recent-title {
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1.32;
+    font-weight: 600;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .recent-card:hover .recent-title { color: var(--green) }
+  .recent-card:hover .recent-thumb {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.4), 8px 8px 0 1px var(--line);
+  }
+  .recent-date {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .03em;
+    color: var(--ink-mute);
+  }
+
+  /* stack the feature above the recents on narrow screens */
+  @media (max-width: 860px) {
+    .featured-layout { grid-template-columns: 1fr; gap: 32px }
+    .recent-col { margin-top: 4px }
+  }
+</style>

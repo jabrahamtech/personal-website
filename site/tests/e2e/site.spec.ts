@@ -18,13 +18,29 @@ const draftSlugs = [
 ];
 const allPostSlugs = [...liveSlugs, ...draftSlugs];
 
+/* The posts index shows the newest published posts as a Featured strip and
+   lists everything else below — the two never overlap. Right now all three
+   published posts are featured, so the list is exactly the five drafts. */
+const featuredSlugs = [
+  'polymarket-bot-event-driven',                    // the large "feature" card
+  'most-hitl-is-escalation-done-badly',             // recent
+  'when-to-force-the-llm-and-when-to-use-a-button', // recent
+];
+const listedSlugs = [
+  'rpa-already-solved-this',
+  'agent-governance-au-insurtech',
+  'boring-infrastructure-stack-for-startups',
+  'from-mvc-to-vertical-slice',
+  'judgement-before-pmf',
+];
+
 /* examplePost is the shared fixture for the rich-content tests (TOC,
    callouts, figures, JSON-LD). when-to-force has multiple h2 headings,
    a callout-tip, three figures, and a stable URL — the best fit. */
 const examplePost = '/posts/when-to-force-the-llm-and-when-to-use-a-button';
 
 test.describe('home (posts list)', () => {
-  test('renders only the ./posts prompt and the post list', async ({ page }) => {
+  test('renders the ./posts prompt, the featured strip, and the post list', async ({ page }) => {
     await page.goto('/');
 
     await expect(page).toHaveTitle(/^Jonathan Abraham/);
@@ -36,48 +52,58 @@ test.describe('home (posts list)', () => {
     await expect(page.locator('.page-head .tagline')).toHaveCount(0);
     await expect(page.locator('.links-row')).toHaveCount(0);
 
-    const rows = page.locator('.post-list .post-row');
-    await expect(rows).toHaveCount(allPostSlugs.length);
-    const hrefs = await rows.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')));
-    expect(hrefs).toEqual(allPostSlugs.map((slug) => `/posts/${slug}`));
+    // Featured strip: one large feature (newest published) + the rest as recents.
+    await expect(page.locator('.feature-card')).toHaveAttribute('href', `/posts/${featuredSlugs[0]}`);
+    const recentHrefs = await page.locator('.recent-card').evaluateAll(
+      (els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')),
+    );
+    expect(recentHrefs).toEqual(featuredSlugs.slice(1).map((slug) => `/posts/${slug}`));
 
-    await expect(page.locator('.post-list .draft')).toHaveCount(draftSlugs.length);
-    await expect(rows.first()).toContainText('What Polymarket taught me about event-driven');
+    // List below = every post NOT featured, in render order (no overlap).
+    const rows = page.locator('.post-list .post-row');
+    await expect(rows).toHaveCount(listedSlugs.length);
+    const hrefs = await rows.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')));
+    expect(hrefs).toEqual(listedSlugs.map((slug) => `/posts/${slug}`));
+    for (const slug of featuredSlugs) expect(hrefs).not.toContain(`/posts/${slug}`);
+
+    await expect(page.locator('.post-list .draft')).toHaveCount(listedSlugs.length);
     await expect(page.locator('main')).not.toContainText('Building this site with Astro');
   });
 
-  test('filters narrow by content type and surface a status line', async ({ page }) => {
+  test('topic chips + the type select filter the list with a status line', async ({ page }) => {
     await page.goto('/');
 
-    /* Posts now span three clusters, so the cluster select is shown
-       alongside type + sort (clusterFilters.length > 1 in index.astro). */
-    await expect(page.locator('#post-filters .filter-select')).toHaveCount(3);
-    await expect(page.locator('#post-filters .chip')).toHaveCount(0);
-    /* Content-type counts across the collection. Case Studies has zero
-       posts, so it is filtered out of the dropdown. */
+    // Cluster browsing is chips now; type + sort remain as secondary selects.
+    await expect(page.locator('#post-filters .filter-select')).toHaveCount(2);
+    await expect(page.locator('#post-filters .topic-chip')).toHaveCount(4); // All + 3 clusters
+    await expect(page.locator('.topic-chip.is-active')).toHaveText('All');
+
+    /* Content-type counts reflect the *listed* (non-featured) posts; types
+       with no listed posts (Technical Builds, Case Studies) are dropped. */
     await expect(page.locator('#filter-type option')).toHaveText([
-      'all types (8)',
+      'all types (5)',
       'Learning Guides (1)',
-      'Technical Builds (1)',
-      'Decision/Diagnostic Guides (4)',
+      'Decision/Diagnostic Guides (2)',
       'Playbooks (2)',
     ]);
 
-    // Technical Builds has exactly one post (polymarket) — a clean
-    // single-result filter to assert against.
-    await page.locator('#filter-type').selectOption({ label: 'Technical Builds (1)' });
-    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(1);
-    await expect(page.locator('.post-list li:not([hidden]) h2')).toHaveText(
-      'What Polymarket taught me about event-driven',
-    );
-    // Status line appears whenever a non-all filter is active.
+    // Chip filter: Engineering Practice has 2 listed posts.
+    await page.getByRole('button', { name: 'Engineering Practice' }).click();
+    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(2);
+    await expect(page.locator('.topic-chip.is-active')).toHaveText('Engineering Practice');
     await expect(page.locator('#post-status')).toBeVisible();
-    await expect(page.locator('#post-status')).toContainText('Technical Builds');
-    await expect(page.locator('#post-status')).toContainText('1 of 8');
+    await expect(page.locator('#post-status')).toContainText('2 of 5');
+    await expect(page.locator('#post-status')).toContainText('Engineering Practice');
 
-    await page.locator('#filter-type').selectOption('all');
-    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(allPostSlugs.length);
-    // Status line is hidden when no filter is active.
+    // Type and chips are mutually exclusive: picking a type resets the chip.
+    await page.locator('#filter-type').selectOption({ label: 'Playbooks (2)' });
+    await expect(page.locator('.topic-chip.is-active')).toHaveText('All');
+    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(2);
+    await expect(page.locator('#post-status')).toContainText('Playbooks');
+
+    // Back to All — every listed post visible, status hidden.
+    await page.getByRole('button', { name: 'All', exact: true }).click();
+    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(listedSlugs.length);
     await expect(page.locator('#post-status')).toBeHidden();
   });
 
@@ -91,11 +117,11 @@ test.describe('home (posts list)', () => {
       );
 
     await expect(page.locator('#filter-order')).toHaveValue('desc');
-    expect(await rowHrefs()).toEqual(allPostSlugs.map((slug) => `/posts/${slug}`));
+    expect(await rowHrefs()).toEqual(listedSlugs.map((slug) => `/posts/${slug}`));
 
-    // Oldest-first reverses each group but keeps drafts after live posts.
-    const ascSlugs = [...[...liveSlugs].reverse(), ...[...draftSlugs].reverse()];
+    // The listed posts are all drafts, so oldest-first is the plain reverse.
     await page.locator('#filter-order').selectOption('asc');
+    const ascSlugs = [...listedSlugs].reverse();
     await expect.poll(rowHrefs).toEqual(ascSlugs.map((slug) => `/posts/${slug}`));
   });
 
@@ -112,11 +138,10 @@ test.describe('home (posts list)', () => {
     expect(order[2]).toMatch(/^div\.meta/);
 
     const meta = first.locator('.meta');
-    // The newest post (polymarket) is live in the "Agents and Workflows"
-    // cluster with a single content-type tag (Technical Builds). No draft badge.
-    await expect(meta).not.toContainText('draft');
+    // First listed post (rpa) is a draft in "Agents and Workflows", typed Playbooks.
+    await expect(meta).toContainText('draft');
     await expect(meta).toContainText('Agents and Workflows');
-    await expect(meta.locator('.tag-cat')).toHaveText(['Technical Builds']);
+    await expect(meta.locator('.tag-cat')).toHaveText(['Playbooks']);
 
     const visibleListText = (await page.locator('.post-list').textContent()) || '';
     for (const noisy of [

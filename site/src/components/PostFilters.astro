@@ -1,0 +1,129 @@
+---
+/**
+ * PostFilters — topic browsing for the posts index.
+ *
+ * Cluster chips are the primary nav (browse by theme); type + sort are
+ * quieter secondary selects. Presentational only: the filtering/sorting
+ * controller lives in index.astro (it owns #post-list and wires up the
+ * #post-filters controls this renders). Scoped styles keep all the filter
+ * chrome here instead of in pages.css.
+ */
+interface FilterOption { value: string; label?: string; count: number }
+interface Props {
+  contentTypeFilters: FilterOption[];
+  clusterFilters: FilterOption[];
+  total: number;
+}
+const { contentTypeFilters, clusterFilters, total } = Astro.props;
+const showChips = clusterFilters.length > 1;
+---
+<div class="post-filters" id="post-filters" aria-label="filter posts">
+  {showChips && (
+    <div class="topic-chips" role="group" aria-label="Browse by topic">
+      <button type="button" class="topic-chip is-active" data-filter-value="all" aria-pressed="true">All</button>
+      {clusterFilters.map((c) => (
+        <button
+          type="button"
+          class="topic-chip"
+          data-filter-value={c.value}
+          data-filter-label={c.value}
+          aria-pressed="false"
+        >{c.value}</button>
+      ))}
+    </div>
+  )}
+  <div class="filter-secondary">
+    <label class="filter-field" for="filter-type">
+      <span class="filter-label">type</span>
+      <select class="filter-select" id="filter-type" data-filter-kind="type">
+        <option value="all">all types ({total})</option>
+        {contentTypeFilters.map((f) => (
+          <option value={f.value}>{f.label} ({f.count})</option>
+        ))}
+      </select>
+    </label>
+    <label class="filter-field filter-field-order" for="filter-order">
+      <span class="filter-label">sort</span>
+      <select class="filter-select" id="filter-order" data-order-control>
+        <option value="desc" selected>newest first</option>
+        <option value="asc">oldest first</option>
+      </select>
+    </label>
+  </div>
+</div>
+
+<style>
+  .post-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 24px;
+    margin: 4px 0 24px;
+    padding: 0 0 22px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* primary: topic chips (clusters) — sharp + mono to match the site */
+  .topic-chips { display: flex; flex-wrap: wrap; gap: 8px }
+  .topic-chip {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: .02em;
+    color: var(--ink-dim);
+    background: var(--bg);
+    border: 1px solid var(--line-2);
+    border-radius: var(--r-sm);
+    padding: 7px 13px;
+    cursor: pointer;
+    transition: color .12s ease, border-color .12s ease, background-color .12s ease;
+  }
+  .topic-chip:hover { color: var(--ink); border-color: var(--ink-mute) }
+  .topic-chip.is-active {
+    color: var(--green);
+    border-color: var(--green-2);
+    background: rgb(from var(--green) r g b / 0.09);
+    font-weight: 600;
+  }
+  .topic-chip:focus-visible { outline: 2px solid var(--green-2); outline-offset: 2px }
+
+  /* secondary: type + sort, deliberately quieter than the chips */
+  .filter-secondary { display: flex; flex-wrap: wrap; gap: 16px }
+  .filter-field { display: flex; flex-direction: column; gap: 5px }
+  .filter-field-order { min-width: 150px }
+  .filter-label {
+    font-family: var(--mono);
+    color: var(--ink-mute);
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .filter-select {
+    min-height: 34px;
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-mute);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 7px 30px 7px 10px;
+    cursor: pointer;
+    background-image:
+      linear-gradient(45deg, transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 15px) 14px, calc(100% - 10px) 14px;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    transition: color .12s ease, border-color .12s ease;
+  }
+  .filter-select:hover,
+  .filter-select:focus { color: var(--ink-dim); border-color: var(--ink-mute); outline: none }
+
+  @media (max-width: 560px) {
+    .post-filters { flex-direction: column; align-items: stretch }
+    .filter-secondary { width: 100% }
+    .filter-field { flex: 1 }
+  }
+</style>

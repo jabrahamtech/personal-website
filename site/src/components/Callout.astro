@@ -1,5 +1,5 @@
 ---
-type CalloutType = 'note' | 'warn' | 'tip' | 'info';
+type CalloutType = 'note' | 'warn' | 'tip' | 'info' | 'lesson';
 interface Props { type?: CalloutType; title?: string }
 const { type = 'note', title } = Astro.props;
 const defaults: Record<CalloutType, string> = {
@@ -7,6 +7,7 @@ const defaults: Record<CalloutType, string> = {
   warn: 'WARN',
   tip: 'TIP',
   info: 'INFO',
+  lesson: 'LESSON',
 };
 const label = (title ?? defaults[type] ?? 'NOTE').toUpperCase();
 const role = type === 'warn' ? 'alert' : 'note';

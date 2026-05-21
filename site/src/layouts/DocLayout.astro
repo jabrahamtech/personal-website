@@ -7,6 +7,8 @@ interface Heading { depth: number; slug: string; text: string }
 interface Props {
   title: string;
   description: string;
+  /** Short standfirst shown under the H1 (typically the post summary). */
+  subtitle?: string;
   promptPath: string;
   crumbs: Crumb[];
   metaRow?: { label: string; value: string }[];
@@ -37,6 +39,7 @@ interface Props {
 const {
   title,
   description,
+  subtitle,
   promptPath,
   crumbs,
   metaRow,
@@ -109,7 +112,7 @@ const titleSizeClass =
         <div class="doc-main">
           <div class="post-prompt eng-only">&gt; {promptPath}</div>
           <h1 class={titleSizeClass}>{cleanTitle}</h1>
-          <slot name="hero" />
+          {subtitle && <p class="doc-subtitle">{subtitle}</p>}
           {metaRow && (
             <div class="meta-row">
               {metaRow.map((m) => <span><b>{m.label}</b> {m.value}</span>)}
@@ -120,6 +123,7 @@ const titleSizeClass =
               {tags.map((t) => <span class="tag">{t}</span>)}
             </div>
           )}
+          <slot name="hero" />
           <article class="prose" id="post-body">
             <slot />
             {postId && (
@@ -141,7 +145,7 @@ const titleSizeClass =
         </div>
         {showToc && (
           <aside class="toc toc-desktop" aria-label="table of contents">
-            <div class="toc-head"><span class="eng-only">&gt; ./contents</span><span class="paper-only">Contents</span></div>
+            <div class="toc-head"><span class="eng-only">&gt; ./contents</span><span class="paper-only">On this page</span></div>
             <ul>
               {tocItems.map((h) => (
                 <li class={`d${h.depth}`}>

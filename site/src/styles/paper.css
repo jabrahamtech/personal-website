@@ -599,6 +599,8 @@ body.mode-paper .prose .callout-tip{border-left-color:var(--green)}
 body.mode-paper .prose .callout-tip .callout-bracket,body.mode-paper .prose .callout-tip .callout-label{color:var(--green)}
 body.mode-paper .prose .callout-warn{border-left-color:var(--amber)}
 body.mode-paper .prose .callout-warn .callout-bracket,body.mode-paper .prose .callout-warn .callout-label{color:var(--amber)}
+body.mode-paper .prose .callout-lesson{border-left-color:var(--accent);background:rgb(from var(--accent) r g b / 0.07)}
+body.mode-paper .prose .callout-lesson .callout-bracket,body.mode-paper .prose .callout-lesson .callout-label{color:var(--accent)}
 body.mode-paper .prose .callout-info{border-left-color:var(--ink-mute)}
 
 /* figures */

@@ -49,59 +49,8 @@
 /* post filters — terminal-style filter bar.
    fields collapse to full width on narrow screens.
    JS in index.astro persists the current select value in localStorage. */
-.post-filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 12px 14px;
-  margin: 4px 0 22px;
-  padding: 0 0 20px;
-  border-bottom: 1px solid var(--line);
-  font-family: var(--mono);
-}
-.post-filters .filter-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1 1 220px;
-  min-width: min(100%, 220px);
-}
-.post-filters .filter-field-order { flex: 1 1 200px; min-width: min(100%, 200px) }
-.post-filters .filter-label {
-  color: var(--green-2);
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-.post-filters .filter-select {
-  width: 100%;
-  min-height: 38px;
-  appearance: none;
-  -webkit-appearance: none;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: .02em;
-  color: var(--ink-dim);
-  background: var(--bg);
-  border: 1px solid var(--line-2);
-  border-radius: var(--r-sm);
-  padding: 9px 36px 9px 11px;
-  cursor: pointer;
-  background-image:
-    linear-gradient(45deg, transparent 50%, currentColor 50%),
-    linear-gradient(135deg, currentColor 50%, transparent 50%);
-  background-position: calc(100% - 17px) 16px, calc(100% - 12px) 16px;
-  background-size: 5px 5px, 5px 5px;
-  background-repeat: no-repeat;
-  transition: color .12s ease, border-color .12s ease, background-color .12s ease;
-}
-.post-filters .filter-select:hover,
-.post-filters .filter-select:focus {
-  color: var(--green);
-  border-color: var(--green-2);
-  outline: none;
-}
+/* Posts filter UI (topic chips + type/sort) lives in
+   components/PostFilters.astro with its own scoped styles. */
 
 .post-empty {
   font-family: var(--mono);
@@ -123,6 +72,11 @@
   margin: -8px 0 14px;
 }
 
+/* posts index — a touch wider than the default reading wrap so the
+   featured lead and the list below have presence. The featured strip's
+   markup + styles live in components/FeaturedPosts.astro (scoped). */
+.wrap.posts-index { max-width: 1040px }
+
 /* posts list — block rhythm with deliberate per-element margins so
    title → summary → meta reads as a hierarchy, not a flat stack of
    three same-spaced rows. */
@@ -133,7 +87,7 @@
 }
 .post-row {
   display: block;
-  padding: 24px 0 26px;
+  padding: 32px 0 34px;
   transition: background .12s ease;
 }
 .post-list li + li .post-row { border-top: 1px solid var(--line) }
@@ -141,20 +95,20 @@
 .post-row:hover { background: rgb(from var(--green) r g b / 0.025) }
 .post-row h2 {
   font-family: var(--mono);
-  font-size: 18.5px;
-  line-height: 1.3;
-  font-weight: 600;
-  margin: 0 0 8px;
+  font-size: 20px;
+  line-height: 1.28;
+  font-weight: 700;
+  margin: 0 0 10px;
   color: var(--ink);
   text-wrap: balance;
 }
 .post-row:hover h2 { color: var(--green) }
 .post-row p {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   color: var(--ink-dim);
-  font-size: 14.5px;
-  line-height: 1.55;
-  max-width: 64ch;
+  font-size: 15px;
+  line-height: 1.58;
+  max-width: 68ch;
   text-wrap: pretty;
 }
 .post-row .meta {
@@ -327,13 +281,6 @@
   .post-row p { font-size: 14.5px; line-height: 1.55; margin: 0 0 10px }
   .post-row .meta { flex-wrap: wrap; row-gap: 6px; font-size: 11px }
   .post-empty { font-size: 12.5px; padding: 14px 0 }
-}
-@media (max-width: 560px) {
-  .post-filters { gap: 10px; margin-bottom: 16px; padding-bottom: 16px }
-  .post-filters .filter-field,
-  .post-filters .filter-field-order { flex: 1 1 100%; min-width: 100% }
-  .post-filters .filter-label { font-size: 10.5px; margin-top: 2px }
-  .post-filters .filter-select { font-size: 12.5px; min-height: 40px }
 }
 @media (max-width: 480px) {
   .post-row .meta .tag,

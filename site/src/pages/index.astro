@@ -2,6 +2,8 @@
 import Base from '../layouts/Base.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { postUrl } from '../lib/urls';
+import FeaturedPosts from '../components/FeaturedPosts.astro';
+import PostFilters from '../components/PostFilters.astro';
 
 type Post = CollectionEntry<'posts'>;
 
@@ -24,6 +26,21 @@ function comparePosts(a: Post, b: Post, order: 'asc' | 'desc' = 'desc') {
 }
 
 const sorted = [...all].sort((a, b) => comparePosts(a, b));
+
+/* "latest" strip on the home page — the 3 most recent *published* posts
+   that have a cover image, newest first. Drafts are excluded. */
+const featured = [...all]
+  .filter((p) => !p.data.draft && p.data.posted && p.data.image)
+  .sort((a, b) =>
+    b.data.posted!.getTime() - a.data.posted!.getTime()
+    || a.data.title.localeCompare(b.data.title),
+  )
+  .slice(0, 3);
+
+/* The featured posts appear only in the strip, not repeated in the list
+   below — so the list is every other post, in the usual order. */
+const featuredIds = new Set(featured.map((p) => p.id));
+const listed = sorted.filter((p) => !featuredIds.has(p.id));
 
 const contentTypeOrder = [
   'Learning Guides',
@@ -51,15 +68,15 @@ const contentTypeFilters = contentTypeOrder
     kind: 'type',
     value,
     label: contentTypeLabels[value],
-    count: sorted.filter((p) => p.data.contentTypes.includes(value)).length,
+    count: listed.filter((p) => p.data.contentTypes.includes(value)).length,
   }))
   .filter((f) => f.count > 0);
 
-const clusterFilters = Array.from(new Set(sorted.map((p) => p.data.cluster).filter(Boolean)))
+const clusterFilters = Array.from(new Set(listed.map((p) => p.data.cluster).filter(Boolean)))
   .map((value) => ({
     kind: 'cluster',
     value: value as string,
-    count: sorted.filter((p) => p.data.cluster === value).length,
+    count: listed.filter((p) => p.data.cluster === value).length,
   }));
 
 function fmt(p: Post) {
@@ -120,50 +137,23 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
   description={description}
   jsonLd={blogJsonLd}
 >
-  <main id="content" class="wrap">
+  <main id="content" class="wrap posts-index">
     <header class="page-head">
       <h1 class="prompt"><span class="ph-prefix eng-only">./</span>posts</h1>
     </header>
 
-    {(() => {
-      const total = sorted.length;
-      return (
-        <div class="post-filters" id="post-filters" aria-label="filter upcoming drafts">
-          <label class="filter-field" for="filter-type">
-            <span class="filter-label">type</span>
-            <select class="filter-select" id="filter-type" data-filter-kind="type">
-              <option value="all">all types ({total})</option>
-              {contentTypeFilters.map((filter) => (
-                <option value={filter.value}>{filter.label} ({filter.count})</option>
-              ))}
-            </select>
-          </label>
-          {clusterFilters.length > 1 && (
-            <label class="filter-field" for="filter-cluster">
-              <span class="filter-label">cluster</span>
-              <select class="filter-select" id="filter-cluster" data-filter-kind="cluster">
-                <option value="all">all clusters ({total})</option>
-                {clusterFilters.map((filter) => (
-                  <option value={filter.value}>{filter.value} ({filter.count})</option>
-                ))}
-              </select>
-            </label>
-          )}
-          <label class="filter-field filter-field-order" for="filter-order">
-            <span class="filter-label">sort</span>
-            <select class="filter-select" id="filter-order" data-order-control>
-              <option value="desc" selected>newest first</option>
-              <option value="asc">oldest first</option>
-            </select>
-          </label>
-        </div>
-      );
-    })()}
+    {featured.length > 0 && <FeaturedPosts posts={featured} />}
+
+    <PostFilters
+      contentTypeFilters={contentTypeFilters}
+      clusterFilters={clusterFilters}
+      total={listed.length}
+    />
 
     <p class="post-status" id="post-status" hidden aria-live="polite"></p>
 
     <ul class="post-list" id="post-list">
-      {sorted.map((post) => {
+      {listed.map((post) => {
         const posted = fmt(post);
         return (
           <li
@@ -201,7 +191,8 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
       const status = document.getElementById('post-status');
       if (!root || !list) return;
       const items = Array.from(list.querySelectorAll('li'));
-      const filterSelects = Array.from(root.querySelectorAll('.filter-select[data-filter-kind]'));
+      const chips = Array.from(root.querySelectorAll('.topic-chip'));
+      const typeSelect = root.querySelector('#filter-type');
       const orderSelect = root.querySelector('[data-order-control]');
       const storageKey = 'ja_post_filter_v3';
       const total = items.length;
@@ -231,17 +222,18 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
         items.forEach((li) => list.appendChild(li));
       }
 
-      function describeFilter(kind, value) {
-        if (kind === 'all' || value === 'all') return null;
-        // Pull the label off the option so the status reads the way the
-        // user picked it (e.g. "Showing 2 of 7 · Playbooks"), with the
-        // trailing "(count)" stripped below.
-        const select = filterSelects.find((s) => s.getAttribute('data-filter-kind') === kind);
-        if (!select) return value;
-        const option = Array.from(select.options).find((o) => o.value === value);
-        if (!option) return value;
-        // Option labels embed the count (e.g. "Guide (2)") — strip it.
-        return option.textContent.replace(/\s*\(\d+\)\s*$/, '').trim();
+      // Human label for the status line — chip label for clusters, the
+      // option text (count stripped) for types.
+      function labelFor(kind, value) {
+        if (kind === 'cluster') {
+          const chip = chips.find((c) => c.getAttribute('data-filter-value') === value);
+          return chip ? (chip.getAttribute('data-filter-label') || chip.textContent.trim()) : value;
+        }
+        if (kind === 'type' && typeSelect) {
+          const opt = Array.from(typeSelect.options).find((o) => o.value === value);
+          return opt ? opt.textContent.replace(/\s*\(\d+\)\s*$/, '').trim() : value;
+        }
+        return value;
       }
 
       function apply(kind, value, order) {
@@ -257,20 +249,21 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
           li.hidden = !match;
           if (match) shown++;
         });
-        filterSelects.forEach((select) => {
-          const selectKind = select.getAttribute('data-filter-kind') || '';
-          select.value = selectKind === kind ? value : 'all';
+        // Type and cluster are mutually exclusive: activating one resets the
+        // other so the visible count is never ambiguous.
+        if (typeSelect) typeSelect.value = kind === 'type' ? value : 'all';
+        chips.forEach((chip) => {
+          const target = kind === 'cluster' ? value : 'all';
+          const on = chip.getAttribute('data-filter-value') === target;
+          chip.classList.toggle('is-active', on);
+          chip.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
         if (orderSelect) orderSelect.value = normalisedOrder;
         if (empty) empty.hidden = shown !== 0;
         if (status) {
-          // Visible count makes the type/cluster mutual-exclusion obvious:
-          // if a user picks one filter while another was active, they see
-          // the count change AND the second select snap to "all".
-          const label = describeFilter(kind, value);
-          if (label) {
+          if (kind !== 'all' && value !== 'all') {
             status.hidden = false;
-            status.textContent = 'Showing ' + shown + ' of ' + total + ' · ' + label;
+            status.textContent = 'Showing ' + shown + ' of ' + total + ' · ' + labelFor(kind, value);
           } else {
             status.hidden = true;
             status.textContent = '';
@@ -279,42 +272,42 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
         try { localStorage.setItem(storageKey, JSON.stringify({ kind, value, order: normalisedOrder })); } catch (_) {}
       }
 
+      // Restore the last filter, ignoring values that no longer exist.
       let initial = { kind: 'all', value: 'all', order: 'desc' };
       try {
         const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
-        // Validation has to check `value` even when `kind === 'all'`, or
-        // a stale value (e.g. a cluster name that no longer exists in
-        // the content collection) would pass through unchecked.
-        const validAllShape = saved && saved.kind === 'all' && saved.value === 'all';
-        const validFilterShape = saved
-          && typeof saved.kind === 'string'
-          && typeof saved.value === 'string'
-          && filterSelects.some((select) =>
-            select.getAttribute('data-filter-kind') === saved.kind
-            && Array.from(select.options).some((option) => option.value === saved.value)
-          );
-        if (validAllShape || validFilterShape) {
-          initial = {
-            kind: saved.kind,
-            value: saved.value,
-            order: saved.order === 'asc' ? 'asc' : 'desc',
-          };
+        const validAll = saved && saved.kind === 'all' && saved.value === 'all';
+        const validType = saved && saved.kind === 'type' && typeSelect
+          && Array.from(typeSelect.options).some((o) => o.value === saved.value);
+        const validCluster = saved && saved.kind === 'cluster'
+          && chips.some((c) => c.getAttribute('data-filter-value') === saved.value);
+        if (validAll || validType || validCluster) {
+          initial = { kind: saved.kind, value: saved.value, order: saved.order === 'asc' ? 'asc' : 'desc' };
         }
       } catch (_) {}
       apply(initial.kind, initial.value, initial.order);
 
-      filterSelects.forEach((select) => {
-        select.addEventListener('change', () => {
-          const value = select.value || 'all';
+      chips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const value = chip.getAttribute('data-filter-value') || 'all';
           const order = orderSelect ? orderSelect.value : 'desc';
-          apply(value === 'all' ? 'all' : select.getAttribute('data-filter-kind') || 'all', value, order);
+          apply(value === 'all' ? 'all' : 'cluster', value, order);
         });
       });
+      if (typeSelect) {
+        typeSelect.addEventListener('change', () => {
+          const value = typeSelect.value || 'all';
+          const order = orderSelect ? orderSelect.value : 'desc';
+          apply(value === 'all' ? 'all' : 'type', value, order);
+        });
+      }
       if (orderSelect) {
         orderSelect.addEventListener('change', () => {
-          const selectedFilter = filterSelects.find((select) => select.value !== 'all');
-          const kind = selectedFilter ? selectedFilter.getAttribute('data-filter-kind') || 'all' : 'all';
-          const value = selectedFilter ? selectedFilter.value || 'all' : 'all';
+          const activeChip = chips.find((c) => c.classList.contains('is-active') && c.getAttribute('data-filter-value') !== 'all');
+          let kind = 'all';
+          let value = 'all';
+          if (activeChip) { kind = 'cluster'; value = activeChip.getAttribute('data-filter-value'); }
+          else if (typeSelect && typeSelect.value !== 'all') { kind = 'type'; value = typeSelect.value; }
           apply(kind, value, orderSelect.value);
         });
       }

@@ -32,7 +32,7 @@
    ~67ch, both inside the comfortable 50-75ch reading measure. The
    column edge is the measure: everything (text, figures, code) aligns
    to it, so there's no asymmetric right-gutter on paragraphs. */
-.doc .doc-main { max-width: 640px; margin: 0 auto; min-width: 0 }
+.doc .doc-main { max-width: 700px; margin: 0 auto; min-width: 0 }
 .doc .post-prompt {
   font-family: var(--mono);
   color: var(--green);
@@ -51,6 +51,15 @@
 .doc h1.size-short { font-size: clamp(30px, 3.8vw, 42px) }
 .doc h1.size-medium { font-size: clamp(26px, 3.2vw, 34px) }
 .doc h1.size-long { font-size: clamp(22px, 2.6vw, 28px); line-height: 1.22 }
+.doc .doc-subtitle {
+  font-family: var(--sans);
+  font-size: clamp(16px, 1.7vw, 19px);
+  line-height: 1.5;
+  color: var(--ink-mute);
+  margin: 14px 0 20px;
+  max-width: 60ch;
+  text-wrap: pretty;
+}
 .doc .meta-row {
   display: flex;
   flex-wrap: wrap;
@@ -75,7 +84,7 @@
 
 .cover {
   display: block;
-  margin: 8px 0 22px;
+  margin: 20px 0 30px;
 }
 .cover img,
 .cover svg {
@@ -113,8 +122,8 @@
 /* prose — reading column */
 .prose {
   font-family: var(--sans);
-  font-size: 16px;
-  line-height: 1.7;
+  font-size: 17px;
+  line-height: 1.72;
   color: var(--ink-dim);
 }
 .prose p { margin: 0 0 18px; text-wrap: pretty }
@@ -173,7 +182,7 @@
   font-family: var(--mono);
   font-size: 22px;
   color: var(--ink);
-  margin: 36px 0 14px;
+  margin: 48px 0 14px;
   font-weight: 700;
   text-wrap: balance;
 }
@@ -182,7 +191,7 @@
   font-family: var(--mono);
   font-size: 17px;
   color: var(--ink);
-  margin: 28px 0 10px;
+  margin: 34px 0 10px;
   font-weight: 600;
   text-wrap: balance;
 }
@@ -342,6 +351,14 @@
 .prose .callout-info { border-left-color: var(--ink-mute) }
 .prose .callout-info .callout-bracket,
 .prose .callout-info .callout-label { color: var(--ink-dim) }
+/* "lesson" — the take-away box. Uses the brand accent + a faint wash so a
+   distilled production lesson reads as the most deliberate block on the page. */
+.prose .callout-lesson {
+  border-left-color: var(--accent);
+  background: rgb(from var(--accent) r g b / 0.06);
+}
+.prose .callout-lesson .callout-bracket,
+.prose .callout-lesson .callout-label { color: var(--accent) }
 
 /* inline figures with mono captions */
 .prose .post-figure { margin: 22px 0; display: block }
@@ -418,14 +435,14 @@
 .toc-desktop a {
   display: flex;
   gap: 6px;
-  color: var(--ink-mute);
-  padding: 3px 0 3px 6px;
+  color: var(--ink-dim);
+  padding: 3px 0 3px 10px;
   text-decoration: none;
-  border-left: 2px solid transparent;
+  border-left: 2px solid var(--line);
   transition: color .12s ease, border-color .12s ease;
 }
-.toc-desktop a:hover { color: var(--ink-dim) }
-.toc-desktop a.active { color: var(--green); border-left-color: var(--green-2) }
+.toc-desktop a:hover { color: var(--ink) }
+.toc-desktop a.active { color: var(--green); border-left-color: var(--green); font-weight: 600 }
 .toc-desktop .text {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -546,18 +563,22 @@
   .doc.has-toc .wrap { max-width: 1216px }
   .doc.has-toc .doc-grid {
     display: grid;
-    grid-template-columns: 220px minmax(0, 640px) 220px;
+    grid-template-columns: minmax(0, 1fr) 220px;
     column-gap: 48px;
     align-items: start;
-    justify-content: center;
   }
-  /* Inside the grid the column already enforces width; clear the
-     centered-column cap so doc-main fills its grid slot edge-to-edge. */
-  .doc.has-toc .doc-main { max-width: none; margin: 0 }
-  .doc.has-toc .doc-spacer { display: block; grid-column: 1 }
-  .doc.has-toc .doc-main { grid-column: 2 }
+  /* doc-main spans the full content zone (~892px at the 1216 wrap). The
+     readable text is capped at 640 and centred within the zone, so wide
+     figures break out symmetrically around the text rather than colliding
+     with the TOC. */
+  .doc.has-toc .doc-main {
+    grid-column: 1;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .doc.has-toc .doc-spacer { display: none }
   .doc.has-toc .toc-desktop {
-    grid-column: 3;
+    grid-column: 2;
     display: block;
     position: sticky;
     top: 80px;
@@ -568,6 +589,17 @@
     overflow: auto;
     padding-left: 16px;
     border-left: 1px solid var(--line);
+  }
+  /* Hero + inline figures break out symmetrically to fill the content
+     zone — wider and legible without opening the zoom — staying centred on
+     the text and clear of the TOC. The 192px = the zone's overhang past
+     the 700 column (96 each side). No transform is used: it would make
+     the zoom <dialog>'s fixed positioning break. */
+  .doc.has-toc .cover,
+  .doc.has-toc .prose .post-figure {
+    width: calc(100% + 192px);
+    max-width: none;
+    margin-left: -96px;
   }
 }
 
