@@ -52,6 +52,11 @@ interface Props {
 
 const { post, postId, newer, older, related } = Astro.props;
 const { data } = post;
+// Fake path for the eng-mode `ls ~/clusters/<slug>` prompt — "Agents and
+// Workflows" → "agents-and-workflows". Cosmetic; no such route exists.
+const clusterSlug = data.cluster
+  ? data.cluster.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+  : '';
 const { Content, headings } = await render(post);
 
 const sourcePath = `site/src/content/posts/${post.id}.mdx`;
@@ -174,15 +179,17 @@ const jsonLdNodes: Record<string, unknown>[] = blogPosting
   {related.length > 0 && (
     <nav class="related" slot="footer" aria-label={`More in ${data.cluster}`}>
       <div class="related-head">
-        <span class="eng-only">&gt; more in {data.cluster}</span>
+        <span class="eng-only">&gt; ls ~/clusters/{clusterSlug}</span>
         <span class="paper-only">More in {data.cluster}</span>
       </div>
       <ul>
         {related.map((r) => (
           <li>
             <a href={`/posts/${r.id}`}>
-              <span class="related-title">{r.data.title}</span>
-              {r.data.draft && <span class="draft">draft</span>}
+              <span class="eng-only related-file">{r.id}.mdx</span>
+              <span class="paper-only related-title">{r.data.title}</span>
+              {r.data.draft && <span class="eng-only related-draft">[draft]</span>}
+              {r.data.draft && <span class="paper-only draft">draft</span>}
             </a>
           </li>
         ))}

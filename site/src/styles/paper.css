@@ -479,6 +479,21 @@ body.mode-paper .prose a:hover{
 body.mode-paper .prose ul{padding-left:0;list-style:none}
 body.mode-paper .prose ul li{position:relative;padding-left:22px;margin:8px 0}
 body.mode-paper .prose ul li::before{content:"—";position:absolute;left:0;top:0;color:var(--green);font-weight:600}
+
+/* related-by-cluster rows are full-width flex links, so the generic prose-link
+   highlighter spans the whole row and the "—" list bullet intrudes. Drop both,
+   then put the green link-highlight on just the title text (its underline). */
+body.mode-paper .prose .related ul li{padding-left:0;margin:0}
+body.mode-paper .prose .related ul li::before{content:none}
+body.mode-paper .prose .related a{background:none}
+body.mode-paper .prose .related a .related-title{
+  background:linear-gradient(180deg, transparent 64%, rgb(from var(--green) r g b / 0.28) 64%, rgb(from var(--green) r g b / 0.28) 92%, transparent 92%);
+  padding:0 1px;
+  transition:background .12s ease;
+}
+body.mode-paper .prose .related a:hover .related-title{
+  background:linear-gradient(180deg, transparent 50%, rgb(from var(--green) r g b / 0.45) 50%, rgb(from var(--green) r g b / 0.45) 96%, transparent 96%);
+}
 body.mode-paper .prose ol{padding-left:24px}
 body.mode-paper .prose blockquote{
   font-family:var(--sans);font-style:italic;color:var(--ink-dim);

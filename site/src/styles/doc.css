@@ -505,48 +505,40 @@
 .pn a span { font-size: 13.5px; color: var(--ink); line-height: 1.35 }
 .pn a.next { text-align: right; align-items: flex-end }
 
-/* related-by-cluster — onward reading by topic, stronger than chronological
-   prev/next, so it sits above it. Mono in both modes, matching .pn. */
+/* related-by-cluster — reads like `ls` output of the cluster's posts.
+   No boxes (prev/next owns the boxed look); a borderless prompt + listing,
+   the same idiom as the TOC and the EOF/git-blame markers. */
 .related {
   margin-top: 48px;
-  padding-top: 24px;
+  padding-top: 22px;
   border-top: 1px solid var(--line);
 }
 .related-head {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--ink-mute);
-  letter-spacing: .04em;
-  margin-bottom: 14px;
+  letter-spacing: .02em;
+  margin-bottom: 8px;
 }
-.related ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.related ul { list-style: none; margin: 0; padding: 0 }
 .related li { margin: 0 }
 .related a {
   display: flex;
+  justify-content: space-between;
   align-items: baseline;
-  gap: 10px;
+  gap: 16px;
   font-family: var(--mono);
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--ink);
-  padding: 10px 14px;
-  border: 1px solid var(--line-2);
-  transition: border-color .12s ease, background .12s ease;
+  padding: 5px 12px;
+  transition: color .12s ease, background .12s ease;
 }
-.related a:hover { border-color: var(--green-2); background: rgb(from var(--green) r g b / 0.03) }
-.related a::before { content: "→"; color: var(--ink-mute); flex: none }
-.related a:hover::before { color: var(--green-2) }
-.related .related-title { flex: 1; line-height: 1.35 }
-.related .draft {
-  align-self: center;
-  color: var(--amber);
-  border: 1px solid var(--line-2);
-  padding: 1px 6px;
-  font-size: 10.5px;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-}
-/* Two bordered onward-reading sections in a row; tighten the gap so the
-   second rule doesn't read as a large empty band. */
+.related a:hover { color: var(--green); background: rgb(from var(--green) r g b / 0.05) }
+.related a:hover .related-file,
+.related a:hover .related-title { color: var(--green) }
+.related .related-title { line-height: 1.35 }
+/* eng-mode draft marker — bracketed amber text, aligned right like `ls -l`. */
+.related .related-draft { flex: none; color: var(--amber); font-size: 12px; letter-spacing: .02em }
 .related + .pn { margin-top: 36px }
 
 /* desktop right-rail TOC kicks in only at >=1320px */
