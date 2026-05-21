@@ -52,6 +52,7 @@ nav.top .row{
   align-items:center;
   height:58px;
   gap:24px;
+  max-width:var(--w-frame);
 }
 nav.top .brand{justify-self:start;grid-column:1}
 nav.top .nav-links{justify-self:center;grid-column:2}
@@ -135,7 +136,7 @@ nav.top .nav-actions{
 /* nowrap everywhere — desktop cells comfortably fit at 4 × ~140px, and
    the mobile cells (after mob-hide drops REGIONS/BUILD) fit on one line.
    Wrapping was the source of the cluttered second-row at every size. */
-.status-strip .row{display:flex;justify-content:space-between;align-items:center;gap:24px;padding-block:7px;flex-wrap:nowrap}
+.status-strip .row{display:flex;justify-content:space-between;align-items:center;gap:24px;padding-block:7px;flex-wrap:nowrap;max-width:var(--w-frame)}
 .status-strip .cell{white-space:nowrap;display:inline-flex;align-items:baseline;gap:6px}
 .status-strip b{color:var(--ink-dim);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
 .status-strip .suf{color:var(--line-2);margin-left:4px;font-size:10.5px;letter-spacing:.05em}
@@ -153,6 +154,7 @@ nav.top .nav-actions{
 
 /* footer */
 footer{padding:36px 0 60px;border-top:1px solid var(--line);margin-top:60px;position:relative;z-index:2}
+.wrap.foot{max-width:var(--w-frame)}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--ink-mute)}
 .foot a{color:var(--ink-dim)}
 .foot a:hover{color:var(--green)}

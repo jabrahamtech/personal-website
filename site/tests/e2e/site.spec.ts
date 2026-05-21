@@ -70,17 +70,17 @@ test.describe('home (posts list)', () => {
     await expect(page.locator('main')).not.toContainText('Building this site with Astro');
   });
 
-  test('topic chips + the type select filter the list with a status line', async ({ page }) => {
+  test('topic chips + the type dropdown filter the list with a status line', async ({ page }) => {
     await page.goto('/');
 
-    // Cluster browsing is chips now; type + sort remain as secondary selects.
-    await expect(page.locator('#post-filters .filter-select')).toHaveCount(2);
+    // Cluster browsing is chips; type + sort are custom dropdowns (not native selects).
+    await expect(page.locator('#post-filters .dd-trigger')).toHaveCount(2); // type + sort
     await expect(page.locator('#post-filters .topic-chip')).toHaveCount(4); // All + 3 clusters
     await expect(page.locator('.topic-chip.is-active')).toHaveText('All');
 
-    /* Content-type counts reflect the *listed* (non-featured) posts; types
+    /* Content-type options reflect the *listed* (non-featured) posts; types
        with no listed posts (Technical Builds, Case Studies) are dropped. */
-    await expect(page.locator('#filter-type option')).toHaveText([
+    await expect(page.locator('[data-dropdown][data-kind="type"] .dd-option')).toHaveText([
       'all types (5)',
       'Learning Guides (1)',
       'Decision/Diagnostic Guides (2)',
@@ -91,20 +91,21 @@ test.describe('home (posts list)', () => {
     await page.getByRole('button', { name: 'Engineering Practice' }).click();
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(2);
     await expect(page.locator('.topic-chip.is-active')).toHaveText('Engineering Practice');
-    await expect(page.locator('#post-status')).toBeVisible();
     await expect(page.locator('#post-status')).toContainText('2 of 5');
     await expect(page.locator('#post-status')).toContainText('Engineering Practice');
 
     // Type and chips are mutually exclusive: picking a type resets the chip.
-    await page.locator('#filter-type').selectOption({ label: 'Playbooks (2)' });
+    await page.locator('[data-dropdown][data-kind="type"] .dd-trigger').click();
+    await page.locator('[data-dropdown][data-kind="type"] .dd-option[data-value="Playbooks"]').click();
     await expect(page.locator('.topic-chip.is-active')).toHaveText('All');
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(2);
     await expect(page.locator('#post-status')).toContainText('Playbooks');
 
-    // Back to All — every listed post visible, status hidden.
+    // Back to All — every listed post visible. The status text clears but the
+    // element stays in flow (reserved height), so it's empty rather than hidden.
     await page.getByRole('button', { name: 'All', exact: true }).click();
     await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(listedSlugs.length);
-    await expect(page.locator('#post-status')).toBeHidden();
+    await expect(page.locator('#post-status')).toHaveText('');
   });
 
   test('sorts newest first by default and can switch to oldest first', async ({ page }) => {
@@ -116,11 +117,14 @@ test.describe('home (posts list)', () => {
         (els) => els.map((e) => (e as HTMLAnchorElement).getAttribute('href')),
       );
 
-    await expect(page.locator('#filter-order')).toHaveValue('desc');
+    // Default is newest first (the sort dropdown's trigger reflects it).
+    await expect(page.locator('[data-dropdown][data-kind="order"] .dd-value')).toHaveText('newest first');
     expect(await rowHrefs()).toEqual(listedSlugs.map((slug) => `/posts/${slug}`));
 
-    // The listed posts are all drafts, so oldest-first is the plain reverse.
-    await page.locator('#filter-order').selectOption('asc');
+    // Switch to oldest first via the custom dropdown. Listed posts are all
+    // drafts, so oldest-first is the plain reverse.
+    await page.locator('[data-dropdown][data-kind="order"] .dd-trigger').click();
+    await page.locator('[data-dropdown][data-kind="order"] .dd-option[data-value="asc"]').click();
     const ascSlugs = [...listedSlugs].reverse();
     await expect.poll(rowHrefs).toEqual(ascSlugs.map((slug) => `/posts/${slug}`));
   });

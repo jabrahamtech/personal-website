@@ -150,7 +150,7 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
       total={listed.length}
     />
 
-    <p class="post-status" id="post-status" hidden aria-live="polite"></p>
+    <p class="post-status" id="post-status" aria-live="polite"></p>
 
     <ul class="post-list" id="post-list">
       {listed.map((post) => {
@@ -167,12 +167,16 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
               <h2>{post.data.title}</h2>
               <p>{post.data.summary}</p>
               <div class="meta">
-                {post.data.draft && <span class="draft">draft</span>}
-                {posted && <span>{posted}</span>}
-                {post.data.cluster && <span class="tag tag-cluster">{post.data.cluster}</span>}
-                {post.data.contentTypes.map((type) => (
-                  <span class="tag tag-cat" title={type}>{contentTypeLabel(type)}</span>
-                ))}
+                <span class="meta-status">
+                  {post.data.draft && <span class="draft">draft</span>}
+                  {posted && <span>{posted}</span>}
+                </span>
+                <span class="meta-tags">
+                  {post.data.cluster && <span class="tag tag-cluster">{post.data.cluster}</span>}
+                  {post.data.contentTypes.map((type) => (
+                    <span class="tag tag-cat" title={type}>{contentTypeLabel(type)}</span>
+                  ))}
+                </span>
               </div>
             </a>
           </li>
@@ -183,134 +187,4 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
     <p class="post-empty" id="post-empty" hidden>nothing here in this filter — try another.</p>
   </main>
 
-  <script is:inline>
-    (function () {
-      const root = document.getElementById('post-filters');
-      const list = document.getElementById('post-list');
-      const empty = document.getElementById('post-empty');
-      const status = document.getElementById('post-status');
-      if (!root || !list) return;
-      const items = Array.from(list.querySelectorAll('li'));
-      const chips = Array.from(root.querySelectorAll('.topic-chip'));
-      const typeSelect = root.querySelector('#filter-type');
-      const orderSelect = root.querySelector('[data-order-control]');
-      const storageKey = 'ja_post_filter_v3';
-      const total = items.length;
-
-      function sortItems(order) {
-        const normalised = order === 'asc' ? 'asc' : 'desc';
-        items.sort((a, b) => {
-          const aDraft = a.getAttribute('data-draft') === '1';
-          const bDraft = b.getAttribute('data-draft') === '1';
-          if (aDraft !== bDraft) return aDraft ? 1 : -1;
-
-          const aRawDate = a.getAttribute('data-posted-time') || '';
-          const bRawDate = b.getAttribute('data-posted-time') || '';
-          const aHasDate = aRawDate !== '';
-          const bHasDate = bRawDate !== '';
-          if (aHasDate || bHasDate) {
-            if (!aHasDate) return 1;
-            if (!bHasDate) return -1;
-            const diff = Number(aRawDate) - Number(bRawDate);
-            if (diff !== 0) return normalised === 'desc' ? -diff : diff;
-          }
-
-          const at = a.getAttribute('data-title') || '';
-          const bt = b.getAttribute('data-title') || '';
-          return normalised === 'desc' ? at.localeCompare(bt) : bt.localeCompare(at);
-        });
-        items.forEach((li) => list.appendChild(li));
-      }
-
-      // Human label for the status line — chip label for clusters, the
-      // option text (count stripped) for types.
-      function labelFor(kind, value) {
-        if (kind === 'cluster') {
-          const chip = chips.find((c) => c.getAttribute('data-filter-value') === value);
-          return chip ? (chip.getAttribute('data-filter-label') || chip.textContent.trim()) : value;
-        }
-        if (kind === 'type' && typeSelect) {
-          const opt = Array.from(typeSelect.options).find((o) => o.value === value);
-          return opt ? opt.textContent.replace(/\s*\(\d+\)\s*$/, '').trim() : value;
-        }
-        return value;
-      }
-
-      function apply(kind, value, order) {
-        const normalisedOrder = order === 'asc' ? 'asc' : 'desc';
-        sortItems(normalisedOrder);
-        let shown = 0;
-        items.forEach((li) => {
-          const types = (li.getAttribute('data-types') || '').split('|').filter(Boolean);
-          const cluster = li.getAttribute('data-cluster') || '';
-          const match = kind === 'all'
-            || (kind === 'type' && types.indexOf(value) !== -1)
-            || (kind === 'cluster' && cluster === value);
-          li.hidden = !match;
-          if (match) shown++;
-        });
-        // Type and cluster are mutually exclusive: activating one resets the
-        // other so the visible count is never ambiguous.
-        if (typeSelect) typeSelect.value = kind === 'type' ? value : 'all';
-        chips.forEach((chip) => {
-          const target = kind === 'cluster' ? value : 'all';
-          const on = chip.getAttribute('data-filter-value') === target;
-          chip.classList.toggle('is-active', on);
-          chip.setAttribute('aria-pressed', on ? 'true' : 'false');
-        });
-        if (orderSelect) orderSelect.value = normalisedOrder;
-        if (empty) empty.hidden = shown !== 0;
-        if (status) {
-          if (kind !== 'all' && value !== 'all') {
-            status.hidden = false;
-            status.textContent = 'Showing ' + shown + ' of ' + total + ' · ' + labelFor(kind, value);
-          } else {
-            status.hidden = true;
-            status.textContent = '';
-          }
-        }
-        try { localStorage.setItem(storageKey, JSON.stringify({ kind, value, order: normalisedOrder })); } catch (_) {}
-      }
-
-      // Restore the last filter, ignoring values that no longer exist.
-      let initial = { kind: 'all', value: 'all', order: 'desc' };
-      try {
-        const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
-        const validAll = saved && saved.kind === 'all' && saved.value === 'all';
-        const validType = saved && saved.kind === 'type' && typeSelect
-          && Array.from(typeSelect.options).some((o) => o.value === saved.value);
-        const validCluster = saved && saved.kind === 'cluster'
-          && chips.some((c) => c.getAttribute('data-filter-value') === saved.value);
-        if (validAll || validType || validCluster) {
-          initial = { kind: saved.kind, value: saved.value, order: saved.order === 'asc' ? 'asc' : 'desc' };
-        }
-      } catch (_) {}
-      apply(initial.kind, initial.value, initial.order);
-
-      chips.forEach((chip) => {
-        chip.addEventListener('click', () => {
-          const value = chip.getAttribute('data-filter-value') || 'all';
-          const order = orderSelect ? orderSelect.value : 'desc';
-          apply(value === 'all' ? 'all' : 'cluster', value, order);
-        });
-      });
-      if (typeSelect) {
-        typeSelect.addEventListener('change', () => {
-          const value = typeSelect.value || 'all';
-          const order = orderSelect ? orderSelect.value : 'desc';
-          apply(value === 'all' ? 'all' : 'type', value, order);
-        });
-      }
-      if (orderSelect) {
-        orderSelect.addEventListener('change', () => {
-          const activeChip = chips.find((c) => c.classList.contains('is-active') && c.getAttribute('data-filter-value') !== 'all');
-          let kind = 'all';
-          let value = 'all';
-          if (activeChip) { kind = 'cluster'; value = activeChip.getAttribute('data-filter-value'); }
-          else if (typeSelect && typeSelect.value !== 'all') { kind = 'type'; value = typeSelect.value; }
-          apply(kind, value, orderSelect.value);
-        });
-      }
-    })();
-  </script>
 </Base>

@@ -67,6 +67,11 @@
 
   /* sticky-offset under the nav */
   --nav-h: 58px;
+
+  /* shared desktop frame width — chrome (nav/footer/status) and the wide
+     content pages all expand to this so the layout stays consistent.
+     Reading columns (article body, about prose) stay narrower for legibility. */
+  --w-frame: 1280px;
 }
 
 /* palette — paper / editorial mode. Overrides only the palette vars;

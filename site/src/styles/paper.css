@@ -171,50 +171,8 @@ body.mode-paper .page-head h1.prompt::before{display:none}
   body.mode-paper .page-head{padding:44px 0 14px}
 }
 
-/* post filters — editorial filter bar.
-   - Soft cream chip surface, hairline rule above the list.
-   - Custom chevron via background-image so the select still hosts native
-     keyboard a11y; appearance:none kills the system glyph. */
-body.mode-paper .post-filters{
-  font-family:var(--sans);
-  display:flex;flex-wrap:wrap;align-items:flex-end;
-  gap:14px 18px;margin:24px 0 0;padding:0 0 26px;
-  border-bottom:1px solid var(--line);
-}
-body.mode-paper .post-filters .filter-field{gap:8px;min-width:min(100%,220px);flex:1 1 220px}
-body.mode-paper .post-filters .filter-field-order{min-width:min(100%,200px);flex:1 1 200px}
-body.mode-paper .post-filters .filter-label{
-  color:var(--ink-mute);
-  font-family:var(--sans);
-  font-size:10.5px;
-  font-weight:600;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-}
-body.mode-paper .post-filters .filter-select{
-  font-family:var(--sans);font-size:14.5px;letter-spacing:0;
-  min-height:42px;color:var(--ink);
-  background-color:var(--bg-3);
-  background-image:linear-gradient(45deg, transparent 50%, var(--ink-mute) 50%),linear-gradient(135deg, var(--ink-mute) 50%, transparent 50%);
-  background-position:calc(100% - 18px) 18px, calc(100% - 13px) 18px;
-  background-size:5px 5px, 5px 5px;
-  background-repeat:no-repeat;
-  border:1px solid var(--line-2);border-radius:var(--r-md);
-  box-shadow:0 1px 0 rgb(from var(--ink) r g b / 0.03);
-  padding:10px 38px 10px 14px;
-  appearance:none;-webkit-appearance:none;
-  transition:border-color .14s ease, box-shadow .14s ease, background-color .14s ease;
-}
-body.mode-paper .post-filters .filter-select:hover{
-  border-color:var(--ink-dim);
-  background-color:var(--bg-3);
-}
-body.mode-paper .post-filters .filter-select:focus{
-  outline:none;
-  border-color:var(--green-2);
-  background-color:var(--bg-3);
-  box-shadow:0 0 0 3px rgb(from var(--green) r g b / 0.14);
-}
+/* Filter bar styling (topic chips + type/sort) lives in
+   components/PostFilters.astro — scoped + mode-adaptive via tokens. */
 body.mode-paper .post-empty{
   font-family:var(--sans);font-style:italic;
   color:var(--ink-mute);font-size:15px;
@@ -223,11 +181,6 @@ body.mode-paper .post-empty{
 body.mode-paper .post-status{
   font-family:var(--sans);font-size:13px;letter-spacing:0;
   color:var(--ink-mute);
-}
-@media (max-width:560px){
-  body.mode-paper .post-filters{gap:12px}
-  body.mode-paper .post-filters .filter-field,
-  body.mode-paper .post-filters .filter-field-order{flex:1 1 100%;min-width:100%}
 }
 
 /* posts list — editorial, hairline rules, restrained hover.
@@ -251,19 +204,19 @@ body.mode-paper .post-row h2{
 body.mode-paper .post-row:hover h2{color:var(--green-2)}
 body.mode-paper .post-row p{
   color:var(--ink-dim);font-size:16px;line-height:1.6;
-  margin:0 0 14px;max-width:64ch;text-wrap:pretty;
+  margin:0 0 14px;text-wrap:pretty;
 }
 body.mode-paper .post-row .meta{
   font-family:var(--sans);font-size:13px;color:var(--ink-mute);
   letter-spacing:0;text-transform:none;
-  display:flex;flex-wrap:wrap;align-items:center;gap:10px;row-gap:6px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;
   margin:0;
 }
-body.mode-paper .post-row .meta > span:not(.tag):not(.draft){
-  position:relative;padding-right:14px;
-}
-body.mode-paper .post-row .meta > span:not(.tag):not(.draft) + span:not(.tag):not(.draft)::before{
-  content:"·";position:absolute;left:-12px;top:0;color:var(--line-2);
+@media (max-width:560px){
+  /* stack status (draft + date) above the tags, left-aligned — overrides
+     the desktop align-items:center which would otherwise centre the
+     column on mobile */
+  body.mode-paper .post-row .meta{flex-direction:column;align-items:flex-start;gap:8px}
 }
 body.mode-paper .post-row .meta .draft,
 body.mode-paper .related .draft{
@@ -358,7 +311,7 @@ body.mode-paper .doc h1{
   font-weight:600;letter-spacing:-0.022em;line-height:1.14;
   color:var(--ink);
   margin:0 0 18px;
-  text-wrap:balance;
+  text-wrap:pretty;
 }
 body.mode-paper .doc h1.size-short{font-size:clamp(30px,4.2vw,42px);line-height:1.12}
 body.mode-paper .doc h1.size-medium{font-size:clamp(28px,3.8vw,38px);line-height:1.16}
@@ -487,7 +440,6 @@ body.mode-paper .prose .related ul li{padding-left:0;margin:0}
 body.mode-paper .prose .related ul li::before{content:none}
 body.mode-paper .prose .related a{background:none}
 body.mode-paper .prose .related a .related-title{
-  background:linear-gradient(180deg, transparent 64%, rgb(from var(--green) r g b / 0.28) 64%, rgb(from var(--green) r g b / 0.28) 92%, transparent 92%);
   padding:0 1px;
   transition:background .12s ease;
 }

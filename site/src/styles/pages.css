@@ -69,13 +69,16 @@
   font-size: 11.5px;
   color: var(--ink-mute);
   letter-spacing: .04em;
-  margin: -8px 0 14px;
+  margin: 2px 0 18px;
+  /* always in flow + reserved so the all <-> filtered toggle doesn't shift
+     the page height (text is emptied, not hidden, when no filter is active) */
+  min-height: 1.3em;
 }
 
 /* posts index — a touch wider than the default reading wrap so the
    featured lead and the list below have presence. The featured strip's
    markup + styles live in components/FeaturedPosts.astro (scoped). */
-.wrap.posts-index { max-width: 1040px }
+.wrap.posts-index { max-width: var(--w-frame) }
 
 /* posts list — block rhythm with deliberate per-element margins so
    title → summary → meta reads as a hierarchy, not a flat stack of
@@ -108,20 +111,26 @@
   color: var(--ink-dim);
   font-size: 15px;
   line-height: 1.58;
-  max-width: 68ch;
   text-wrap: pretty;
 }
 .post-row .meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
-  row-gap: 6px;
+  gap: 8px 14px;
   font-family: var(--mono);
   font-size: 11.5px;
   color: var(--ink-mute);
   letter-spacing: .03em;
   margin: 0;
+}
+/* two groups — status (draft + date) and tags — so mobile can stack them */
+.post-row .meta-status,
+.post-row .meta-tags {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 .post-row .meta .draft {
   color: var(--amber);
@@ -133,6 +142,12 @@
 }
 .post-row .meta .tag { color: var(--ink-mute) }
 .post-row .meta .tag-cluster { color: var(--green-2) }
+/* mobile: stack status (draft + date) above the tags, and trim tag size */
+@media (max-width: 560px) {
+  .post-row .meta { flex-direction: column; align-items: flex-start; gap: 8px }
+  .post-row .meta .tag,
+  .post-row .meta .tag-cat { font-size: 10.5px; padding: 1px 6px }
+}
 
 /* about — bio header in eng mode is a transparent wrapper so the
    figure inside floats inside the prose's block formatting context.

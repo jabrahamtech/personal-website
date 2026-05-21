@@ -46,7 +46,9 @@
   letter-spacing: -0.01em;
   font-weight: 700;
   margin: 0 0 14px;
-  text-wrap: balance;
+  /* pretty (not balance) so the title fills the first line instead of
+     splitting into two short even halves. */
+  text-wrap: pretty;
 }
 .doc h1.size-short { font-size: clamp(30px, 3.8vw, 42px) }
 .doc h1.size-medium { font-size: clamp(26px, 3.2vw, 34px) }
@@ -176,6 +178,19 @@
   white-space: pre-wrap;
   word-break: normal;
   overflow-wrap: anywhere;
+}
+/* On phones the soft-wrap shreds indentation and breaks statements
+   mid-line, so code scrolls horizontally instead (line integrity wins over
+   avoiding a scroll). A slightly smaller size fits more before scrolling. */
+@media (max-width: 720px) {
+  .prose pre[data-language]:not([data-language="plaintext"]),
+  .prose pre[data-language]:not([data-language="plaintext"]) code {
+    white-space: pre;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+  .prose pre,
+  .prose pre code { font-size: 12px }
 }
 .prose pre code { background: transparent; border: 0; padding: 0; color: inherit }
 .prose h2 {
@@ -541,40 +556,46 @@
 .related li { margin: 0 }
 .related a {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 16px;
+  align-items: center;
+  gap: 12px;
   font-family: var(--mono);
   font-size: 13px;
   color: var(--ink);
-  padding: 5px 12px;
+  padding: 10px 12px;
   transition: color .12s ease, background .12s ease;
 }
+.related li + li a { border-top: 1px solid var(--line) }
 .related a:hover { color: var(--green); background: rgb(from var(--green) r g b / 0.05) }
 .related a:hover .related-file,
 .related a:hover .related-title { color: var(--green) }
-.related .related-title { line-height: 1.35 }
+/* One clean line per row — long titles ellipsis rather than wrap and
+   collide with the next row / the draft badge. */
+.related .related-file,
+.related .related-title {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 /* eng-mode draft marker — bracketed amber text, aligned right like `ls -l`. */
 .related .related-draft { flex: none; color: var(--amber); font-size: 12px; letter-spacing: .02em }
 .related + .pn { margin-top: 36px }
 
 /* desktop right-rail TOC kicks in only at >=1320px */
 @media (min-width: 1320px) {
-  .doc.has-toc .wrap { max-width: 1216px }
+  .doc.has-toc .wrap { max-width: var(--w-frame) }
   .doc.has-toc .doc-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 220px;
     column-gap: 48px;
     align-items: start;
   }
-  /* doc-main spans the full content zone (~892px at the 1216 wrap). The
-     readable text is capped at 640 and centred within the zone, so wide
-     figures break out symmetrically around the text rather than colliding
-     with the TOC. */
+  /* doc-main fills the whole content zone so the reading text and the
+     figures/hero render at the same width (no breakout). */
   .doc.has-toc .doc-main {
     grid-column: 1;
-    max-width: 700px;
-    margin: 0 auto;
   }
   .doc.has-toc .doc-spacer { display: none }
   .doc.has-toc .toc-desktop {
@@ -589,17 +610,6 @@
     overflow: auto;
     padding-left: 16px;
     border-left: 1px solid var(--line);
-  }
-  /* Hero + inline figures break out symmetrically to fill the content
-     zone — wider and legible without opening the zoom — staying centred on
-     the text and clear of the TOC. The 192px = the zone's overhang past
-     the 700 column (96 each side). No transform is used: it would make
-     the zoom <dialog>'s fixed positioning break. */
-  .doc.has-toc .cover,
-  .doc.has-toc .prose .post-figure {
-    width: calc(100% + 192px);
-    max-width: none;
-    margin-left: -96px;
   }
 }
 
