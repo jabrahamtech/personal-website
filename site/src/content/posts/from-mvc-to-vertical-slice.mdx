@@ -1,6 +1,6 @@
 ---
-title: "From MVC to vertical slice, and why it stuck for both humans and agents"
-summary: "Why I stopped writing layered MVC and switched to vertical slice, and how the same property that helped my team now helps coding agents read the code."
+title: "Why layered codebases punish humans and AI coding agents (and what vertical slice fixes)"
+summary: "Why layered MVC codebases hurt both your devs and your AI coding agents, and how one folder per feature (vertical slice) fixes it, with the SPL migration story."
 posted: 2026-05-19
 draft: true
 pipelineStatus: "Draft"
@@ -10,7 +10,7 @@ cluster: "Engineering Practice"
 tags: ['architecture', 'vertical-slice', 'coding-agents', 'dotnet', 'context-engineering']
 image:
   src: "/posts/from-mvc-to-vertical-slice/hero.png"
-  alt: "Hero card with the title written by hand, a deep-rust underline beneath 'vertical slice', and a small vignette comparing a layered folder tree to a feature-folder tree."
+  alt: "Hero card with the headline 'Why layered codebases punish humans and AI coding agents' handwritten, a deep-rust underline beneath 'AI coding agents', and a vignette in the upper right comparing a layered /src folder tree (Controllers, Services, Repositories, DTOs, Validators, Mappers — one feature edits five folders) with a sliced /src/Features/CreateServiceRequest folder (Endpoint, Request, Response, Validator, Handler — one feature, one folder)."
   width: 2000
   height: 1125
 ---
