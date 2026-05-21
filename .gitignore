@@ -6,4 +6,5 @@ site/.astro
 .env
 .env.production
 *.zip
-.claude/
+.claude/*
+!.claude/skills/
