@@ -158,7 +158,7 @@ body.mode-paper .page-head h1{
   text-transform:capitalize;
 }
 body.mode-paper .page-head .prompt{display:none}
-body.mode-paper .page-head :is(h1,h2).prompt{
+body.mode-paper .page-head h1.prompt{
   display:block;
   font-size:clamp(28px,3.6vw,38px);
   font-weight:500;
@@ -166,15 +166,9 @@ body.mode-paper .page-head :is(h1,h2).prompt{
   color:var(--ink);
   text-transform:capitalize;
 }
-body.mode-paper .page-head :is(h1,h2).prompt::before{display:none}
-/* Homepage: the hero is the page title, so "Posts" is a smaller section
-   heading and loses the page-head's big top padding + its top divider
-   (the hero already supplies the rule above it). */
-body.mode-paper .posts-index .page-head{padding:30px 0 18px}
-body.mode-paper .posts-index .page-head :is(h1,h2).prompt{font-size:clamp(20px,2.4vw,26px)}
+body.mode-paper .page-head h1.prompt::before{display:none}
 @media (max-width:720px){
   body.mode-paper .page-head{padding:44px 0 14px}
-  body.mode-paper .posts-index .page-head{padding:22px 0 14px}
 }
 
 /* Filter bar styling (topic chips + type/sort) lives in
@@ -704,7 +698,7 @@ body.mode-paper .panic .btn-primary:hover{background:var(--green-2);color:var(--
      modes on a phone doesn't shift the brand's size. */
   body.mode-paper .brand{font-size:14px}
   body.mode-paper .page-head h1{font-size:clamp(24px,7vw,32px);line-height:1.18}
-  body.mode-paper .page-head :is(h1,h2).prompt{font-size:clamp(24px,7vw,32px)}
+  body.mode-paper .page-head h1.prompt{font-size:clamp(24px,7vw,32px)}
   body.mode-paper .doc{padding:36px 0 24px}
   /* Size variants need to be listed so they win against the more
      specific .size-* selectors set above. */

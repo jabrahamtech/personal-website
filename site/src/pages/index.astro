@@ -4,7 +4,6 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { postUrl } from '../lib/urls';
 import FeaturedPosts from '../components/FeaturedPosts.astro';
 import PostFilters from '../components/PostFilters.astro';
-import HomeHero from '../components/HomeHero.astro';
 
 type Post = CollectionEntry<'posts'>;
 
@@ -139,10 +138,8 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
   jsonLd={blogJsonLd}
 >
   <main id="content" class="wrap posts-index">
-    <HomeHero />
-
     <header class="page-head">
-      <h2 class="prompt"><span class="ph-prefix eng-only">./</span>posts</h2>
+      <h1 class="prompt"><span class="ph-prefix eng-only">./</span>posts</h1>
     </header>
 
     {featured.length > 0 && <FeaturedPosts posts={featured} />}
