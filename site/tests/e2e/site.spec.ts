@@ -46,9 +46,14 @@ test.describe('home (posts list)', () => {
     await expect(page).toHaveTitle(/^Jonathan Abraham/);
     await expect(page.locator('.page-head .prompt')).toHaveText('./posts');
 
-    // The prompt now IS the h1 — exactly one h1 in page-head, with the path text
-    await expect(page.locator('.page-head h1')).toHaveCount(1);
-    await expect(page.locator('.page-head h1')).toHaveText('./posts');
+    // The commercial hero is now the page <h1>; "./posts" is demoted to an <h2>
+    // section heading (still wearing the .prompt chrome).
+    await expect(page.locator('.page-head h2.prompt')).toHaveCount(1);
+    await expect(page.locator('.page-head h2.prompt')).toHaveText('./posts');
+    await expect(page.locator('.page-head h1')).toHaveCount(0);
+    // Exactly one <h1> on the page and it is the hero statement.
+    await expect(page.locator('h1')).toHaveCount(1);
+    await expect(page.locator('h1.hh-statement')).toContainText('production-grade AI systems');
     await expect(page.locator('.page-head .tagline')).toHaveCount(0);
     await expect(page.locator('.links-row')).toHaveCount(0);
 
@@ -166,8 +171,8 @@ test.describe('home (posts list)', () => {
     const visible = (await page.locator('main').textContent()) || '';
     expect(visible).not.toContain('Working notes on production AI');
     expect(await page.locator('main .intro').count()).toBe(0);
-    // The page-head h1 IS the prompt now (path-as-heading)
-    await expect(page.locator('.page-head h1.prompt')).toHaveCount(1);
+    // "./posts" is now an <h2> section heading (the hero owns the page <h1>).
+    await expect(page.locator('.page-head h2.prompt')).toHaveCount(1);
   });
 
   test('no pitch-surface artifacts remain on home', async ({ page }) => {
@@ -194,6 +199,51 @@ test.describe('home (posts list)', () => {
     await expect(foot.locator('a[href^="mailto:"]')).toHaveText('email');
     await expect(foot.locator('a[href*="github.com/jabrahamtech"]')).toHaveText('github');
     await expect(foot.locator('a[href*="linkedin.com/in/jabrahamtech"]')).toHaveText('linkedin');
+  });
+
+  test('commercial hero leads the page and routes to /services', async ({ page }) => {
+    await page.goto('/');
+    const hero = page.locator('.home-hero');
+    await expect(hero).toBeVisible();
+    // The hero statement is the page <h1>.
+    await expect(hero.locator('h1.hh-statement')).toContainText('production-grade AI systems');
+    // Primary CTA → /services; secondary → /about.
+    await expect(hero.locator('a.cta-btn[href="/services"]')).toBeVisible();
+    await expect(hero.locator('a.cta-btn[href="/about"]')).toBeVisible();
+    // Hero sits above the posts section.
+    const heroBox = await hero.boundingBox();
+    const postsHead = await page.locator('.page-head').boundingBox();
+    expect(heroBox!.y).toBeLessThan(postsHead!.y);
+  });
+});
+
+test.describe('services page', () => {
+  test('renders the qualify-and-attract sections + email CTA', async ({ page }) => {
+    await page.goto('/services');
+    await expect(page).toHaveTitle(/Services — Jonathan Abraham/);
+    await expect(page.locator('.page-head h1')).toHaveText('./services');
+    // Selective framing: both a "fit" and a "not a fit" column.
+    await expect(page.locator('.svc-col[data-kind="fit"]')).toBeVisible();
+    await expect(page.locator('.svc-col[data-kind="not"]')).toBeVisible();
+    // Four engagement types.
+    await expect(page.locator('.work-list > li')).toHaveCount(4);
+    // Conversion is email.
+    await expect(
+      page.locator('.svc-cta a.cta-btn[href^="mailto:jabrahamtech@gmail.com"]'),
+    ).toBeVisible();
+  });
+
+  test('is indexable and emits Service + BreadcrumbList JSON-LD', async ({ page }) => {
+    await page.goto('/services');
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /index,follow/);
+    const ldTypes = await page.locator('script[type="application/ld+json"]').evaluateAll(
+      (els) => els.map((e) => {
+        try { return (JSON.parse(e.textContent || '{}') as { '@type'?: string })['@type']; }
+        catch { return null; }
+      }),
+    );
+    expect(ldTypes).toContain('Service');
+    expect(ldTypes).toContain('BreadcrumbList');
   });
 });
 

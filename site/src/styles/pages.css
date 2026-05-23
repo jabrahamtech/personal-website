@@ -38,13 +38,45 @@
   box-shadow: 0 0 8px var(--green);
   animation: phblink 1.4s ease-in-out infinite;
 }
-.page-head h1.prompt {
+/* :is(h1, h2) — the homepage demotes "./posts" to an <h2> (its <h1> is the
+   commercial hero statement); about/terminal keep it as the page <h1>. Both
+   wear the same prompt chrome. */
+.page-head :is(h1, h2).prompt {
   font-size: clamp(16px, 2vw, 20px);
   font-weight: 600;
   gap: 0;
 }
-.page-head h1.prompt::before { margin-right: 9px }
-.page-head h1.prompt .ph-prefix { color: var(--green-2); font-weight: 500; margin-right: 1px }
+.page-head :is(h1, h2).prompt::before { margin-right: 9px }
+.page-head :is(h1, h2).prompt .ph-prefix { color: var(--green-2); font-weight: 500; margin-right: 1px }
+
+/* When the homepage hero precedes it, "./posts" reads as a section divider,
+   not the page title — drop the big top padding the page-head normally uses
+   for nav clearance (the hero owns that now). */
+.posts-index .page-head { padding-top: 24px }
+
+/* Shared call-to-action button — homepage hero + services page.
+   Eng (default): filled green terminal button, mono. Paper inherits the
+   editorial dark-fill treatment the 404 actions already use (see paper.css).
+   `.ghost` is the secondary outline variant. */
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  padding: 11px 16px;
+  cursor: pointer;
+  color: #0a0d0a;
+  background: var(--green);
+  border: 1px solid var(--green);
+  border-radius: var(--r-sm);
+  transition: background .14s ease, color .14s ease, border-color .14s ease;
+}
+.cta-btn:hover { background: var(--green-2); border-color: var(--green-2); color: #0a0d0a }
+.cta-btn.ghost { color: var(--ink); background: transparent; border-color: var(--line-2) }
+.cta-btn.ghost:hover { color: var(--green); border-color: var(--green-2); background: transparent }
 
 /* post filters — terminal-style filter bar.
    fields collapse to full width on narrow screens.

@@ -24,6 +24,7 @@ This file follows the [llms.txt](https://llmstxt.org/) convention. Content here 
 
 ## Identity
 
+- [Services — Jonathan Abraham](https://jabrahamtech.com/services): What he takes on and who it's for. A small number of hands-on AI engagements a year, mostly by referral — AI product direction (pre-PMF), voice and conversational AI, the backend AI runs on, and production hardening for regulated, high-stakes domains. Available across Australia and the US. Includes an explicit "probably not a fit if…" list.
 - [About — Jonathan Abraham](https://jabrahamtech.com/about): AI engineer in Melbourne. About 5 years shipping production systems, the last 2 on AI. Founder of Brokerloop. Came into AI from full-stack engineering and consulting rather than research, which means commercial constraints get thought about first. Stack: Go · TypeScript · Python · React · Postgres · Redis · OpenAI · Anthropic · Groq · LangGraph · MCPs (Model Context Protocol servers) · Twilio · Deepgram · Retell.ai · ElevenLabs · AWS · Railway · Cloudflare · PostHog · Sentry · Base · Solidity contracts · Ponder.sh. New work is by referral.
 
 ## Capabilities

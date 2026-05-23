@@ -1,0 +1,321 @@
+---
+import Base from '../layouts/Base.astro';
+
+const siteOrigin = (Astro.site ?? new URL('https://jabrahamtech.com')).toString().replace(/\/$/, '');
+const personId = `${siteOrigin}/#jonathan`;
+const url = `${siteOrigin}/services`;
+
+/* Service + OfferCatalog — the commercial counterpart to the Person/WebSite
+   spine in Base.astro. provider @id resolves to the site-wide Person node, so
+   answer engines attach these engagements to the same entity as the posts and
+   the About page. Kept deliberately concrete; no pricing (engagements are
+   scoped per-conversation). */
+const serviceJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  '@id': `${url}#service`,
+  name: 'AI systems engineering & advisory — Jonathan Abraham',
+  serviceType: 'AI engineering, voice AI, and production hardening',
+  url,
+  description:
+    'A small number of hands-on AI engagements a year, mostly by referral: product direction pre-PMF, voice and conversational AI, the backend AI runs on, and production hardening for regulated, high-stakes domains.',
+  provider: { '@id': personId },
+  areaServed: [
+    { '@type': 'Country', name: 'Australia' },
+    { '@type': 'Country', name: 'United States' },
+  ],
+  audience: {
+    '@type': 'BusinessAudience',
+    name: 'Startups and teams with an AI prototype that needs to become a product',
+  },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Engagements',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'AI product direction (pre-PMF)',
+          description:
+            'What to build, who for, what it costs, what breaks, what needs a human, and the metric that proves it works — before runway is spent building the wrong thing well.',
+        },
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Voice & conversational AI',
+          description:
+            'Real-time voice agents that hold up on live calls: telephony, ASR/TTS, barge-in, latency budgets, and escalation design.',
+        },
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Backend for AI systems',
+          description:
+            'Go/TypeScript services, Postgres, queues, event-driven pipelines, observability, and the integrations that keep agents alive in production.',
+        },
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Production hardening',
+          description:
+            'Taking AI from working demo to a system that survives real users, real volume, and real regulation, with human-in-the-loop designed as escalation.',
+        },
+      },
+    ],
+  },
+};
+
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteOrigin}/` },
+    { '@type': 'ListItem', position: 2, name: 'Services', item: url },
+  ],
+};
+
+const description =
+  'What Jonathan Abraham takes on, who it’s for, and who it isn’t. A small number of hands-on AI engagements a year, mostly by referral — product direction, voice AI, AI backends, and production hardening across Australia and the US.';
+---
+<Base
+  title="Services — Jonathan Abraham"
+  description={description}
+  jsonLd={[serviceJsonLd, breadcrumb]}
+>
+  <main id="content" class="wrap">
+    <header class="page-head">
+      <h1 class="prompt"><span class="ph-prefix eng-only">./</span>services</h1>
+    </header>
+
+    <article class="prose">
+      <p class="lede">
+        I take on a small number of AI engagements a year, mostly by referral.
+        This page exists so you can decide — before we ever talk — whether I'm
+        the right person for what you're building. I'd rather lose your email
+        than your month.
+      </p>
+
+      <p class="svc-status">
+        <span class="eng-only">&gt; status: </span>open to select work · AU + US · by referral · a handful of engagements a year
+      </p>
+
+      <h2>What I help with</h2>
+      <ul class="work-list">
+        <li>
+          <strong>Product direction for AI, pre-PMF.</strong>
+          What to build, who it's for, what it costs, what breaks, what needs a
+          human, and the metric that proves it's working — decided before you
+          burn runway building the wrong thing well.
+        </li>
+        <li>
+          <strong>Voice &amp; conversational AI.</strong>
+          Real-time voice agents that hold up on live calls: telephony, ASR and
+          TTS, barge-in, latency budgets, and the escalation paths for the
+          moments a model shouldn't be deciding alone.
+        </li>
+        <li>
+          <strong>The backend AI actually runs on.</strong>
+          The unglamorous layer that keeps agents alive in production — Go and
+          TypeScript services, Postgres, queues, event-driven pipelines,
+          observability, and the integrations a demo never needs.
+        </li>
+        <li>
+          <strong>Production hardening.</strong>
+          Taking something that works in a demo to something that survives real
+          users, real volume, and real regulation. Human-in-the-loop designed as
+          escalation, not theatre.
+        </li>
+      </ul>
+
+      <h2>Who it's for — and who it isn't</h2>
+      <div class="svc-criteria">
+        <div class="svc-col" data-kind="fit">
+          <p class="svc-col-head">
+            <span class="eng-only">+ a fit if</span>
+            <span class="paper-only">A fit if…</span>
+          </p>
+          <ul>
+            <li>You have an AI prototype that demos well but isn't a product yet.</li>
+            <li>You're pre-PMF, and every wrong call costs runway you don't have.</li>
+            <li>You're in a regulated or high-stakes domain — insurance, finance, health — where "mostly works" is a liability.</li>
+            <li>You want someone who's shipped voice and agents to real users, not just built a notebook.</li>
+            <li>You'd rather have one senior person who's done it than a team learning on your time.</li>
+          </ul>
+        </div>
+        <div class="svc-col" data-kind="not">
+          <p class="svc-col-head">
+            <span class="eng-only">− probably not if</span>
+            <span class="paper-only">Probably not if…</span>
+          </p>
+          <ul>
+            <li>You want a long-term staff seat or a big team — I take a few contracts a year, hands-on.</li>
+            <li>You want someone to ratify a decision you've already made — I'll push back; that's most of the value.</li>
+            <li>You're optimising for the cheapest pair of hands. I'm not that, and that's fine.</li>
+            <li>You need a foundation model trained from scratch — I build systems around models, not the models themselves.</li>
+            <li>You need it shipped tomorrow with no scope — I scope before I build, which is why the builds last.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>How I work</h2>
+      <ul class="svc-how">
+        <li>By referral, a small number of engagements a year.</li>
+        <li>Australia and the US — Melbourne-based; I've shipped for a venture-funded LA company across the time gap.</li>
+        <li>Anywhere from advisory to hands-on build, usually starting with advice and earning the build.</li>
+        <li>We start with a conversation about scope, not a contract.</li>
+      </ul>
+    </article>
+
+    <section class="svc-cta" aria-label="Get in touch">
+      <h2>Start here</h2>
+      <p>
+        If that sounds like your problem, send me a short, specific note about
+        what you're building and where it's stuck — that's the best possible
+        start. Email is
+        <a href="mailto:jabrahamtech@gmail.com">jabrahamtech@gmail.com</a>.
+      </p>
+      <div class="svc-cta-actions">
+        <a class="cta-btn" href="mailto:jabrahamtech@gmail.com">
+          <span class="eng-only">▸ email me</span>
+          <span class="paper-only">Email me →</span>
+        </a>
+        <a class="cta-btn ghost" href="/">
+          <span class="eng-only">./read the notes</span>
+          <span class="paper-only">Read the notes</span>
+        </a>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  /* Status line under the lede — echoes the masthead StatusStrip's register. */
+  .svc-status {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: .02em;
+    color: var(--ink-mute);
+    margin: -4px 0 8px;
+  }
+
+  /* Fit / not-fit panel — the "qualify as much as attract" brief, rendered.
+     Outside-of-prose-list reasoning is sidestepped by scoping every rule under
+     .svc-col, which out-specifies the .prose ul defaults in both themes. */
+  .svc-criteria {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    margin: 18px 0 8px;
+    overflow: hidden;
+  }
+  .svc-col { padding: 24px 22px; }
+  .svc-col + .svc-col { border-left: 1px solid var(--line); }
+  .svc-col-head {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+  .svc-col[data-kind="fit"] .svc-col-head { color: var(--green); }
+  .svc-col[data-kind="not"] .svc-col-head { color: var(--amber); }
+  .svc-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+  }
+  .svc-col li {
+    position: relative;
+    padding-left: 22px;
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--ink-dim);
+    text-wrap: pretty;
+  }
+  .svc-col li::before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+  .svc-col[data-kind="fit"] li::before { content: "+"; color: var(--green); }
+  .svc-col[data-kind="not"] li::before { content: "–"; color: var(--amber); }
+
+  /* CTA panel — a deliberate conversion moment. Headings restyled here
+     (rather than reusing .prose h2) because the buttons must sit outside
+     .prose to avoid the .prose a override clobbering .cta-btn. */
+  .svc-cta {
+    margin: 52px 0 8px;
+    padding: 30px 26px;
+    border: 1px solid var(--line-2);
+    background: rgb(from var(--green) r g b / 0.035);
+    border-radius: var(--r-md);
+  }
+  .svc-cta h2 {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .svc-cta h2::before { content: "> "; color: var(--green); }
+  .svc-cta p {
+    font-size: 16px;
+    line-height: 1.62;
+    color: var(--ink-dim);
+    margin: 0 0 22px;
+    max-width: 62ch;
+    text-wrap: pretty;
+  }
+  .svc-cta p a {
+    color: var(--green);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .svc-cta p a:hover { color: var(--green-2); border-bottom-color: var(--green-2); }
+  .svc-cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 16px;
+  }
+
+  @media (max-width: 620px) {
+    .svc-criteria { grid-template-columns: 1fr; }
+    .svc-col + .svc-col { border-left: 0; border-top: 1px solid var(--line); }
+    .svc-cta { padding: 24px 20px; }
+  }
+</style>
+
+<style>
+  /* Paper-mode overrides for this page's bespoke blocks. Only the body.mode-paper
+     ancestor is :global — the .svc-* parts stay scoped so they inherit the same
+     [data-astro-cid] attributes as the default rules above and reliably
+     out-specify them. (A plain global `body.mode-paper .svc-cta h2` loses to
+     Astro's attribute-scoped default, which silently kept the eng mono heading.) */
+  :global(body.mode-paper) .svc-cta {
+    background: var(--bg-3);
+    border-color: var(--line);
+  }
+  :global(body.mode-paper) .svc-cta h2 {
+    font-family: var(--sans);
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+  }
+  :global(body.mode-paper) .svc-cta h2::before { content: ""; }
+  :global(body.mode-paper) .svc-cta p a { color: var(--green-2); }
+</style>
