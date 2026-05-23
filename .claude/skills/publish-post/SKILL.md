@@ -67,6 +67,10 @@ export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
    - The cover image is **not** repeated in the body — `posts/[slug].astro` auto-renders `image.src` into the `hero` slot, so an in-body copy double-renders it.
    - Every `<Figure src="...">` path resolves on disk (`test -f public<src>`).
 
+   **AEO shape** — cheap to get right, and it's what gets a post lifted into ChatGPT / Perplexity / Google AI answers:
+   - **Concise answer up top.** The body should open with a self-contained answer the reader (and a scraper) gets in the first ~40–60 words — an explicit `## Short answer` section or a tight lead paragraph, not a slow throat-clear. Answer engines snippet the opening. The published posts model both shapes: `most-hitl…` and `when-to-force…` use a `## Short answer`; `polymarket…` opens with a lead paragraph plus a bolded one-line claim. If a post opens with setup/preamble, flag it and propose a one-paragraph answer lead **in the author's voice** (plain, specific, no "in this post we'll explore").
+   - **A `## Related` block, made bidirectional.** Find 1–3 genuinely related *published* posts (same `cluster` first — `grep -l 'cluster:' src/content/posts/*.mdx`, then scan titles) and link them near the end as `- [Title](/posts/<slug>) — lowercase clause naming the real connection`. **Then add the backlink:** if B is A's natural companion, A should appear in B's Related too — internal links only build topic authority when they're reciprocal. So publishing may legitimately edit a *sibling* post's Related section; when it does, that sibling is part of the rebuild and you say so in the report. Never link to drafts (they're `noindex`'d, so the link leaks authority into a dead end), and never manufacture a link the content doesn't actually support.
+
 4. **Show the diagnosis, then apply.** Present the issue list. Mechanical, unambiguous flips can be applied directly; content rewrites (summary, alt, date choice) confirm with the user first. The publish flips, via `Edit`:
    - `draft: true` → `draft: false`
    - `pipelineStatus:` → `"Published"`

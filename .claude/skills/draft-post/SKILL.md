@@ -57,9 +57,9 @@ import Callout from '../../components/Callout.astro';
 import Figure from '../../components/Figure.astro';
 import CodeBlock from '../../components/CodeBlock.astro';
 
-<Callout type="note">
-  Drafting. Replace this with the hook — one or two sentences that earn the click.
-</Callout>
+## Short answer
+
+Lead with the answer, not a wind-up. The first 40–60 words should stand on their own — the claim stated plainly — so a reader (and an answer engine building a snippet) gets the point before scrolling. Replace this; expand the argument below. *(House style: every published post opens with a concise answer like this, or a tight lead paragraph.)*
 
 ## First section
 
