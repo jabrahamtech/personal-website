@@ -9,7 +9,7 @@ Takes one specified draft, runs the SEO/AEO optimisation + quality pass, flips i
 
 ## The one mental model that matters
 
-There is **nothing to hand-edit in RSS, llms.txt, or the sitemap.** Every public index is generated at build time from the content collection, filtering `!draft && posted`:
+There is **nothing to hand-edit in RSS, the sitemap, or the generated *Posts* list in llms.txt.** Every public *post* index is generated at build time from the content collection, filtering `!draft && posted`:
 
 | Surface | Source | Gate |
 |---|---|---|
@@ -19,6 +19,8 @@ There is **nothing to hand-edit in RSS, llms.txt, or the sitemap.** Every public
 | `/sitemap-index.xml` (+ `sitemap-0.xml`) | `@astrojs/sitemap` + `astro.config.mjs` draft filter | excludes `draft: true` slugs |
 | OG card + `BlogPosting` JSON-LD + `robots` | `src/layouts/Base.astro` via `posts/[slug].astro` | `noindex` while `draft`; `BlogPosting` only when `posted` set |
 | IndexNow ping | `scripts/notify-indexnow.mjs` (postbuild) | only when `INDEXNOW_ENABLED=1` (Railway only) |
+
+> **llms.txt is only partly generated.** Just its `## Posts` section comes from the collection (gated `!draft && posted`). The `## Identity` (About **and the `/services` page**), `## Capabilities`, `## Interactive`, and `## Elsewhere` sections are hand-written prose in `llms.txt.ts` — publishing a post never touches them, so don't assume the whole file regenerates (and don't "tidy away" those static pointers).
 
 So **publishing = make the post correct → flip frontmatter → `npm run build` (regenerates all of the above) → verify it landed in each one.** The skill's real job is the optimisation pass and the propagation proof, not editing feeds by hand.
 
@@ -52,7 +54,7 @@ export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
    - `title` — present.
    - `summary` — present, 1–2 sentences. This single string is reused as the meta description, `og:description`, the RSS `<description>`, the llms.txt bullet, and the JSON-LD `description`. Aim ~70–160 chars; flag if it's a stub, truncated, or >300 chars.
    - `tags` — lowercase-hyphen slugs (e.g. `voice-ai`). They become RSS `<category>` entries and JSON-LD `keywords`. Suggest reusing existing tags — `grep -h '^tags:' src/content/posts/*.mdx | tr ',' '\n'` to see what's in use — rather than minting near-duplicates.
-   - `contentTypes` — one or more of the Zod enum (Learning Journey Guide · Technical Build Breakdown · Business Outcome Case Study · Decision / Comparison Guide · Diagnostic / Failure Mode Guide · Playbook / Checklist / SOP Guide · POV / Strategic Opinion Post). `cluster` — set to a real topic cluster (see other posts). Both feed RSS categories + JSON-LD `keywords`/`articleSection`.
+   - `contentTypes` — one or more of the Zod enum (**Learning Guides · Technical Builds · Case Studies · Decision/Diagnostic Guides · Playbooks**). `cluster` — set to a real topic cluster (see other posts). Both feed RSS categories + JSON-LD `keywords`/`articleSection`. (If the build rejects a value, re-check `site/src/content.config.ts` — the enum is the source of truth.)
    - `image` (the cover **and** OG card — strongly expected for a published post):
      - `src` resolves to a real file: check `test -f "public<src>"`.
      - Format is **PNG or JPG, not SVG** — Facebook/LinkedIn/iMessage scrapers don't render SVG cards. If `src` ends `.svg`, flag it and offer `npm run render:og <in.svg> public/posts/<slug>/hero.png 1200 675`.
@@ -102,7 +104,7 @@ export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
 
 ## Don't
 
-- Don't hand-edit `rss.xml.ts`, `llms.txt.ts`, `llms-full.txt.ts`, or the sitemap — they regenerate from the collection. If a post isn't appearing, the cause is always `draft`/`posted`, not the feed code.
+- Don't hand-edit the **post lists** in `rss.xml.ts`, `llms.txt.ts`, `llms-full.txt.ts`, or the sitemap — they regenerate from the collection. If a post isn't appearing, the cause is always `draft`/`posted`, not the feed code. (The non-post sections of `llms.txt.ts` — Identity/Services/Capabilities/etc. — *are* hand-maintained, but that's page positioning, unrelated to publishing a post.)
 - Don't add an `updated` / `dateModified` frontmatter field — the schema doesn't support it and `dateModified` deliberately mirrors `posted`.
 - Don't set `readTime` — it's auto-computed at 230 wpm from the body.
 - Don't skip the build's error output — schema and MDX failures surface there and nowhere else.

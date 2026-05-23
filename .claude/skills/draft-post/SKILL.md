@@ -17,7 +17,7 @@ The project lives at `/Users/jonothanabraham/Documents/GitHub/personal-website`.
    - `title` — free text. Drives the slug + H1.
    - `summary` — free text, 1–2 sentence hook. Reused as the meta description, OG/RSS description, llms.txt bullet, and JSON-LD `description`.
    - `tags` — free text, comma-separated, slug-style (`voice-ai, production`). Suggest reusing existing tags (`grep -h '^tags:' site/src/content/posts/*.mdx`).
-   - `content type` — single-select from the Zod enum: Learning Journey Guide · Technical Build Breakdown · Business Outcome Case Study · Decision / Comparison Guide · Diagnostic / Failure Mode Guide · Playbook / Checklist / SOP Guide · POV / Strategic Opinion Post. Default to **POV / Strategic Opinion Post**.
+   - `content type` — single-select from the Zod enum: **Learning Guides · Technical Builds · Case Studies · Decision/Diagnostic Guides · Playbooks**. Default to **Decision/Diagnostic Guides** (the schema default). The enum is defined in `site/src/content.config.ts` — if these ever drift, that file wins.
 
    Don't ask about `draft`, `posted`, `readTime`, or `cluster` — defaults/omission handle them. (`cluster` is optional; mention afterward they can add one to join a topic-cluster grouping.)
 
