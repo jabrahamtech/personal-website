@@ -24,6 +24,9 @@ export default defineConfig({
     mdx(),
     sitemap({
       filter: (page) => {
+        // /terminal is noindex (an interactive easter egg, not content to rank),
+        // so keep it out of the sitemap — listing a noindex URL is inconsistent.
+        if (/\/terminal\/?$/.test(page)) return false;
         const m = page.match(/\/posts\/([^/]+)\/?$/);
         return !m || !draftSlugs.has(m[1]);
       },

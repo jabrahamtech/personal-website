@@ -94,7 +94,7 @@ const siteId = `${siteOrigin}/#site`;
 
 const defaultOg = {
   src: '/og/default.png',
-  alt: 'jonathan_abraham.os — shipping production AI for over 2 years',
+  alt: 'Jonathan Abraham — shipping production AI for over 2 years',
 };
 
 function imageFor(p: Post) {
@@ -139,7 +139,7 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
 >
   <main id="content" class="wrap posts-index">
     <header class="page-head">
-      <h1 class="prompt"><span class="ph-prefix eng-only">./</span>posts</h1>
+      <h1 class="prompt"><span class="ph-prefix eng-only" aria-hidden="true"></span>posts</h1>
     </header>
 
     {featured.length > 0 && <FeaturedPosts posts={featured} />}

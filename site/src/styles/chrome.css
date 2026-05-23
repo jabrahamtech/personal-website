@@ -62,6 +62,18 @@ nav.top .nav-actions{
 }
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:0.02em;color:var(--ink)}
 .brand .accent{color:var(--green)}
+/* eng wordmark + nav-sheet chrome rendered as CSS generated-content so the
+   literal "jonathan_abraham.os", "> ./menu" and "[esc]" strings never enter the
+   crawlable DOM. AI scrapers read hidden eng chrome out of the shared HTML and
+   described the site as a terminal/OS; this keeps the eng look pixel-identical
+   while the served markup reads as the paper site it actually renders. */
+body.mode-eng .brand-eng::before{content:"jonathan_abraham"}
+body.mode-eng .brand-eng::after{content:".os";color:var(--green)}
+body.mode-eng .nav-menu-eng::after{content:"\003E ./menu"}
+body.mode-eng .nav-esc-eng::after{content:"[esc]"}
+/* eng-only nav link labels (e.g. "terminal") from data-label — keeps the word
+   out of the DOM while rendering identically in engineer mode. */
+.nav-genlabel::after{content:attr(data-label)}
 .nav-links{display:flex;gap:22px;font-family:var(--mono);font-size:13px;color:var(--ink-dim)}
 .nav-links a{position:relative;padding:6px 0}
 .nav-links a:hover,.nav-links a[aria-current="page"]{color:var(--green)}
@@ -104,6 +116,7 @@ nav.top .nav-actions{
 .nav-sheet-list li{border-bottom:1px solid var(--line)}
 .nav-sheet-list a{display:flex;align-items:baseline;gap:14px;padding:18px 4px;font-family:var(--mono);font-size:18px;color:var(--ink);text-decoration:none}
 .nav-sheet-list a .fkey{color:var(--ink-mute);font-size:12px;letter-spacing:.06em;width:38px;flex:0 0 auto}
+.nav-sheet-list a .fkey::before{content:"[" attr(data-fkey) "]"}
 .nav-sheet-list a[aria-current="page"]{color:var(--green)}
 .nav-sheet-list a[aria-current="page"] .fkey{color:var(--green-2)}
 

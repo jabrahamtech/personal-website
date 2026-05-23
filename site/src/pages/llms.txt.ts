@@ -54,7 +54,7 @@ ${posts}
 
 ## Interactive
 
-- [Terminal — operator.training](https://jabrahamtech.com/terminal): A 5-stage interactive incident-response sim. You're paged at 2am with a voice AI hallucinating customer addresses. Teaches triage, root cause, mitigation, verification, and postmortem patterns for production AI systems.
+- [operator.training — interactive incident sim](https://jabrahamtech.com/terminal): A 5-stage interactive incident-response sim. You're paged at 2am with a voice AI hallucinating customer addresses. Teaches triage, root cause, mitigation, verification, and postmortem patterns for production AI systems.
 
 ## Elsewhere
 

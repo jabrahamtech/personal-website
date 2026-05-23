@@ -1,43 +1,11 @@
 ---
-// Bloomberg-style status strip rendered just below the nav on every page.
-// Static-but-believable values; the local time updates client-side.
+// Bloomberg-style status strip, engineer-mode only. Its labels read as
+// terminal/OS chrome, so neither the markup nor an inline script carries them:
+// the builder and ALL its strings live in /status-strip.js (external — not read
+// by scrapers for page descriptions), which injects the strip only once
+// engineer mode is active. Paper / first-load visitors get a clean empty mount.
+// The build marker is passed via data-build so it stays sourced from this file.
 const buildSlug = 'a3f8c'; // bumped manually on substantive deploys
 ---
-<div class="status-strip eng-only" role="status" aria-label="system status">
-  <div class="wrap row">
-    <span class="cell live"><span class="dot"></span><b>MEL</b> <span id="ss-time">--:--</span><span class="suf">AEST</span></span>
-    <span class="cell"><b>STATUS</b> open_to_select_work</span>
-    <span class="cell ss-mob-hide"><b>REGIONS</b> AU + US</span>
-    <span class="cell ss-mob-hide"><b>BUILD</b> {buildSlug}</span>
-  </div>
-</div>
-
-<script is:inline>
-  (function () {
-    const el = document.getElementById('ss-time');
-    if (!el) return;
-    function tick() {
-      // AEST/AEDT — Australia/Melbourne; falls back to local if Intl is unavailable.
-      try {
-        const t = new Intl.DateTimeFormat('en-AU', {
-          hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Australia/Melbourne'
-        }).format(new Date());
-        el.textContent = t;
-      } catch {
-        const d = new Date();
-        el.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-      }
-    }
-    // Tick once now, then schedule the next tick at the next real minute
-    // boundary so the displayed time flips when the wall clock does — not
-    // up-to-30s late as the previous setInterval(30_000) pattern allowed.
-    // After the first boundary, setInterval at 60s keeps it aligned for the
-    // session (drift over a typical visit is negligible).
-    tick();
-    const msToNextMinute = 60_000 - (Date.now() % 60_000);
-    setTimeout(function () {
-      tick();
-      setInterval(tick, 60_000);
-    }, msToNextMinute);
-  })();
-</script>
+<div class="status-strip eng-only" id="status-strip" role="status" aria-label="system status" data-build={buildSlug}></div>
+<script is:inline src="/status-strip.js" defer></script>

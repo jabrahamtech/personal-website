@@ -10,12 +10,24 @@ const links: Link[] = [
 <nav class="top">
   <div class="wrap row">
     <a class="brand" href="/" aria-label="Jonathan Abraham — home">
-      <span class="brand-eng eng-only">jonathan_abraham<span class="accent">.os</span></span>
+      {/* eng wordmark is rendered via CSS generated-content (chrome.css) so the
+          "jonathan_abraham.os" string never enters the crawlable DOM — it read
+          as a "terminal/OS site" to AI scrapers. Paper carries the real name. */}
+      <span class="brand-eng eng-only" aria-hidden="true"></span>
       <span class="brand-paper paper-only">Jonathan Abraham</span>
     </a>
     <div class="nav-links" id="nav-links-desktop">
+      {/* eng-only link labels (e.g. "terminal") render via CSS generated-content
+          from data-label so the word stays out of the crawlable DOM; normal
+          links keep their text ("posts", "about" are fine for crawlers). */}
       {links.map((l) => (
-        <a href={l.href} data-fkey={l.fkey} class={l.engOnly ? 'eng-only' : undefined} aria-current={l.match(path) ? 'page' : undefined}>{l.label}</a>
+        <a
+          href={l.href}
+          data-fkey={l.fkey}
+          class={l.engOnly ? 'eng-only nav-genlabel' : undefined}
+          data-label={l.engOnly ? l.label : undefined}
+          aria-current={l.match(path) ? 'page' : undefined}
+        >{l.engOnly ? '' : l.label}</a>
       ))}
     </div>
     <div class="nav-actions">
@@ -39,11 +51,11 @@ const links: Link[] = [
   <div class="nav-sheet-inner">
     <div class="nav-sheet-head">
       <span class="nav-sheet-title">
-        <span class="eng-only">&gt; ./menu</span>
+        <span class="eng-only nav-menu-eng" aria-hidden="true"></span>
         <span class="paper-only">Menu</span>
       </span>
       <button type="button" class="nav-sheet-close" id="nav-sheet-close" aria-label="close menu">
-        <span class="eng-only">[esc]</span>
+        <span class="eng-only nav-esc-eng" aria-hidden="true"></span>
         <span class="paper-only" aria-hidden="true">×</span>
       </button>
     </div>
@@ -51,8 +63,10 @@ const links: Link[] = [
       {links.map((l) => (
         <li class={l.engOnly ? 'eng-only' : undefined}>
           <a href={l.href} aria-current={l.match(path) ? 'page' : undefined}>
-            <span class="fkey">[{l.fkey}]</span>
-            <span class="label">{l.label}</span>
+            {/* keycap text comes from CSS generated-content (attr data-fkey) so the
+                literal "[F1] [F2] [F3]" strings stay out of the crawlable DOM. */}
+            <span class="fkey" data-fkey={l.fkey} aria-hidden="true"></span>
+            <span class={l.engOnly ? 'label nav-genlabel' : 'label'} data-label={l.engOnly ? l.label : undefined}>{l.engOnly ? '' : l.label}</span>
           </a>
         </li>
       ))}
@@ -192,7 +206,7 @@ const links: Link[] = [
     //     they came from" between closing the sheet and the browser starting
     //     the next page. The sheet is torn down naturally when the new DOM
     //     replaces the current one.
-    //   * Engineer mode → close the sheet so the terminal-frame page-loader
+    //   * Engineer mode → close the sheet so the engineer-mode page-loader
     //     overlay (z-index 1000) becomes visible. Without closing, the
     //     dialog's top-layer rendering would cover the loader.
     //   * Same-page click → just close the sheet (no navigation will fire).
@@ -241,7 +255,7 @@ const links: Link[] = [
       const target = (href.replace(/\/$/, '') || '/');
       if (cur === target) return;
       // Delegate to the matching <a> so the page-loader click handler in
-      // Base.astro picks it up and shows the terminal-frame loader before
+      // Base.astro picks it up and shows the engineer-mode loader before
       // navigating. Falls back to direct navigation if the link is missing.
       const link = document.querySelector('nav.top .nav-links a[href="' + href + '"]');
       if (link) link.click();

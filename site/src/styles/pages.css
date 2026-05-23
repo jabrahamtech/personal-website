@@ -45,6 +45,9 @@
 }
 .page-head h1.prompt::before { margin-right: 9px }
 .page-head h1.prompt .ph-prefix { color: var(--green-2); font-weight: 500; margin-right: 1px }
+/* "./" rendered via generated-content so the literal prefix stays out of the
+   crawlable H1 text (the indexed heading reads as "posts"). */
+body.mode-eng .page-head h1.prompt .ph-prefix::before { content: "./" }
 
 /* Shared call-to-action button — the /services page CTA.
    Eng (default): filled green terminal button, mono. Paper inherits the
