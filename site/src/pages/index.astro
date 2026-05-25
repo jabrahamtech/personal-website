@@ -79,11 +79,6 @@ const clusterFilters = Array.from(new Set(listed.map((p) => p.data.cluster).filt
     count: listed.filter((p) => p.data.cluster === value).length,
   }));
 
-function fmt(p: Post) {
-  if (p.data.posted) return p.data.posted.toISOString().slice(0, 10);
-  return '';
-}
-
 function contentTypeLabel(value: string) {
   return contentTypeLabels[value as ContentType] ?? value;
 }
@@ -154,7 +149,6 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
 
     <ul class="post-list" id="post-list">
       {listed.map((post) => {
-        const posted = fmt(post);
         return (
           <li
             data-types={post.data.contentTypes.join('|')}
@@ -167,10 +161,9 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
               <h2>{post.data.title}</h2>
               <p>{post.data.summary}</p>
               <div class="meta">
-                <span class="meta-status">
-                  {post.data.draft && <span class="draft">draft</span>}
-                  {posted && <span>{posted}</span>}
-                </span>
+                {post.data.draft && (
+                  <span class="meta-status"><span class="draft">draft</span></span>
+                )}
                 <span class="meta-tags">
                   {post.data.cluster && <span class="tag tag-cluster">{post.data.cluster}</span>}
                   {post.data.contentTypes.map((type) => (

@@ -70,15 +70,14 @@ const editUrl = `https://github.com/jabrahamtech/personal-website/edit/main/${so
      that the content isn't published. Previously this only showed up
      when `posted` was unset; with drafts now declaring `posted` dates,
      that pathway no longer fires.
-   - "posted" / "pipeline" describe where the post is in the lifecycle. */
+   - The publication date is intentionally NOT shown in the visible meta row:
+     posts read as evergreen references. `data.posted` is still set in
+     frontmatter, so it continues to drive listing order, RSS/llms feeds,
+     and the BlogPosting JSON-LD `datePublished` below — none of which the
+     reader sees on the page. */
 const metaRow: { label: string; value: string }[] = [];
 metaRow.push({ label: 'id', value: postId });
 if (data.draft) metaRow.push({ label: 'status', value: 'draft' });
-if (data.posted) {
-  metaRow.push({ label: 'posted', value: data.posted.toISOString().slice(0, 10) });
-} else {
-  metaRow.push({ label: 'pipeline', value: data.pipelineStatus.toLowerCase() });
-}
 if (data.cluster) metaRow.push({ label: 'cluster', value: data.cluster });
 metaRow.push({ label: 'read', value: data.readTime ?? computeReadTime(post.body) });
 

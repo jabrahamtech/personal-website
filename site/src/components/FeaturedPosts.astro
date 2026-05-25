@@ -16,8 +16,6 @@ interface Props {
 }
 const { posts } = Astro.props;
 const [feature, ...recent] = posts;
-const fmtDate = (p: CollectionEntry<'posts'>) =>
-  p.data.posted ? p.data.posted.toISOString().slice(0, 10) : '';
 ---
 {feature && (
   <section class="featured" aria-label="Featured posts">
@@ -42,7 +40,7 @@ const fmtDate = (p: CollectionEntry<'posts'>) =>
             {feature.data.cluster && <span class="feature-eyebrow">{feature.data.cluster}</span>}
             <span class="feature-title">{feature.data.title}</span>
             <span class="feature-desc">{feature.data.summary}</span>
-            <span class="feature-meta">{fmtDate(feature)} · {feature.data.readTime ?? computeReadTime(feature.body)}</span>
+            <span class="feature-meta">{feature.data.readTime ?? computeReadTime(feature.body)}</span>
           </span>
         </a>
       </div>
@@ -68,7 +66,6 @@ const fmtDate = (p: CollectionEntry<'posts'>) =>
               <span class="recent-body">
                 {post.data.cluster && <span class="recent-eyebrow">{post.data.cluster}</span>}
                 <span class="recent-title">{post.data.title}</span>
-                <span class="recent-date">{fmtDate(post)}</span>
               </span>
             </a>
           ))}
