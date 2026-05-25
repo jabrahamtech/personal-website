@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { postUrl } from '../lib/urls';
+import { computeReadTime } from '../lib/readTime';
 import FeaturedPosts from '../components/FeaturedPosts.astro';
 import PostFilters from '../components/PostFilters.astro';
 
@@ -161,9 +162,10 @@ const description = "Notes from Jonathan Abraham on shipping AI that actually ha
               <h2>{post.data.title}</h2>
               <p>{post.data.summary}</p>
               <div class="meta">
-                {post.data.draft && (
-                  <span class="meta-status"><span class="draft">draft</span></span>
-                )}
+                <span class="meta-status">
+                  {post.data.draft && <span class="draft">draft</span>}
+                  <span class="meta-read">{post.data.readTime ?? computeReadTime(post.body)}</span>
+                </span>
                 <span class="meta-tags">
                   {post.data.cluster && <span class="tag tag-cluster">{post.data.cluster}</span>}
                   {post.data.contentTypes.map((type) => (

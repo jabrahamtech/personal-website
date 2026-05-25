@@ -66,6 +66,7 @@ const [feature, ...recent] = posts;
               <span class="recent-body">
                 {post.data.cluster && <span class="recent-eyebrow">{post.data.cluster}</span>}
                 <span class="recent-title">{post.data.title}</span>
+                <span class="recent-meta">{post.data.readTime ?? computeReadTime(post.body)}</span>
               </span>
             </a>
           ))}
@@ -172,7 +173,7 @@ const [feature, ...recent] = posts;
     transform: translate(-2px, -2px);
     box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.4), 8px 8px 0 1px var(--line);
   }
-  .recent-date {
+  .recent-meta {
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: .03em;
