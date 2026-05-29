@@ -9,7 +9,7 @@ cluster: "Product Strategy"
 tags: ['product-strategy', 'pre-pmf', 'startup', 'judgement', 'ai-products']
 image:
   src: "/posts/judgement-before-pmf/hero.png"
-  alt: "Hero card with the title 'Judgement before product-market fit' handwritten in two lines, a deep-rust underline beneath 'Judgement', and a vignette in the upper right showing five small option cards in a fan with the middle one picked out in deep rust, captioned 'ai generates the five — you pick the one that ships'."
+  alt: "Hero card with the title 'Judgement before product-market fit' handwritten in two lines, a deep-rust underline beneath 'Judgement', and a vignette in the upper right showing five small option cards in a fan with the middle one picked out in deep rust, captioned 'ai generates the five, you pick the one that ships'."
   width: 2000
   height: 1125
 ---
@@ -18,13 +18,23 @@ image:
 
 The themes hold inside a large company. They invert at a pre-PMF startup, because the price of getting judgement wrong scales with how much runway you have to absorb the mistake.
 
-This is the reframe.
-
 ## The short answer
 
 Inside an enterprise, the five LP26 themes are operating discipline. Inside a startup before product-market fit, they are survival rules. The principle survives the move; the failure mode does not. A misread that costs an enterprise some margin will cost a seed-stage team the company.
 
 The sentence I would put on a sticker: **judgement is not the differentiator before PMF. It is the product.**
+
+## What I actually do
+
+When I work on AI products, "messy idea to shipped system" is the bit I sell. The reframe changes what I push for in the first weeks of any new build.
+
+Before any AI feature gets built, I want to see one customer conversation that proves the problem exists outside the founder's head. Not five. One conversation in which the customer described the pain in their own words, unprompted. If that conversation has not happened, the feature is a guess in a costume.
+
+When generating options for what to build next, I let AI generate five. I almost never ship one of the five. The value is that the five make the underlying frame visible. You can see what assumption every option is built on, and the right move is usually a sixth option that breaks the assumption all five share. AI is good at filling in a frame. Choosing the frame is the founder's job.
+
+For anything that gets into production, the question I ask is not "is the model good enough?" but "do we have the judgement loop wired up so that when it is wrong, we hear about it in days, not in months?" AI accelerates the signal. The human owns the call.
+
+The longer-term bet is that teams who treat judgement as a deliberately trained organisational muscle, not a personal trait of the founder, end up with better odds at every stage. Pre-PMF the muscle keeps you alive. Post-PMF it compounds into something that looks, from the outside, like taste.
 
 ## 1. Less = survival, not focus
 
@@ -38,7 +48,7 @@ The rule I now write down before any pre-PMF roadmap: any feature ships only if 
 
 [Mike Belsito's](https://www.linkedin.com/in/mikebelsito/) point at LP26 was that AI helps you identify signals, synthesise information, and accelerate decision-making, but it should never automate judgement itself. True at any scale. Sharper before PMF, because most companies still treat judgement like something senior people accumulate through scars rather than something you deliberately train.
 
-That assumption is wrong even inside large companies. The [Good Judgment Project](https://en.wikipedia.org/wiki/The_Good_Judgment_Project), Philip Tetlock's IARPA-funded forecasting tournament, found that the top forecasters — drawn from the general public, not from intelligence services — beat trained intelligence analysts with access to classified information by roughly 30%. The trait that mattered was not credentials. It was how they thought: probabilistic rather than confident, willing to update on evidence, eclectic in source material, comfortable holding partial views. Tetlock's earlier work on [Expert Political Judgment](https://en.wikipedia.org/wiki/Philip_E._Tetlock) found that pundits with strong unified worldviews were less accurate than generalists who held more partial, less confident views. If judgement were purely a function of scar tissue, the senior analysts would have won. They did not.
+That assumption is wrong even inside large companies. The [Good Judgment Project](https://en.wikipedia.org/wiki/The_Good_Judgment_Project), Philip Tetlock's IARPA-funded forecasting tournament, found that the top forecasters, drawn from the general public rather than intelligence services, beat trained intelligence analysts with access to classified information by roughly 30%. The trait that mattered was not credentials. It was how they thought: probabilistic rather than confident, willing to update on evidence, eclectic in source material, comfortable holding partial views. Tetlock's earlier work on [Expert Political Judgment](https://en.wikipedia.org/wiki/Philip_E._Tetlock) found that pundits with strong unified worldviews were less accurate than generalists who held more partial, less confident views. If judgement were purely a function of scar tissue, the senior analysts would have won. They did not.
 
 Which means a small team can deliberately train this muscle, and a startup with three months of runway has every reason to.
 
@@ -74,59 +84,44 @@ The skill that actually matters is the one Rob Fitzpatrick wrote down in [The Mo
 
 AI genuinely earns its place at this stage. Synthesising five interview transcripts into a single problem statement, with the speaker's exact language attached, is faster than doing it in your head and is often more honest. The signal-extraction step is automatable in a way the conviction step is not.
 
-## What I actually do
-
-When I work on AI products, "messy idea to shipped system" is the bit I sell. The reframe above changes what I push for in the first weeks of any new build.
-
-Before any AI feature gets built, I want to see one customer conversation that proves the problem exists outside the founder's head. Not five. One conversation in which the customer described the pain in their own words, unprompted. If that conversation has not happened, the feature is a guess in a costume.
-
-When generating options for what to build next, I let AI generate five. I almost never ship one of the five. The value is that the five make the underlying frame visible. You can see what assumption every option is built on, and the right move is usually a sixth option that breaks the assumption all five share. AI is good at filling in a frame. Choosing the frame is the founder's job.
-
-For anything that gets into production, the question I ask is not "is the model good enough?" but "do we have the judgement loop wired up so that when it is wrong, we hear about it in days, not in months?" That is the operational version of what Mike Belsito was pointing at. AI accelerates the signal. The human owns the call.
-
-The longer-term bet is that teams who treat judgement as a deliberately trained organisational muscle, not a personal trait of the founder, end up with better odds at every stage. Pre-PMF the muscle keeps you alive. Post-PMF it compounds into something that looks, from the outside, like taste.
-
 ## Caveats
 
-CB Insights' 43% figure is from their own analysis of VC-backed shutdowns since 2023. Industry research, not peer-reviewed, and the sample is specifically VC-backed; bootstrapped failure patterns may differ.
-
-METR's 19% slowdown sat on 16 experienced open-source developers working on real tasks in their own projects. One rigorous data point against a literature of vendor-funded studies showing speedup. Both findings can be true if the speedup measurements are dominated by narrow generation tasks and the slowdown is dominated by verification and integration in unfamiliar code. The honest read is that the productivity effect of AI on real work is mixed and context-dependent.
-
-Tetlock's superforecaster findings come from geopolitical forecasting tournaments. Mapping them to product judgement is an analogy I find compelling, not a direct empirical claim. The structural point (thinking style matters more than credentials, deliberate training improves accuracy) has held up across replications. The specific 30% accuracy gain does not transfer to "founder picking which feature to build."
-
-The defensibility section is the one I have the lowest confidence in. The 7 Powers framework is well-developed and the AI-era extensions are thoughtful, but they are blog-post-quality strategic commentary, not empirical work. Anyone claiming to know what is defensible for an AI startup in 2026 should be treated with caution, including me.
+- CB Insights' 43% figure is their own analysis of VC-backed shutdowns since 2023: industry research, not peer-reviewed, and bootstrapped failure patterns may differ.
+- METR's 19% slowdown is one rigorous data point (16 experienced developers, real tasks) against a literature of vendor-funded speedup studies. Both can be true if the speedup is narrow generation work and the slowdown is verification and integration in unfamiliar code. The honest read: AI's effect on real work is mixed and context-dependent.
+- Tetlock's superforecaster findings come from geopolitical tournaments. The structural point (thinking style beats credentials, deliberate training improves accuracy) has replicated; the specific 30% gain does not transfer to "founder picking which feature to build."
+- Defensibility is the section I have the lowest confidence in. 7 Powers and its AI-era extensions are thoughtful strategic commentary, not empirical work. Anyone claiming to know what is defensible for an AI startup in 2026 should be treated with caution, including me.
 
 ## References
 
 Primary essays and frameworks:
 
-- [Marc Andreessen — The only thing that matters (2007)](https://pmarchive.com/guide_to_startups_part4.html)
-- [Eric Ries — The Lean Startup principles](https://theleanstartup.com/principles)
-- [Rob Fitzpatrick — The Mom Test](https://www.momtestbook.com/)
-- [Hamilton Helmer — 7 Powers (official book site)](https://7powers.com/)
+- [Marc Andreessen: The only thing that matters (2007)](https://pmarchive.com/guide_to_startups_part4.html)
+- [Eric Ries: The Lean Startup principles](https://theleanstartup.com/principles)
+- [Rob Fitzpatrick: The Mom Test](https://www.momtestbook.com/)
+- [Hamilton Helmer: 7 Powers (official book site)](https://7powers.com/)
 
 Empirical work:
 
-- [METR — Measuring the impact of early-2025 AI on experienced open-source developer productivity (July 2025)](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)
+- [METR: Measuring the impact of early-2025 AI on experienced open-source developer productivity (July 2025)](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)
 - [METR full paper, arXiv 2507.09089](https://arxiv.org/abs/2507.09089)
-- [GitHub research — quantifying Copilot's impact on developer productivity](https://github.blog/news-insights/research/research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/)
-- [The Good Judgment Project — overview](https://en.wikipedia.org/wiki/The_Good_Judgment_Project)
-- [Philip E. Tetlock — author page including Expert Political Judgment and Superforecasters](https://en.wikipedia.org/wiki/Philip_E._Tetlock)
+- [GitHub research: quantifying Copilot's impact on developer productivity](https://github.blog/news-insights/research/research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/)
+- [The Good Judgment Project: overview](https://en.wikipedia.org/wiki/The_Good_Judgment_Project)
+- [Philip E. Tetlock: author page including Expert Political Judgment and Superforecasters](https://en.wikipedia.org/wiki/Philip_E._Tetlock)
 
 Industry research:
 
-- [CB Insights — Why startups fail: top reasons](https://www.cbinsights.com/research/report/startup-failure-reasons-top/)
+- [CB Insights: Why startups fail: top reasons](https://www.cbinsights.com/research/report/startup-failure-reasons-top/)
 
 Strategic commentary:
 
-- [Virta Ventures — The 7 Powers in an AI world](https://www.virtaventures.co/insights/7-powers-in-an-ai-world)
+- [Virta Ventures: The 7 Powers in an AI world](https://www.virtaventures.co/insights/7-powers-in-an-ai-world)
 
 Original inspiration:
 
-- [Weiyao Fang's LinkedIn summary of Leading the Product 2026](https://www.linkedin.com/feed/update/urn:li:activity:7462041541793136641/) — the five-theme breakdown this essay reframes for a pre-PMF audience.
+- [Weiyao Fang's LinkedIn summary of Leading the Product 2026](https://www.linkedin.com/feed/update/urn:li:activity:7462041541793136641/): the five-theme breakdown this essay reframes for a pre-PMF audience.
 - [Leading the Product (Melbourne, Publicis Sapient)](https://www.linkedin.com/company/leading-the-product/)
 
 ## Related
 
-- [The boring infrastructure stack I'd actually pick for a startup](/posts/boring-infrastructure-stack-for-startups) — the same pre-Series-B pragmatism, applied to the stack instead of product judgement.
-- [When to force the LLM, and when to use a button](/posts/when-to-force-the-llm-and-when-to-use-a-button) — judgement at the feature level: which product decisions belong to the model and which to deterministic UI.
+- [The boring infrastructure stack I'd actually pick for a startup](/posts/boring-infrastructure-stack-for-startups): the same pre-Series-B pragmatism, applied to the stack instead of product judgement.
+- [When to force the LLM, and when to use a button](/posts/when-to-force-the-llm-and-when-to-use-a-button): which product decisions belong to the model and which to deterministic UI.

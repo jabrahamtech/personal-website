@@ -20,8 +20,6 @@ import Figure from '../../components/Figure.astro';
 
 The pattern I keep seeing across the agent programs I get to look at is the same one: the team treats its work as net-new. They invent governance from scratch, build their own demand pipeline, argue from first principles about whether to keep a human in the loop, and reinvent the centre-of-excellence operating model as if Blue Prism and UiPath never existed. They are not stupid. They are simply too far inside the agentic frame to notice that almost every operational problem they're stuck on was solved in a different conference room ten years ago. The mistake is not building agents. The mistake is pretending the automation operating model starts from zero.
 
-The thesis is not subtle: most agent-program failures in 2026 are RPA failures in new clothing. The same governance gap. The same pilot purgatory. The same citizen-developer sprawl. The same audit conversation, with new acronyms. Two things are genuinely different: non-determinism and unstructured data. Those differences justify agents existing as a separate category. They do not excuse the governance amnesia.
-
 ## The short answer
 
 If you are standing up an agent program in 2026, start by reading the RPA failure literature. Adopt the centre-of-excellence operating model. Run real process discovery before you build anything. Build the resiliency engineering before you scale. Wire the audit trail in from day one, mapped to the NIST AI RMF and the [AI Agent Standards Initiative](https://www.nist.gov/caisi/ai-agent-standards-initiative) NIST CAISI launched in February 2026, rather than reinvented in-house. Reserve agentic patterns for the workflows RPA genuinely could not touch: variable-format documents, exception reasoning, anything where the rule set is not enumerable in advance.
@@ -41,7 +39,7 @@ These two differences are load-bearing. Most of the rest of the agent operating 
 <Figure
   src="/posts/rpa-already-solved-this/figure-01.png"
   alt="Four RPA-era practices and their agent-era equivalents: centre of excellence to agent CoE, process discovery to workflow scoping, resiliency engineering to evals and fallback paths, audit and standards to the NIST AI RMF Agentic Profile."
-  caption="Fig. 1 — four RPA-era practices and their agent-era equivalents."
+  caption="Fig. 1: four RPA-era practices and their agent-era equivalents."
 />
 
 ## 1. The Centre of Excellence pattern survives the transition
@@ -86,7 +84,7 @@ I don't expect every agent team to read the full NIST initiative material this q
 
 If you're shopping for an agent platform, the practical implication is to run the agent-washing test before any contract. Ask the vendor to show the autonomy tier of the agent against the NIST CAISI material, the tool-use risk model, the eval suite running against their production traffic, and the incident-response runbook for when the agent goes wrong. Vendors with real agentic capability will have answers. Vendors who rebranded their RPA product will not.
 
-The deeper point: the analyst community has reached for the same word — "washing" — that already existed in the RPA marketing vocabulary five years ago. The cycle is rhyming.
+The deeper point: the analyst community has reached for the same word, "washing", that already existed in the RPA marketing vocabulary five years ago. The cycle is rhyming.
 
 ## Where the advice bends
 
@@ -108,17 +106,15 @@ Do not skip process discovery because the demo is good. The demo is always good.
 
 Do not retrofit governance after the first incident. RPA programs that did this paid for it.
 
-Do not treat the hybrid architecture as universally correct. Use it where the underlying systems are stable and the cost of integration is justified. Use a pure agent pattern where the structured layer was always going to be a workaround.
-
-## The takeaway
+## The 60% that ships
 
 <Figure
   src="/posts/rpa-already-solved-this/figure-02.png"
   alt="Stat callout: 40% of agentic AI projects forecast by Gartner to be canceled by the end of 2027, drawn as a hand-drawn 10 by 10 grid of dots with 40 filled in deep rust."
-  caption="Fig. 2 — the rate at which any new automation category fails when its operators forget the previous one."
+  caption="Fig. 2: the rate at which any new automation category fails when its operators forget the previous one."
 />
 
-The hard part of agentic AI is not the agent. The hard part is everything around the agent — scoping, governance, resiliency, audit — and most of that is a re-run of an enterprise transformation the industry already went through with RPA. The teams that ship useful agentic systems in 2026 and 2027 are going to be the teams that read the RPA failure literature and refused to repeat it. Gartner's 40% cancellation forecast is not a bug in the technology. It is the predictable rate at which any new automation category fails when its operators forget the previous one.
+The hard part of agentic AI is not the agent. The hard part is everything around the agent (scoping, governance, resiliency, audit), and most of that is a re-run of an enterprise transformation the industry already went through with RPA. The teams that ship useful agentic systems in 2026 and 2027 are going to be the teams that read the RPA failure literature and refused to repeat it. Gartner's 40% cancellation forecast is not a bug in the technology. It is the predictable rate at which any new automation category fails when its operators forget the previous one.
 
 I'd rather build the 60% that ships.
 
@@ -129,7 +125,6 @@ I'd rather build the 60% that ships.
 - The widely cited EY figure that 30-50% of initial RPA projects fail is referenced through secondary sources and a 2017 interview. It is directionally consistent with Forrester and ISG, but the primary source is harder to verify and the figure is more than five years old. The post relies on Forrester and ISG for the harder numbers.
 - NIST's AI Agent Standards Initiative launched in February 2026 and was still gathering RFI responses and running sector listening sessions at the time of writing. Cite it as the current direction of travel rather than a settled standard. The Cloud Security Alliance agentic profile is a draft industry-aligned proposal, not an official NIST document.
 - "Around 80% of enterprise data is unstructured" is the standard analyst figure but varies by industry and how the data is bucketed. Use as a directional anchor, not a precise number.
-- Hybrid architecture is not universally correct. It is the convergent pattern for environments where deterministic execution and unstructured-data reasoning both matter. Single-pattern environments don't need it.
 
 ## References
 
@@ -146,6 +141,6 @@ I'd rather build the 60% that ships.
 
 ## Related
 
-- [When your AI agent passes the demo and fails the audit](/posts/agent-governance-au-insurtech) — the same governance and audit primitives, mapped onto Australian insurance supervision.
-- [Most "human-in-the-loop" is escalation done badly](/posts/most-hitl-is-escalation-done-badly) — one of the four practices in close-up: designing human involvement deliberately instead of arguing it from first principles.
-- [Stop running one coding agent for everything](/posts/coding-agent-setup-may-2026) — the same least-privilege discipline applied to my own coding setup: written roles, scoped tools, skills as workflows rather than secret stores.
+- [When your AI agent passes the demo and fails the audit](/posts/agent-governance-au-insurtech): the same governance and audit primitives, mapped onto Australian insurance supervision.
+- [Most "human-in-the-loop" is escalation done badly](/posts/most-hitl-is-escalation-done-badly): designing human involvement deliberately instead of arguing it from first principles.
+- [Stop running one coding agent for everything](/posts/coding-agent-setup-may-2026): the same least-privilege discipline applied to my own coding setup, written roles, scoped tools, skills as workflows not secret stores.

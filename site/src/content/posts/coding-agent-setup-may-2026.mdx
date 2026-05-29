@@ -1,5 +1,5 @@
 ---
-title: "Stop running one coding agent for everything (the Claude-as-orchestrator, Codex-as-specialist split I run in May 2026)"
+title: "Stop running one coding agent for everything (my May 2026 setup)"
 summary: "A working two-agent setup for founder-engineers in 2026. Claude as the continuity layer, Codex as the bounded specialist, hooks and MCPs as the controlled automation layer."
 posted: 2026-05-23
 contentTypes:
@@ -65,8 +65,20 @@ Five fields, all explicit. The agent does not have to guess what good looks like
 <Figure
   src="/posts/coding-agent-setup-may-2026/figure-01.png"
   alt="Two-agent split showing Claude as orchestration layer holding planning, memory and synthesis, with a narrow handoff arrow to Codex holding audits, migrations, tests and simulations, plus a returning verification arrow."
-  caption="Fig. 1 — the orchestrator / specialist split, with the five-field handoff packet between them."
+  caption="Fig. 1: the orchestrator / specialist split, with the five-field handoff packet between them."
 />
+
+## Audit your skills folder this week
+
+This is the one part of the post I would underline if I were sitting across from you.
+
+I went through my own skill ecosystem doing exactly the audit I am about to recommend, and found a user-invocable production-analysis skill that contained sensitive access material. Not credentials in a clever obfuscated form. Material that should never have been in a skill file in the first place. The skill ran fine. It would have continued to run fine. The risk was that it was sitting in a folder a coding agent reads on every session.
+
+The audit takes an hour. Open every skill in `~/.claude/skills/` and `~/.codex/skills/`, or wherever your tool keeps them. For each one, ask: does this contain anything that would not survive being read aloud at a standup; does it pass secrets via positional arguments rather than environment variables or a secret store; does it write to a path the agent should not be writing to; does it depend on a tool surface (browser, shell, database) that should be scoped to a subagent rather than available to the whole session?
+
+Anything that fails the first question moves out of the skill file immediately. Either to a runtime prompt the user has to confirm, or to a proper secret store. The skill becomes the workflow and only the workflow. Do not rely on the agent to safely ignore sensitive material it can read.
+
+The most important sentence in this post is the one before this one. If you take nothing else, run the audit.
 
 ## AGENTS.md and CLAUDE.md hold the local contract
 
@@ -98,22 +110,10 @@ The split I actually run: OpenAI questions go to the `openaiDeveloperDocs` MCP f
 
 The single mental model I would lift from all of this: treat MCPs, hooks, plugins and skills as executable automation with least privilege. None of them is "just config".
 
-## Audit your skills folder this week
-
-This is the one part of the post I would underline if I were sitting across from you.
-
-I went through my own skill ecosystem doing exactly the audit I am about to recommend, and found a user-invocable production-analysis skill that contained sensitive access material. Not credentials in a clever obfuscated form. Material that should never have been in a skill file in the first place. The skill ran fine. It would have continued to run fine. The risk was that it was sitting in a folder a coding agent reads on every session.
-
-The audit takes an hour. Open every skill in `~/.claude/skills/` and `~/.codex/skills/`, or wherever your tool keeps them. For each one, ask: does this contain anything that would not survive being read aloud at a standup; does it pass secrets via positional arguments rather than environment variables or a secret store; does it write to a path the agent should not be writing to; does it depend on a tool surface (browser, shell, database) that should be scoped to a subagent rather than available to the whole session?
-
-Anything that fails the first question moves out of the skill file immediately. Either to a runtime prompt the user has to confirm, or to a proper secret store. The skill becomes the workflow and only the workflow. Do not rely on the agent to safely ignore sensitive material it can read.
-
-The most important sentence in this post is the one before this one. If you take nothing else, run the audit.
-
 <Figure
   src="/posts/coding-agent-setup-may-2026/figure-02.png"
   alt="Project archetypes map showing four families: trading and finance systems, voice and insurance automation, web3 game monorepos, frontend content and product apps, all connected to a single shared agent setup at the centre."
-  caption="Fig. 2 — four project families share one orchestrator/specialist setup, with per-repo files holding the local contract."
+  caption="Fig. 2: four project families share one orchestrator/specialist setup, with per-repo files holding the local contract."
 />
 
 ## Where the setup bends
@@ -136,11 +136,9 @@ Do not skip the handoff sentence to save time. The five-field handoff is the sin
 
 Do not treat the changelogs as optional reading. [Codex](https://developers.openai.com/codex/changelog) and Claude Code moved quickly through April and May 2026, especially around hooks, MCP/plugin support, goals, browser/app workflows, subagents and workspace flows. Some capabilities, like image input, landed earlier but now sit inside the current working surface area. If you have not re-read both docs/changelogs in the last month, your mental model of what each tool does is probably stale.
 
-## The takeaway
+## The split is the thing
 
-The 2026 pattern I trust for serious work is two agents with written roles, not one agent with infinite ambition. Claude as the continuity layer, Codex as the specialist. AGENTS.md and CLAUDE.md as the local contract. Hooks as quiet guardrails. MCPs and subagents as least-privilege adapters. Skills as workflows, never as secret stores.
-
-The setup I run is not the only one that works. It is the one that survived six months of real projects across trading bots, voice automation, web3 monorepos, and frontend product work without producing the failure mode I started this post with. The split is the thing. Everything else is implementation detail.
+The setup I run is not the only one that works. It is the one that survived six months of real projects across trading bots, voice automation, web3 monorepos, and frontend product work without producing the failure mode I opened with: two agents with written roles, not one agent with infinite ambition. Everything else is implementation detail.
 
 ## Caveats
 
@@ -152,16 +150,16 @@ The "audit your skills folder" anecdote is mine. I have not tested whether the s
 
 ## Related
 
-- [Why layered codebases punish humans and AI coding agents (and what vertical slice fixes)](/posts/from-mvc-to-vertical-slice) — the codebase side of the same problem: structure the repo so a bounded specialist can land a slice without tracing the whole stack first.
-- [Why most AI agent programs are repeating RPA's mistakes](/posts/rpa-already-solved-this) — the operating-model view of the same least-privilege, written-down discipline, scaled past a single developer's setup.
-- [Most "human-in-the-loop" is escalation done badly](/posts/most-hitl-is-escalation-done-badly) — the deliberate version of the recovery move here: stop the specialist, hand the failure back to the planner, re-handoff only once the assumptions are clear.
+- [Why layered codebases punish humans and AI coding agents (and what vertical slice fixes)](/posts/from-mvc-to-vertical-slice): structure the repo so a bounded specialist can land a slice without tracing the whole stack first.
+- [Why most AI agent programs are repeating RPA's mistakes](/posts/rpa-already-solved-this): the operating-model view of the same written-down, least-privilege discipline, scaled past a single developer's setup.
+- [Most "human-in-the-loop" is escalation done badly](/posts/most-hitl-is-escalation-done-badly): stop the specialist, hand the failure back to the planner, re-handoff only once the assumptions are clear.
 
 ## References
 
-- [Claude Code hooks reference](https://code.claude.com/docs/en/hooks) — official hook lifecycle events, command/HTTP/prompt/agent hook types.
-- [Claude Code subagents](https://code.claude.com/docs/en/sub-agents) — independent context windows, tool restriction, scoping rules.
-- [AGENTS.md open standard](https://agents.md/) — the cross-vendor per-repo agent instruction convention.
-- [Introducing the Model Context Protocol](https://www.anthropic.com/news/model-context-protocol) — Anthropic, November 2024.
-- [Claude Sonnet 4 now supports 1M tokens of context](https://www.anthropic.com/news/1m-context) — Anthropic, August 2025.
-- [OpenAI Codex CLI](https://developers.openai.com/codex/cli) — official Codex CLI documentation.
-- [Codex changelog](https://developers.openai.com/codex/changelog) — May 2026 features and version history.
+- [Claude Code hooks reference](https://code.claude.com/docs/en/hooks): official hook lifecycle events, command/HTTP/prompt/agent hook types.
+- [Claude Code subagents](https://code.claude.com/docs/en/sub-agents): independent context windows, tool restriction, scoping rules.
+- [AGENTS.md open standard](https://agents.md/): the cross-vendor per-repo agent instruction convention.
+- [Introducing the Model Context Protocol](https://www.anthropic.com/news/model-context-protocol): Anthropic, November 2024.
+- [Claude Sonnet 4 now supports 1M tokens of context](https://www.anthropic.com/news/1m-context): Anthropic, August 2025.
+- [OpenAI Codex CLI](https://developers.openai.com/codex/cli): official Codex CLI documentation.
+- [Codex changelog](https://developers.openai.com/codex/changelog): May 2026 features and version history.

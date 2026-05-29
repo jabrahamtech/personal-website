@@ -9,7 +9,7 @@ cluster: "Engineering Practice"
 tags: ['architecture', 'vertical-slice', 'coding-agents', 'dotnet', 'context-engineering']
 image:
   src: "/posts/from-mvc-to-vertical-slice/hero.png"
-  alt: "Hero card with the headline 'Why layered codebases punish humans and AI coding agents' handwritten, a deep-rust underline beneath 'AI coding agents', and a vignette in the upper right comparing a layered /src folder tree (Controllers, Services, Repositories, DTOs, Validators, Mappers — one feature edits five folders) with a sliced /src/Features/CreateServiceRequest folder (Endpoint, Request, Response, Validator, Handler — one feature, one folder)."
+  alt: "Hero card with the headline 'Why layered codebases punish humans and AI coding agents' handwritten, a deep-rust underline beneath 'AI coding agents', and a vignette in the upper right comparing a layered /src folder tree (Controllers, Services, Repositories, DTOs, Validators, Mappers: one feature edits five folders) with a sliced /src/Features/CreateServiceRequest folder (Endpoint, Request, Response, Validator, Handler: one feature, one folder)."
   width: 2000
   height: 1125
 ---
@@ -92,7 +92,7 @@ The same mistake shows up in other stacks. Different folder names, same smell.
 
 A React app can be layered badly too. `components/`, `hooks/`, `api/`, `types/`, `stores/`, and `utils/` looks tidy until one product change touches all six. The shape I prefer for product code is feature-first: `features/create-service-request/` with the form, schema, mutation, API client, and state sitting together, and a parallel test folder for the same feature. Shared UI primitives still belong in a shared place. Feature-specific UI stays with the feature.
 
-Python has the same failure mode. A FastAPI app with top-level `routers/`, `schemas/`, `services/`, and `repositories/` can become layered MVC under different names. For small services that is fine. For product code with many distinct use cases, I prefer `features/create_service_request/` with the router, request schema, handler, and response schema together, and the tests in a parallel `tests/features/create_service_request/` tree. The shared database session, auth, logging, and domain primitives stay shared. The feature flow does not hide across five folders.
+Python has the same failure mode. A FastAPI app with top-level `routers/`, `schemas/`, `services/`, and `repositories/` is layered MVC under different names. For product code with many distinct use cases I prefer `features/create_service_request/`, with the router, request schema, handler, and response schema together and the tests in a parallel `tests/features/create_service_request/` tree. Shared database session, auth, logging, and domain primitives stay shared.
 
 Java got here years ago through its own door. The [package by feature, not by layer](http://www.javapractices.com/topic/TopicAction.do?Id=205) argument has been circulating in Spring communities for a long time, and DZone's [Package by Layer is Obsolete](https://dzone.com/articles/package-by-layer-for-spring-projects-is-obsolete) makes the same point bluntly.
 
@@ -113,7 +113,7 @@ In every one of these systems, the agent's view of the world for a given change 
 <Figure
   src="/posts/from-mvc-to-vertical-slice/figure-01.png"
   alt="Two-column diagram. On the left, a 'layered' codebase: the agent's retrieval node fans out to controllers, services, repositories, validators, and mappers, with the DTOs file dashed and marked 'missed'. On the right, a 'sliced' codebase: the agent retrieves a single CreateServiceRequest folder containing endpoint, request, response, validator, handler, mapper, and tests."
-  caption="Fig. 1 — the retrieval surface of one feature change across two codebase shapes."
+  caption="Fig. 1: the retrieval surface of one feature change across two codebase shapes."
   width={2000}
   height={1125}
 />
@@ -162,11 +162,11 @@ It fits some shapes of system better than others. A web service with many indepe
 
 The framework matters less than the discipline. FastEndpoints is the cleanest .NET expression I have used, but vertical slice predates it and works in plain Minimal APIs, in classic ASP.NET controllers if you structure the folders right, in Spring with `@RestController` packages, in FastAPI routers, in Express handler files. The principle is the shape of the source tree and the rule about where shared abstractions live. The library is a productivity multiplier on top.
 
-## The shorter version
+## The principle didn't change
 
-Organise the codebase around what changes, which for most applications is a feature, not a layer. Slicing by feature is what helped my team at SPL onboard faster, review more honestly, and break fewer unrelated things on the way through. It is also what helps coding agents make smaller, more reliable changes, because the context they need to load is the size of a feature, not the size of an architecture.
+Organise the codebase around what changes, which for most applications is a feature, not a layer. That is what helped my team at SPL onboard faster, review more honestly, and break fewer unrelated things, and it is what helps coding agents make smaller, more reliable changes: the context they load is the size of a feature, not the size of an architecture.
 
-Bogard named this in 2018. Parnas and the cohesion researchers named it in the 1970s. The agent tooling vendors are now naming it again, indirectly, by building retrieval pipelines around the assumption that source-tree shape matters. The principle did not change. We just kept rediscovering reasons to take it seriously.
+Bogard named this in 2018. Parnas and the cohesion researchers named it in the 1970s. The agent tooling vendors are naming it again now, indirectly, by building retrieval pipelines around the assumption that source-tree shape matters. The principle did not change. We just keep rediscovering reasons to take it seriously.
 
 ## What I'm not claiming
 
@@ -181,15 +181,15 @@ Bogard named this in 2018. Parnas and the cohesion researchers named it in the 1
 Cohesion and modularity:
 
 - [Parnas, D.L. (1972). On the Criteria to Be Used in Decomposing Systems into Modules. Communications of the ACM, 15(12), 1053–1058.](https://dl.acm.org/doi/10.1145/361598.361623)
-- [Robert C. Martin — Screaming Architecture, Clean Architecture (2017).](https://www.oreilly.com/library/view/clean-architecture-a/9780134494272/ch21.xhtml)
+- [Robert C. Martin: Screaming Architecture, Clean Architecture (2017).](https://www.oreilly.com/library/view/clean-architecture-a/9780134494272/ch21.xhtml)
 
 Vertical slice:
 
-- [Jimmy Bogard — Vertical Slice Architecture (2018).](https://www.jimmybogard.com/vertical-slice-architecture/)
-- [Milan Jovanović — Structuring Vertical Slices.](https://www.milanjovanovic.tech/blog/vertical-slice-architecture-structuring-vertical-slices)
-- [Milan Jovanović — Vertical Slice Architecture Is Easier Than You Think.](https://www.milanjovanovic.tech/blog/vertical-slice-architecture-is-easier-than-you-think)
-- [Tim Deschryver — Treat your .NET Minimal API Endpoint as the application layer.](https://timdeschryver.dev/blog/treat-your-net-minimal-api-endpoint-as-the-application-layer)
-- [Rico Fritzsche — Why Vertical Slices Won't Evolve from Clean Architecture.](https://ricofritzsche.me/why-vertical-slices-wont-evolve-from-clean-architecture/)
+- [Jimmy Bogard: Vertical Slice Architecture (2018).](https://www.jimmybogard.com/vertical-slice-architecture/)
+- [Milan Jovanović: Structuring Vertical Slices.](https://www.milanjovanovic.tech/blog/vertical-slice-architecture-structuring-vertical-slices)
+- [Milan Jovanović: Vertical Slice Architecture Is Easier Than You Think.](https://www.milanjovanovic.tech/blog/vertical-slice-architecture-is-easier-than-you-think)
+- [Tim Deschryver: Treat your .NET Minimal API Endpoint as the application layer.](https://timdeschryver.dev/blog/treat-your-net-minimal-api-endpoint-as-the-application-layer)
+- [Rico Fritzsche: Why Vertical Slices Won't Evolve from Clean Architecture.](https://ricofritzsche.me/why-vertical-slices-wont-evolve-from-clean-architecture/)
 
 FastEndpoints:
 
@@ -198,16 +198,16 @@ FastEndpoints:
 
 Package by feature, across stacks:
 
-- [Java Practices — Package by feature, not layer.](http://www.javapractices.com/topic/TopicAction.do?Id=205)
-- [DZone — Package by Layer for Spring Projects Is Obsolete.](https://dzone.com/articles/package-by-layer-for-spring-projects-is-obsolete)
+- [Java Practices: Package by feature, not layer.](http://www.javapractices.com/topic/TopicAction.do?Id=205)
+- [DZone: Package by Layer for Spring Projects Is Obsolete.](https://dzone.com/articles/package-by-layer-for-spring-projects-is-obsolete)
 
 Agent codebase navigation and context engineering:
 
-- [Anthropic — How Claude Code works in large codebases.](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start)
-- [Anthropic — Effective context engineering for AI agents.](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
-- [OpenAI — Codex product page.](https://openai.com/codex/)
-- [Sourcegraph — How Cody understands your codebase.](https://sourcegraph.com/blog/how-cody-understands-your-codebase)
-- [Cursor — Securely indexing large codebases (cited as a third-party example of agent retrieval design).](https://cursor.com/blog/secure-codebase-indexing)
+- [Anthropic: How Claude Code works in large codebases.](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start)
+- [Anthropic: Effective context engineering for AI agents.](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [OpenAI: Codex product page.](https://openai.com/codex/)
+- [Sourcegraph: How Cody understands your codebase.](https://sourcegraph.com/blog/how-cody-understands-your-codebase)
+- [Cursor: Securely indexing large codebases (cited as a third-party example of agent retrieval design).](https://cursor.com/blog/secure-codebase-indexing)
 
 Long-context retrieval evidence:
 
@@ -216,5 +216,5 @@ Long-context retrieval evidence:
 
 ## Related
 
-- [The boring infrastructure stack I'd actually pick for a startup](/posts/boring-infrastructure-stack-for-startups) — the infrastructure counterpart: the boring, debuggable stack that pairs with a boring, navigable codebase.
-- [Stop running one coding agent for everything](/posts/coding-agent-setup-may-2026) — the agent-setup side of the same idea: once the repo is navigable, hand a slice to a bounded specialist instead of overloading one agent with the whole stack.
+- [The boring infrastructure stack I'd actually pick for a startup](/posts/boring-infrastructure-stack-for-startups): the boring, debuggable stack that pairs with a navigable codebase.
+- [Stop running one coding agent for everything](/posts/coding-agent-setup-may-2026): once the repo is navigable, hand a slice to a bounded specialist instead of overloading one agent with the whole stack.

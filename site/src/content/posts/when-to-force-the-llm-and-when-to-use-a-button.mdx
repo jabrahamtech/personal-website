@@ -44,7 +44,7 @@ Then there's cost, which is the silent one. The 2026 story in AI economics isn't
 
 <Figure
   src="/posts/when-to-force-the-llm-and-when-to-use-a-button/stat-500ms.jpg"
-  alt="~500ms — the voice turn-taking budget the LLM cannot guarantee."
+  alt="~500ms: the voice turn-taking budget the LLM cannot guarantee."
   caption="Voice has a budget the LLM can't promise to hit."
   width={1200}
   height={675}
@@ -72,7 +72,7 @@ They're authoritative. When the button and the model disagree, the button wins. 
 
 <Figure
   src="/posts/when-to-force-the-llm-and-when-to-use-a-button/architecture.jpg"
-  alt="A deterministic outer loop with three nodes — open step (LLM), captured value, next step — and four back-channel buttons beneath: pause, previous, next, confirm."
+  alt="A deterministic outer loop with three nodes, open step (LLM), captured value, next step, plus four back-channel buttons beneath: pause, previous, next, confirm."
   caption="Where the model sits inside the workflow."
   width={1200}
   height={675}
@@ -99,20 +99,16 @@ If you're sceptical that this is just my taste, there's a 2025 paper on [*genera
 
 The takeaway sits one level deeper than "use buttons for users." It's that **structured beats free-text even when the LLM is the one doing the work.** The model is not actually better off in ambiguity. We just keep assuming it is, because the demo runs fine.
 
-## When to force the LLM into the solution
+## When the model is right, and when it isn't
 
-The mirror of the rule. Some places do call for the model:
+Some places do call for the model:
 
 - The input is unstructured language and you can't predict the shape of it. Free-text intake, summarisation, classification of fuzzy categories, extraction from messy documents.
 - The user wins something specifically by *talking* rather than tapping. Hands-busy contexts. Field workflows. Anywhere typing or clicking adds real friction.
 - The branching is too wide for a UI. Thirty leaves where most users only touch three: a model that routes is cheaper than thirty buttons no one will read.
 - Personalisation needs context you can't pre-encode. Tone, follow-up phrasing, adaptive prompts.
 
-When all four are true, the model is the product. Don't apologise for it.
-
-## When to avoid forcing the LLM
-
-The reverse list, written out so it's hard to miss:
+And the cases where deterministic logic does the job better:
 
 - Anything binary and consequential. Confirmations. Authorisations. Payments. Account deletions.
 - Anything stateful that the user expects to control. Pause, resume, go back, skip, restart.
@@ -120,15 +116,13 @@ The reverse list, written out so it's hard to miss:
 - Anything that has to be auditable or compliant. Regulators don't want to read your prompt.
 - Anything that has to happen in under 500 milliseconds. Voice turn-taking breaks at that threshold, and the model can't make it.
 
-These aren't moral failings of the model. They're cases where deterministic logic does the job better.
-
 ## A diagnostic you can run today
 
 Walk through one full session of your product. Note every place a user has to repeat themselves, rephrase, correct, or say *"no, that's not what I meant."* Note every place they pause because they're not sure the model heard them. Note every place they ask the model to do something procedural rather than something expressive.
 
 Each of those notes is a candidate for a button, a form field, or a fixed rule. You probably don't need to rebuild the product. You need to peel the model off a few specific steps.
 
-## The final rule
+## What getting it right looks like
 
 You'll know you've drawn the line correctly when users stop noticing the model in the places where it's doing its job, and start noticing the buttons in the places where they need control. The model gets quieter, more useful, and more accurate. The product gets faster and more trusted. Nothing about it looks like a demo, which is exactly the point.
 
@@ -145,17 +139,11 @@ You'll know you've drawn the line correctly when users stop noticing the model i
 **Doesn't adding buttons make the experience feel less like AI?**
 Yes, and that's usually a feature. Most users don't want an "AI experience." They want the thing they were trying to do to happen reliably. The model is a means, not an aesthetic.
 
-**Isn't the LLM fast enough now?**
-For some things, yes. For natural turn-taking in voice, the threshold is around 500 milliseconds. A button click is roughly zero. If a user is going to do an action ten times in a session, those numbers compound.
-
-**Where should I start if my product is currently all LLM?**
-Run the diagnostic above. The places where users repeat themselves or correct the model are the candidates. You probably don't need to rebuild. You need to peel.
-
 **How does this relate to agents?**
-Same idea, scaled up. An agent with full autonomy over a long task is the maximally-LLM-owned design. A workflow with the model inside specific steps is the minimum. Most real products live closer to the workflow end and the ones that try to live near the agent end usually walk back.
+Same idea, scaled up. An agent with full autonomy over a long task is the maximally-LLM-owned design. A workflow with the model inside specific steps is the minimum. Most real products live closer to the workflow end, and the ones that try to live near the agent end usually walk back.
 
 **Is this just "use traditional software inside your AI agent?"**
-Related, but a different angle. That post (coming) is about the *back-end* parts of an agent that should stay deterministic: rules, queues, database constraints, retries. This one is about the *front-end*: what the user clicks, sees, and steers with. Same instinct, different surface.
+Related, but a different angle. That post (coming) is about the *back-end* parts of an agent that should stay deterministic: rules, queues, database constraints, retries. This one is about the *front-end*: what the user clicks, sees, and steers with.
 
 ## Caveats
 
@@ -163,8 +151,8 @@ The Brokerloop example is described in general terms. Accuracy and frustration i
 
 ## Related
 
-- [Most "human-in-the-loop" is escalation done badly](/posts/most-hitl-is-escalation-done-badly) — once you've decided the model owns a step, this is the next question: on what trigger a human gets pulled back in.
-- [What Polymarket taught me about event-driven](/posts/polymarket-bot-event-driven) — the same line drawn on the back end, which work gets to be loose and event-driven and which has to be synchronous and deliberate.
+- [Most "human-in-the-loop" is escalation done badly](/posts/most-hitl-is-escalation-done-badly): once the model owns a step, on what trigger a human gets pulled back in.
+- [What Polymarket taught me about event-driven](/posts/polymarket-bot-event-driven): the same line drawn on the back end, which work gets to be loose and which has to be synchronous.
 
 ## If you're working through this
 

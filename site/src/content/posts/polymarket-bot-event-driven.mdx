@@ -16,7 +16,7 @@ image:
 
 import Figure from '../../components/Figure.astro';
 
-{/* TODO — open items from the handoff brief (section 7):
+{/* TODO: open items from the handoff brief (section 7):
      1. Greg Young CodeBetter 2010 URL was unreachable at finalisation time.
         The current References section points only at the Kurrent / Event
         Store transcript of his 2014 Code on the Beach talk, which carries
@@ -37,17 +37,11 @@ import Figure from '../../components/Figure.astro';
 
 I built a Polymarket market-making bot. The pitch I'd bought was that event-driven would simplify it. It did the opposite. The bus helped at the edges, but every decision that actually had to be right wanted to be boring, synchronous, and explicit.
 
-The codebase that shipped is a hybrid: an async bus for facts, a synchronous hot path for decisions, an append-only SQLite log off to the side for memory. None of the three is optional. None of them lives inside a single pattern. The literature has been saying this since at least 2011 (LMAX) and 2017 (Fowler). The 2025 vendor pitch — Kafka shape for everything — quietly drops the middle layer.
-
-This post walks the build. The point is not that prediction-market bots are interesting (they are, modestly). The point is that the architecture I had to settle into is the architecture most automation builders need and most articles paper over.
-
-A production trading bot should be event-driven at the edges and synchronous at the decision point, with durable memory kept separate.
-
-The shape that survived in this Polymarket bot is the three-layer hybrid: facts, decisions, memory. Facts move through the async bus: order-book updates, user fills, boundary events, the stream of things that happened or changed. Decisions run through the executor's hot path: strategy intent, risk checks, capital reservation, backend submit, position update. Memory sits off to the side as an append-only event log of decisions, fills, errors, and reconciliations.
+The codebase that shipped is a three-layer hybrid: an async bus for facts, a synchronous hot path for decisions, an append-only SQLite log off to the side for memory. Facts are the stream of things that happened: order-book updates, user fills, boundary events. Decisions are the executor's hot path: strategy intent, risk checks, capital reservation, submit, position update. Memory is the durable log of decisions, fills, errors, and reconciliations. None of the three is optional, and none lives inside a single pattern.
 
 Pure event-driven architecture fails at the moment the bot has to decide, because risk and submit cannot be a loose chain of passive handlers. Pure synchronous architecture fails at the inputs, because market data, fills, reconnects, and resolution signals arrive as streams. The hybrid is what survived contact with production.
 
-The rule is simple: stream the facts, synchronise the decision, append the memory.
+The rule: stream the facts, synchronise the decision, append the memory. The literature has been saying a version of this since LMAX in 2011 and Fowler in 2017. The 2025 vendor pitch, a Kafka shape for everything, quietly drops the middle layer.
 
 ## Problem and requirements
 
@@ -73,14 +67,14 @@ The other relevant detail: most of the code was written with heavy AI assistance
 
 At the centre of the system is an in-memory message bus. One process, one bus, multiple async tasks reading and publishing. The bus is unremarkable except for two policies: coalescing on high-volume topics, and unbounded queues on critical ones. Feeds publish market data and user data. Strategies consume market data and publish orders. The executor consumes orders, runs risk checks, submits to a backend, and publishes fills. The reconciliation service consumes the user-fills feed in live mode and corrects the executor's optimistic view of the world. A boundary service publishes typed interval-boundary events that drive resolution and redemption.
 
-That sentence sounds tidy. The code is not. Five core supervised tasks at boot — `FeedManager`, `ExecutionEngine`, `Cache`, `BoundaryPriceService`, `ResolutionService` — plus `MarketFinder`, `RedemptionSweeper`, and `ReconciliationService` in live mode. Each runs under a supervisor that restarts on crash with exponential backoff capped at thirty seconds and trips a circuit breaker after three crashes in five minutes. The bus is injected into roughly a dozen components. The boundary cases are most of the engineering: what happens when a feed disconnects, what happens when the bus drops an update under load, what happens when the executor's optimistic fill diverges from what the venue reports.
+That sentence sounds tidy. The code is not. Five core supervised tasks at boot (`FeedManager`, `ExecutionEngine`, `Cache`, `BoundaryPriceService`, `ResolutionService`), plus `MarketFinder`, `RedemptionSweeper`, and `ReconciliationService` in live mode. Each runs under a supervisor that restarts on crash with exponential backoff capped at thirty seconds and trips a circuit breaker after three crashes in five minutes. The bus is injected into roughly a dozen components. The boundary cases are most of the engineering: what happens when a feed disconnects, what happens when the bus drops an update under load, what happens when the executor's optimistic fill diverges from what the venue reports.
 
 Here is the diagram view of the main flow.
 
 <Figure
   src="/posts/polymarket-bot-event-driven/figure-01.svg"
   alt="System diagram: an async message bus on the left feeding a synchronous executor hot path in the middle (strategy intent → risk → submit), with an append-only event log branching off to the right. The middle 'decisions' panel carries a deep-rust accent line and a deep-rust filled execution-engine box."
-  caption="Fig. 1 — bus carries facts, executor runs the synchronous decision, append-only log is the separate memory."
+  caption="Fig. 1: bus carries facts, executor runs the synchronous decision, append-only log is the separate memory."
   width={1600}
   height={900}
 />
@@ -136,7 +130,7 @@ class CoalescingBuffer:
         self._event.set()
 ```
 
-`book_update` is keyed by `token_id` — every new snapshot for a token overwrites the last one. `orders` and `fills` are not coalesced; they sit on `asyncio.Queue(maxsize=0)`, truly unbounded. That two-line policy difference *is* the architecture, written down.
+`book_update` is keyed by `token_id`: every new snapshot for a token overwrites the last one. `orders` and `fills` are not coalesced; they sit on `asyncio.Queue(maxsize=0)`, truly unbounded. That two-line policy difference *is* the architecture, written down.
 
 ### The hot path is synchronous on purpose
 
@@ -252,12 +246,6 @@ Different stacks, same logical shape. The reactive edge keeps the system respons
 
 Sam Newman's [orchestration-vs-choreography distinction](https://www.oreilly.com/library/view/building-microservices/9781491950340/) maps onto this directly. Choreography (events flowing between services) lives on the reactive edge. Orchestration (a service that knows the sequence and tells participants what to do) lives in the decision layer. Both are needed, and both belong in different parts of the system. The [saga pattern with compensating actions](https://newsletter.theburningmonk.com/posts/event-driven-architecture-know-your-commands-from-your-events) bridges them when state spans services. Backpressure is the unnamed thing the coalescing policy implements.
 
-## Product lesson
-
-This is a build post but the lesson is not really about code.
-
-Most automation systems land in the same architectural shape when they are honest about their requirements. Reactive on the edges. Deterministic in the middle. Durable history off to the side. The names change. Message bus or event stream or pub/sub on the edges. State machine or workflow or business logic processor in the middle. Event log or event store or audit trail off to the side. The shape stays.
-
 The 2025 vendor narrative [pushes Kafka-shaped event streaming as the architecture](https://www.confluent.io/blog/the-future-of-ai-agents-is-event-driven/) for everything an automation system might need. It is half right. The reactive edges of an automation system benefit enormously from streaming. The decision points do not, and treating them as event chains is what Fowler called the [passive-aggressive command trap](https://martinfowler.com/articles/201701-event-driven.html) and what [Bernd Ruecker has spent years arguing](https://www.infoq.com/news/2019/03/event-driven-systems/) the field keeps reinventing. The durable record is not the bus either, and treating it as the bus loses the ability to query state cheaply.
 
 When I look at the automation systems I have helped teams ship across voice, documents, and internal tooling, the ones that survive past launch look like the trading bot. The ones that struggle look like the vendor pitch.
@@ -276,9 +264,9 @@ Risk checks live in the executor's process. For a single-strategy bot that is fi
 
 The boundary service is good. The resolution service is good. The reconciliation service is good. The metrics collector is the one I would re-design from scratch.
 
-## CTA
+## If you're building this
 
-If you are building automation that has to make decisions in production (agents, workflows, internal tools, anything reactive that has to be right), the architecture conversation worth having is which patterns belong in which layer, not which vendor's stream gets the contract. I help teams move from impressive automation demos to systems that survive contact with users. If that is what you are working on, I am open to conversations.
+If you're building automation that has to make decisions in production, the conversation worth having is which patterns belong in which layer, not which vendor's stream gets the contract. I help teams move from impressive demos to systems that survive contact with users.
 
 ## Caveats and claim-safety notes
 
@@ -286,55 +274,38 @@ If you are building automation that has to make decisions in production (agents,
 - No PnL, latency, or fill-rate figures are claimed. The reliability claims are qualitative.
 - The "AI-assisted development biases toward function calls" claim is an observation from this build, not a controlled study. Treat it as a hypothesis worth testing on your own.
 
-## Terminology
-
-**Three-layer hybrid**
-The architecture that separates facts, decisions, and memory instead of forcing them into one event-driven pattern. Facts stream through the bus, decisions run synchronously in the hot path, and memory is stored as an append-only record.
-
-**Synchronous decision hot path**
-The executor-owned path where strategy intent becomes an order: receive command, run risk, reserve capital, submit to the backend, update position. This path is synchronous because correctness matters more than loose coupling at the moment of action.
-
-**Append-only event log as memory**
-A durable record of decisions, fills, errors, and reconciliations that exists beside the bus, not inside it. The log is for explanation, audit, and replay; the bus is for moving live facts through the process.
-
-**Supervisor + circuit breaker pattern**
-The runtime pattern that keeps long-lived engines alive without pretending crashes are harmless. Supervised tasks restart with backoff, and the circuit breaker trips when repeated failures show the system is no longer healthy.
-
-**Boundary price service**
-The service that turns time and market boundaries into typed events the rest of the bot can consume. It keeps resolution and redemption logic driven by explicit boundary signals instead of scattered timers.
-
 ## References
 
 Canonical / empirical:
 
-- [Martin Fowler — What do you mean by "Event-Driven"?](https://martinfowler.com/articles/201701-event-driven.html)
-- [Martin Fowler — The LMAX Architecture](https://martinfowler.com/articles/lmax.html)
+- [Martin Fowler: What do you mean by "Event-Driven"?](https://martinfowler.com/articles/201701-event-driven.html)
+- [Martin Fowler: The LMAX Architecture](https://martinfowler.com/articles/lmax.html)
 - [LMAX Disruptor documentation](https://lmax-exchange.github.io/disruptor/)
-- [Greg Young — Code on the Beach 2014 transcript (Kurrent / Event Store)](https://www.kurrent.io/blog/transcript-of-greg-youngs-talk-at-code-on-the-beach-2014-cqrs-and-event-sourcing)
-- [Bernd Ruecker — A Critical Look at Event-Driven Systems (InfoQ, QCon London 2019)](https://www.infoq.com/news/2019/03/event-driven-systems/)
-- [Bernd Ruecker — Opportunities and Pitfalls of Event-driven Utopia (InfoQ)](https://www.infoq.com/presentations/event-driven-benefits-pitfalls/)
-- [Sam Newman — Building Microservices (O'Reilly)](https://www.oreilly.com/library/view/building-microservices/9781491950340/)
-- [Martin Kleppmann — Designing Data-Intensive Applications, Chapter 11](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/)
-- [Three Dots Labs — Event-Driven Architecture: The Hard Parts](https://threedots.tech/episode/event-driven-architecture/)
+- [Greg Young: Code on the Beach 2014 transcript (Kurrent / Event Store)](https://www.kurrent.io/blog/transcript-of-greg-youngs-talk-at-code-on-the-beach-2014-cqrs-and-event-sourcing)
+- [Bernd Ruecker: A Critical Look at Event-Driven Systems (InfoQ, QCon London 2019)](https://www.infoq.com/news/2019/03/event-driven-systems/)
+- [Bernd Ruecker: Opportunities and Pitfalls of Event-driven Utopia (InfoQ)](https://www.infoq.com/presentations/event-driven-benefits-pitfalls/)
+- [Sam Newman: Building Microservices (O'Reilly)](https://www.oreilly.com/library/view/building-microservices/9781491950340/)
+- [Martin Kleppmann: Designing Data-Intensive Applications, Chapter 11](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/)
+- [Three Dots Labs: Event-Driven Architecture: The Hard Parts](https://threedots.tech/episode/event-driven-architecture/)
 
 Patterns / supporting:
 
-- [Oskar uit de Bos — The Event-Carried State Transfer pattern (ITNEXT)](https://itnext.io/the-event-carried-state-transfer-pattern-aae49715bb7f)
-- [INNOQ — Compacted State Feeds](https://www.innoq.com/en/blog/2024/02/compacted-state-feed/)
-- [Burning Monk newsletter — Know your commands from your events](https://newsletter.theburningmonk.com/posts/event-driven-architecture-know-your-commands-from-your-events)
+- [Oskar uit de Bos: The Event-Carried State Transfer pattern (ITNEXT)](https://itnext.io/the-event-carried-state-transfer-pattern-aae49715bb7f)
+- [INNOQ: Compacted State Feeds](https://www.innoq.com/en/blog/2024/02/compacted-state-feed/)
+- [Burning Monk newsletter: Know your commands from your events](https://newsletter.theburningmonk.com/posts/event-driven-architecture-know-your-commands-from-your-events)
 
 Vendor and AI-context references (cited as the perspective the post pushes back on):
 
-- [Confluent — The Future of AI Agents Is Event-Driven (Sean Falconer, May 2025)](https://www.confluent.io/blog/the-future-of-ai-agents-is-event-driven/)
-- [Kai Waehner — Kafka and Flink Power Event-Driven Agentic AI](https://www.kai-waehner.de/blog/2025/04/14/how-apache-kafka-and-flink-power-event-driven-agentic-ai-in-real-time/)
-- [HiveMQ — Event-Driven Architecture for Agentic AI Collaboration](https://www.hivemq.com/blog/benefits-of-event-driven-architecture-scale-agentic-ai-collaboration-part-2/)
+- [Confluent: The Future of AI Agents Is Event-Driven (Sean Falconer, May 2025)](https://www.confluent.io/blog/the-future-of-ai-agents-is-event-driven/)
+- [Kai Waehner: Kafka and Flink Power Event-Driven Agentic AI](https://www.kai-waehner.de/blog/2025/04/14/how-apache-kafka-and-flink-power-event-driven-agentic-ai-in-real-time/)
+- [HiveMQ: Event-Driven Architecture for Agentic AI Collaboration](https://www.hivemq.com/blog/benefits-of-event-driven-architecture-scale-agentic-ai-collaboration-part-2/)
 
 Polymarket / CLOB context:
 
-- [Polymarket Documentation — Trading](https://docs.polymarket.com/developers/market-makers/trading)
-- [NautilusTrader — Polymarket integration](https://nautilustrader.io/docs/latest/integrations/polymarket/)
+- [Polymarket Documentation: Trading](https://docs.polymarket.com/developers/market-makers/trading)
+- [NautilusTrader: Polymarket integration](https://nautilustrader.io/docs/latest/integrations/polymarket/)
 
 ## Related
 
-- [Most "human-in-the-loop" is escalation done badly](/posts/most-hitl-is-escalation-done-badly) — same pillar: oversight and decision design for AI-adjacent systems.
-- [When to force the LLM, and when to use a button](/posts/when-to-force-the-llm-and-when-to-use-a-button) — companion piece on which layer of a workflow the model should own.
+- [Most "human-in-the-loop" is escalation done badly](/posts/most-hitl-is-escalation-done-badly): oversight and decision design for AI-adjacent systems.
+- [When to force the LLM, and when to use a button](/posts/when-to-force-the-llm-and-when-to-use-a-button): which layer of a workflow the model should own.
