@@ -78,7 +78,7 @@ The audit takes an hour. Open every skill in `~/.claude/skills/` and `~/.codex/s
 
 Anything that fails the first question moves out of the skill file immediately. Either to a runtime prompt the user has to confirm, or to a proper secret store. The skill becomes the workflow and only the workflow. Do not rely on the agent to safely ignore sensitive material it can read.
 
-The most important sentence in this post is the one before this one. If you take nothing else, run the audit.
+If you take nothing else, run the audit.
 
 ## AGENTS.md and CLAUDE.md hold the local contract
 
@@ -108,7 +108,7 @@ MCPs are useful and dangerous in the same way. The protocol Anthropic [shipped i
 
 The split I actually run: OpenAI questions go to the `openaiDeveloperDocs` MCP first, with the official OpenAI docs as a fallback (not web search). Browser QA does not get a global Playwright MCP. It gets a `browser-tester` subagent with Playwright tools scoped to that agent's context, so the main session never sees the browser surface area. [Claude Code's subagent docs](https://code.claude.com/docs/en/sub-agents) describe this pattern well. The practical reason to use it is so a planning conversation does not accidentally open a Chrome window. Linear and Sentry are off by default and turn on when I am actually working a ticket or chasing an error. Obsidian is on and treated as durable memory, not scratchpad. Trading-specific MCPs (Polymarket, Kalshi, whale tracking) live with the trading repos and nowhere else. Stitch, Remotion and shadcn MCPs live with the design-to-code repos and nowhere else.
 
-The single mental model I would lift from all of this: treat MCPs, hooks, plugins and skills as executable automation with least privilege. None of them is "just config".
+Treat MCPs, hooks, plugins and skills as executable automation with least privilege. None of them is "just config".
 
 <Figure
   src="/posts/coding-agent-setup-may-2026/figure-02.png"
@@ -142,7 +142,7 @@ The setup I run is not the only one that works. It is the one that survived six 
 
 ## Caveats
 
-This is a personal setup as of May 2026. Tooling moves fast. Hooks, subagents, and MCP capabilities all expanded in the last quarter, and any specific feature claim in this post should be sanity-checked against the relevant changelog before you copy it.
+This is a personal setup as of May 2026. Tooling moves fast, so any specific feature claim in this post should be sanity-checked against the relevant changelog before you copy it.
 
 I have not benchmarked the split against a single-agent baseline. The improvement is observed, not measured. A reader running rigorous evals will produce a more confident answer than I have.
 

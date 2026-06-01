@@ -56,7 +56,7 @@ My recommendation is unambiguous: spend the first quarter of any serious agent p
 
 The second-most-replicated RPA finding is that programs without rigorous process discovery automate the wrong work. [ISG reported in June 2020](https://www.globenewswire.com/news-release/2020/06/08/2044966/0/en/Escaping-Pilot-Purgatory-Scaling-Automation-Across-the-Enterprise-the-Focus-of-ISG-Talk.html) that around 70% of enterprises had deployed RPA but only 12% had automated 50 or more processes. ISG called this pilot purgatory. The diagnosis was consistent across the analyst community: pilots were chosen for demo appeal rather than business value, and the program ran out of executive air cover before any of them scaled.
 
-The agent-era version of this is the impressive-demo trap. A team builds an agent that does something photogenic, like booking a meeting, summarising a sales call, or drafting a SQL query, without first asking whether the workflow it sits inside is actually worth automating. [McKinsey's research](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-change-agent-goals-decisions-and-implications-for-ceos-in-the-agentic-age) is that nearly two-thirds of enterprises have experimented with AI agents but fewer than 10% have scaled them to measurable value. Different decade. Same spread.
+The agent-era version of this is the impressive-demo trap. A team builds an agent that does something photogenic, like booking a meeting, summarising a sales call, or drafting a SQL query, without first asking whether the workflow it sits inside is actually worth automating. The demo is always good. The demo is not the system. [McKinsey's research](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-change-agent-goals-decisions-and-implications-for-ceos-in-the-agentic-age) is that nearly two-thirds of enterprises have experimented with AI agents but fewer than 10% have scaled them to measurable value. Different decade. Same spread.
 
 The RPA-era discipline was process discovery: workshops with the people doing the work, time-and-motion observation, ROI modelling against the current cost of the task, formal go/no-go gating before any build started. The cynical view is that this was busywork. The practitioner view is that it was the only thing that stopped programs from automating ceremonial work nobody cared about.
 
@@ -92,19 +92,9 @@ Three honest caveats.
 
 The first is that not every workflow is a good candidate for an agent at all, and the RPA-era discipline of "automate the stable parts deterministically, agent the unstable parts" is converging across the analyst community for a reason. If your workflow is high-volume, low-variance, and the underlying systems are stable, RPA is still the right answer and an agent is overengineering. The Forrester resiliency lesson is the same lesson in reverse: do not put a probabilistic system into a place where determinism was the whole point.
 
-The second is that the agent-era governance layer is genuinely harder in two places (prompt injection and behavioural drift) that RPA simply did not have to handle. NIST's AI Agent Standards Initiative has been running for three months at the time of writing. It is a direction of travel, not a finished framework. Anyone who tells you the governance question is fully solved is overclaiming, and the appropriate posture is to build with humility against a moving target.
+The second is that the agent-era governance layer is genuinely harder in two places (prompt injection and behavioural drift) that RPA simply did not have to handle. NIST's AI Agent Standards Initiative has been running for three months at the time of writing. It is a direction of travel, not a finished framework. Anyone who tells you the governance question is fully solved is overclaiming.
 
 The third is that the RPA wave produced its own pathologies: over-centralised CoEs that throttled delivery, multi-year platform standardisation projects that delivered nothing, vendor lock-in that became expensive to unwind. Borrow the operating model, not the politics. The agent generation has a chance to keep the CoE pattern lean.
-
-## What to avoid
-
-A short list, since the post is meant to be useful rather than encyclopedic.
-
-Do not let citizen developers spin up production agents without standards. The shadow-IT estate this produces will outlive the agent program itself.
-
-Do not skip process discovery because the demo is good. The demo is always good. The demo is not the system.
-
-Do not retrofit governance after the first incident. RPA programs that did this paid for it.
 
 ## The 60% that ships
 

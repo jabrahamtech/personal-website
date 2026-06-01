@@ -44,7 +44,7 @@ The point is not that new AI law has arrived. The point is that existing obligat
 
 ## The two layers
 
-It is worth being explicit about the split, because it is the source of most of the confusion when an engineering team and a risk team talk past each other.
+The split is where most of the confusion lives: an engineering team and a risk team talking past each other.
 
 The programme layer is governance as an organisational function. Who owns this agent. What risks did we identify before approving it. What controls are on the data it touches. What telemetry are we keeping, for how long, in what form. This layer is what APRA CPS 220 (risk management), CPS 230 (operational risk and service providers), CPS 234 (information security), and the first three guardrails of the [Voluntary AI Safety Standard](https://www.industry.gov.au/publications/voluntary-ai-safety-standard) (accountability, risk management, security and data governance) explicitly require. NIST AI RMF's Govern-Map-Measure-Manage functions are the same idea expressed differently. So is [ISO/IEC 42001](https://www.iso.org/standard/42001), the AI management-system standard.
 
@@ -101,7 +101,7 @@ Which means there is no waiting. The rules are here. The agent has to fit them.
 
 ## Three places this changes what you build
 
-The abstractions matter when you can see them rewriting the architecture. Three places where the primitives clearly change the design.
+Three places where the primitives change the design.
 
 ### Claims triage
 
@@ -145,7 +145,7 @@ I have spent enough time around production voice AI workflows to have a strong v
 
 Pay rent at build time: the trace schema (what gets logged on every agent step, in a form that downstream complaints and audit systems can read directly); the action whitelist (every tool the agent can call, signed off by both engineering and a risk owner, with the human-approval predicate); the kill-switch surface (per-case, per-cohort, global, plus a documented recovery procedure for in-flight state); and the version pin on prompts, tools, and models, with the version stored on every decision row. None of those are exotic. All of them are easier in week one of the build than week twenty.
 
-Can wait, in practice: the formal model card, the slide-deck governance framework, the AI risk policy document. Those are produced from the system, not the other way around. If the schema above is correct, those documents almost write themselves.
+Can wait, in practice: the formal model card, the slide-deck governance framework, the AI risk policy document. If the schema above is correct, those documents almost write themselves.
 
 The trap to avoid: treating the [Voluntary AI Safety Standard](https://www.industry.gov.au/publications/voluntary-ai-safety-standard)'s ten guardrails as a compliance checklist filled out by a policy team that has never read the code. They are design inputs to the system. Read them with the architecture diagram open.
 
@@ -167,13 +167,13 @@ Bolt-on governance is the worst. The agent gets built, the policy paper gets wri
 
 Tool-first procurement is next. Picking the LLM provider, the agent framework, the observability platform, and the guardrails platform before you have written the trace schema is buying answers to questions you haven't asked. The primitives drive the procurement. Not the other way around.
 
-Pure model-card theatre is third. A beautifully written model card with no working trace pipeline is not governance, it is documentation. The trace pipeline is the governance.
+Pure model-card theatre is third. A beautifully written model card with no working trace pipeline is not governance, it is documentation.
 
 Treating the ICA Code as outside the agent's design is fourth. The 10-business-day clock and the 20-business-day update obligation are real numbers that an agent's monitoring and escalation primitives have to be designed against. They are not background context.
 
 ## What "demo to product" means here
 
-The primitives have converged across both layers, and the Australian stack (APRA standards, ASIC obligations and guides, OAIC Privacy Act guidance, the ICA Code, the Voluntary AI Safety Standard, and the April and May 2026 APRA and ASIC letters) lands on every one of them through one instrument or another. The job is to make them shape the system at design time, so the audit, the IDR response, and the regulator's REP 798-style review all draw from the same trace the engineering team already had to build for the product to work.
+The primitives have converged across both layers, and the Australian stack (APRA standards, ASIC obligations and guides, OAIC Privacy Act guidance, the ICA Code, the Voluntary AI Safety Standard, and the April and May 2026 APRA and ASIC letters) lands on every one of them through one instrument or another. The job is to make them shape the system at design time, so the audit, the IDR response, and the regulator's REP 798-style review all draw from the same trace.
 
 If you cannot draw the six on the whiteboard right now, the build is not ready. The model was never the hard part.
 

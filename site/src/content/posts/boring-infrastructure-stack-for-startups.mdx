@@ -69,7 +69,7 @@ The minimum: Sentry for errors, structured logs, and one LLM observability tool 
 
 Concrete example. I built an RFID linen tracking system for SPL where Grafana was doing the heavy lifting from day one. The dashboards caught bad reads and offline scanners before the ops team did. The system felt more reliable than it was, because we saw issues first.
 
-For AI features, three things matter: LLM call logging, cost tracking per feature or per tenant, and eval scores sampled from production traffic. You don't have to build any of that yourself in 2026. My shortlist: Helicone (fastest setup, change one base URL), Langfuse (open-source MIT, the full-featured free option), Braintrust (commercial, used by Stripe, Notion, Vercel, Perplexity). Pick one and wire it in the day you ship the AI feature, not the day the bill confuses you.
+For AI features, three things matter: LLM call logging, cost tracking per feature or per tenant, and eval scores sampled from production traffic. You don't have to build any of that yourself in 2026. My shortlist: Helicone (fastest setup, change one base URL), Langfuse (open-source MIT, the full-featured free option), Braintrust (commercial, used by Stripe, Notion, Vercel, Perplexity). Pick one and wire it in the day you ship the AI feature, not later.
 
 The eval pipeline is the one founders skip. Sample production traffic, run it through evaluators (LLM-as-judge, regex, human review), store the results, alert on regressions. Langfuse and Braintrust handle this as a core feature, so you usually don't need a separate evals stack. Without it, you don't know if your last prompt change made things better or worse.
 
@@ -151,7 +151,7 @@ Terraform has the dominant IaC ecosystem. 4,800+ providers, around 26 million we
 
 On AWS itself, start at App Runner for most apps. It's the closest equivalent to what Railway gave you: push a container, get a URL, autoscaling included. Climb to Fargate when you need orchestration: coordinated services, sidecars, scaling at the service level. Raw EC2 only when App Runner and Fargate genuinely can't do what you need (GPU workloads, specific networking, compliance constraints). Most startups never make it past App Runner.
 
-Almost everything startups over-engineer at the start gets thrown out by month six anyway. The escape plan is boring on purpose. PaaS until you feel the cost, then AWS via Terraform.
+Almost everything startups over-engineer at the start gets thrown out by month six anyway.
 
 ## The boring conclusion
 

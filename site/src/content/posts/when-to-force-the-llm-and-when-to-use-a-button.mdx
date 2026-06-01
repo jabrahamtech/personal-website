@@ -58,7 +58,7 @@ For a few weeks, all four lived inside the model. The user could say *"go back"*
 
 The fix was small and slightly embarrassing: we added buttons to the companion web interface. *Pause. Previous question. Next question. Confirm captured value.* The four things the model kept guessing at became four things the user could click. The voice agent kept doing the open-ended part: listening, asking, capturing. The four deterministic controls moved out of the prompt and into the UI.
 
-Accuracy on captured data went up. Frustration went down. Latency on those four interactions dropped to roughly zero, because clicking a button doesn't require an inference call. None of this was a model upgrade. It was a workflow change.
+Accuracy on captured data went up. Frustration went down. Latency on those four interactions dropped to roughly zero. None of this was a model upgrade. It was a workflow change.
 
 ## Back-channel UI: the pattern, named
 
@@ -89,10 +89,6 @@ When you're trying to decide whether a step in your product should be owned by t
 
 If you're answering yes to two or more, that step almost certainly belongs to a button, form, dropdown, slider, or rule, not the model. Save the model for the parts where the input is open-ended and the human gains something from being heard rather than clicking.
 
-<Callout type="tip">
-  The model is doing the part that needs language. The UI is doing the part that needs certainty.
-</Callout>
-
 ## The structured-input research nobody is quoting
 
 If you're sceptical that this is just my taste, there's a 2025 paper on [*generative interfaces for language models* (Chen, Zhang, Zhang, Shao & Yang, arXiv 2508.19227)](https://arxiv.org/abs/2508.19227) that ran the experiment cleanly. They compared two ways of letting an LLM handle a user request: one where the interface was described to the model in free natural language, and one where it was described as a structured representation with explicit fields and constraints. Structured representations won, measurably, in human evaluation. Around a 13% to 17% lift on overall win rates.
@@ -114,7 +110,7 @@ And the cases where deterministic logic does the job better:
 - Anything stateful that the user expects to control. Pause, resume, go back, skip, restart.
 - Anything where the valid answer set is small and the cost of a misread is large. Yes/no, today/tomorrow, this account/that account.
 - Anything that has to be auditable or compliant. Regulators don't want to read your prompt.
-- Anything that has to happen in under 500 milliseconds. Voice turn-taking breaks at that threshold, and the model can't make it.
+- Anything that has to happen in under 500 milliseconds.
 
 ## A diagnostic you can run today
 

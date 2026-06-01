@@ -103,7 +103,7 @@ The third is *policy*. Categorical rules that override everything else. Insuranc
 
 The fourth is *user request*. The customer asked for a human. This is the simplest trigger and the one too many teams under-tune. If a user has typed "agent" or "human" or "this isn't working", you've already lost the resolution on that case. Stop trying to win it back. Hand it over.
 
-A good escalation system uses all four. If any trigger fires, you escalate, with full context, to the right kind of human (a domain reviewer, a senior agent, a compliance officer, not all the same person). The human's role at that moment is the action the trigger named, not "review everything we just did." You measure the escalation rate, the false-escalation rate, the missed-escalation rate, and the outcome quality on escalated cases. These are the metrics that tell you whether your system is doing its job. They are also the metrics that almost no team reports on, which is why so many production AI rollouts have a quiet quality problem you only discover at the post-mortem.
+A good escalation system uses all four. If any trigger fires, you escalate, with full context, to the right kind of human (a domain reviewer, a senior agent, a compliance officer, not all the same person). The human's role at that moment is the action the trigger named, not "review everything we just did." You measure the escalation rate, the false-escalation rate, the missed-escalation rate, and the outcome quality on escalated cases. They are also the metrics that almost no team reports on, which is why so many production AI rollouts have a quiet quality problem you only discover at the post-mortem.
 
 ## Klarna, read correctly
 
@@ -123,9 +123,9 @@ I have to be honest about regulated high-stakes decisions, because they're where
 
 The deeper reading is that the law is asking for *meaningful* oversight, and the empirical evidence I just walked through says default-path HITL doesn't deliver it. The European Data Protection Supervisor's [2025 TechDispatch on human oversight of automated decision-making](https://www.edps.europa.eu/data-protection/our-work/publications/techdispatch/2025-09-23-techdispatch-22025-human-oversight-automated-making_en) explicitly recognises the rubber-stamping problem. EU AI Act Article 14 requires that the design of the oversight "enable awareness of the possible tendency of automatically relying or over-relying on the output produced by a high-risk AI system (automation bias)." [Guidance under GDPR Article 22](https://www.dpocentre.com/blog/ai-and-article-22-the-need-for-meaningful-human-review/) has been clear for years that mere rubber-stamping or superficial review doesn't satisfy the requirement.
 
-Read together, the regulators are describing exactly the failure mode this post is arguing against, and asking for exactly the design discipline this post is arguing for. They have read the literature. The legal requirement of "meaningful human oversight" is, when you look closely, asking you to do escalation properly. With designed triggers, meaningful human authority, audit logging, and the human capacity to actually do the job when invoked.
+The legal requirement of "meaningful human oversight" is, when you look closely, asking you to do escalation properly. With designed triggers, meaningful human authority, audit logging, and the human capacity to actually do the job when invoked.
 
-This is the part of the argument I'd want to lean on if I were writing for a chief compliance officer, not a head of product. Pointing at GDPR or the EU AI Act and saying "see, the law requires HITL" is reading the headline. Reading the substance of the law and the regulator commentary turns the same regulation into a brief against default-path HITL and for designed escalation. It is the most contrarian and the most defensible move in this whole space.
+This is the part of the argument I'd want to lean on if I were writing for a chief compliance officer, not a head of product. It is the most contrarian and the most defensible move in this whole space.
 
 ## When default-path HITL is still the right call
 

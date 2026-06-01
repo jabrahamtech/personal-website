@@ -20,7 +20,7 @@ I spent a long time writing layered MVC. Controllers in one folder, services in 
 
 At SPL, our team moved a customer-facing .NET service from that shape to [FastEndpoints](https://fast-endpoints.com/) and vertical slices. Each endpoint became one folder. Request, validator, handler, response, all sitting next to each other. Onboarding got faster. Code reviews got smaller. The number of accidental cross-feature changes dropped sharply. I had read [Jimmy Bogard's 2018 essay](https://www.jimmybogard.com/vertical-slice-architecture/) earlier and thought it was a niche taste. After a couple of months on the migrated service I stopped thinking of it as a taste and started defaulting to it on every new project.
 
-Two years on, the same property has paid out a second time. The codebases I now write with [Claude Code](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start) and [Codex](https://openai.com/codex/) read better when they're sliced by feature than when they're sliced by layer. In my experience, the agents need less context to make a useful change, and they make fewer confident mistakes. The reason is the same reason humans got faster: the unit of work and the unit of code shape are the same.
+Two years on, the same property has paid out a second time. The codebases I now write with [Claude Code](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start) and [Codex](https://openai.com/codex/) read better when they're sliced by feature than when they're sliced by layer. The agents need less context to make a useful change, and they make fewer confident mistakes. The reason is the same reason humans got faster: the unit of work and the unit of code shape are the same.
 
 ## The starting point: layered MVC, the default that nobody chose on purpose
 
@@ -156,7 +156,7 @@ A pull request reviewer can load one folder and have the whole feature in contex
 
 Vertical slice is not a free architecture. It has failure modes worth naming honestly.
 
-It can degenerate into copy-pasted near-duplicates if the discipline on extraction lapses. A codebase with sixty handlers that all repeat the same validation idiom is not a vertical-sliced codebase. It is a manual macro. The discipline is to extract patterns after they have appeared three times, and to put the extraction somewhere clearly named.
+It can degenerate into copy-pasted near-duplicates if the discipline on extraction lapses. A codebase with sixty handlers that all repeat the same validation idiom is not a vertical-sliced codebase. It is a manual macro.
 
 It fits some shapes of system better than others. A web service with many independent use cases is the canonical fit. A library, an SDK, a long-running pipeline with a small surface area, or a CRUD admin tool with mostly homogeneous endpoints are cases where layered or hexagonal architectures often read more cleanly, because the feature axis is degenerate. Rico Fritzsche makes a related point in [Why Vertical Slices Won't Evolve from Clean Architecture](https://ricofritzsche.me/why-vertical-slices-wont-evolve-from-clean-architecture/): the two architectures answer different questions, and they do not converge as the codebase ages.
 
@@ -174,7 +174,7 @@ Bogard named this in 2018. Parnas and the cohesion researchers named it in the 1
 
 - The agent claim is observation plus inference. The retrieval-degradation literature (Liu et al. 2023, Hsieh et al. 2024) explains why a smaller, more local subset is easier to act on correctly, and the agent tooling vendors describe their pipelines in ways that line up with that. I have not run a controlled A/B benchmark on identical features rendered both ways. Treat the claim as a strong inference, not a measured number.
 
-- The cohesion advice applies most cleanly to application services with many distinct use cases. Libraries, SDKs, infrastructure code, and small CRUD admin tools often read more cleanly in a layered or hexagonal shape. Pick the architecture the work asks for.
+- The cohesion advice applies most cleanly to application services with many distinct use cases. Pick the architecture the work asks for.
 
 ## References
 

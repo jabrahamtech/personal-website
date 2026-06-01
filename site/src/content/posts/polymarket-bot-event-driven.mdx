@@ -182,7 +182,7 @@ None of those is novel. Each one has a name in the literature. The work was know
 
 ## What broke
 
-The system did not fall over in production in any spectacular way. The thing that broke was the development process itself, and it is the most useful lesson I have to share from this build.
+The system did not fall over in production in any spectacular way. The thing that broke was the development process itself.
 
 The first version looked clean because every file was readable in isolation. The problem only surfaced when I tried to add paper trading and a second strategy. Suddenly the strategy knew too much about the executor, the executor owned too much risk logic, and swapping one part meant touching three others.
 
@@ -232,7 +232,7 @@ The most reliable single decision was the coalescing policy. The strategies do n
 
 ## Where this hybrid shows up in practice
 
-Once you can see the three-layer shape, you find it everywhere automation systems have to be reliable.
+The same three-layer shape shows up wherever automation systems have to be reliable.
 
 | Automation system | Reactive edge (bus / stream) | Synchronous decision layer | Append-only memory |
 |---|---|---|---|
@@ -242,7 +242,7 @@ Once you can see the three-layer shape, you find it everywhere automation system
 | Internal agent system | Tool-call results, context updates, user inputs | Orchestrator, policy checks, action dispatch | Run history, prompt and response log |
 | RPA / scheduled workflow | Triggers, source-system events, queue items | Business rule engine, idempotency checks | Run log with inputs, outputs, retries |
 
-Different stacks, same logical shape. The reactive edge keeps the system responsive. The synchronous layer makes the decisions that have to be right. The append-only memory makes the system explicable after the fact. Collapsing two of those into one is the move that costs production systems credibility. The temptations are familiar: bus and decision into a single choreographed event chain, or bus and memory into a single Kafka topic.
+Different stacks, same logical shape. The reactive edge keeps the system responsive. The synchronous layer makes the decisions that have to be right. The append-only memory makes the system explicable after the fact.
 
 Sam Newman's [orchestration-vs-choreography distinction](https://www.oreilly.com/library/view/building-microservices/9781491950340/) maps onto this directly. Choreography (events flowing between services) lives on the reactive edge. Orchestration (a service that knows the sequence and tells participants what to do) lives in the decision layer. Both are needed, and both belong in different parts of the system. The [saga pattern with compensating actions](https://newsletter.theburningmonk.com/posts/event-driven-architecture-know-your-commands-from-your-events) bridges them when state spans services. Backpressure is the unnamed thing the coalescing policy implements.
 
