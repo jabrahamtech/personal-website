@@ -16,12 +16,6 @@ image:
 
 import Figure from '../../components/Figure.astro';
 
-{/* TODO (structure): this post does two jobs, a practical whiteboard test and a
-    full AU-insurance regulatory explainer. If it grows further, split the
-    regulatory mapping (the AU map table plus the programme and per-decision
-    primitive citations) into its own companion post and keep this one on the
-    whiteboard test. */}
-
 A claims-triage agent goes through three internal reviews and a procurement gate before someone in second-line risk asks a small question: when the customer is unhappy with the outcome and writes in, can you produce, in order, what the system was told, what tools it called, what it decided, why, and which human signed off? The team has answers for some of those. Not all of them. The model is fine. The architecture cannot answer the audit.
 
 This is the most common failure mode I see when Australian insurers and insurtechs try to put agents into production. The model passes the demo. The system cannot pass [ASIC's RG 271 internal dispute resolution standard](https://download.asic.gov.au/media/3olo5aq5/rg271-published-2-september-2021.pdf), or [APRA's CPS 230 operational risk requirements](https://www.apra.gov.au/sites/default/files/2023-07/Prudential%20Standard%20CPS%20230%20Operational%20Risk%20Management%20-%20clean.pdf), or its own product-governance settings. Governance does not catch up with the build later. It either shaped the build, or the build has to be redone.

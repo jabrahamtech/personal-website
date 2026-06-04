@@ -16,25 +16,6 @@ image:
 
 import Figure from '../../components/Figure.astro';
 
-{/* TODO: open items from the handoff brief (section 7):
-     1. Greg Young CodeBetter 2010 URL was unreachable at finalisation time.
-        The current References section points only at the Kurrent / Event
-        Store transcript of his 2014 Code on the Beach talk, which carries
-        the same CQRS + event-sourcing argument. If we want the original
-        CodeBetter blog as a citation, search the Wayback Machine for
-        codebetter.com/gregyoung/2010/02/13/cqrs-and-event-sourcing and add
-        it back as a secondary reference.
-     2. Bernd Ruecker QCon NY 2019 pitfalls presentation page was reached
-        but the full transcript was not searched line by line. Cited content
-        is consistent with his broader 2019 InfoQ piece (verified). If a
-        stricter review wants tighter sourcing, cite the QCon talk video
-        directly rather than the presentation page.
-     3. Polymarket-specific details (CLOB structure, complete-set arbitrage,
-        USDC collateralisation) are cited against docs.polymarket.com and
-        NautilusTrader's integration docs. Both are live at finalisation
-        but venue mechanics change. Re-check before flipping draft=false
-        if the post sits in draft for more than a few weeks. */}
-
 I built a Polymarket market-making bot. The pitch I'd bought was that event-driven would simplify it. It did the opposite. The bus helped at the edges, but every decision that actually had to be right wanted to be boring, synchronous, and explicit.
 
 The codebase that shipped is a three-layer hybrid: an async bus for facts, a synchronous hot path for decisions, an append-only SQLite log off to the side for memory. Facts are the stream of things that happened: order-book updates, user fills, boundary events. Decisions are the executor's hot path: strategy intent, risk checks, capital reservation, submit, position update. Memory is the durable log of decisions, fills, errors, and reconciliations. None of the three is optional, and none lives inside a single pattern.

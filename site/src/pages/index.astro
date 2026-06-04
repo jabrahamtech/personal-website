@@ -28,15 +28,23 @@ function comparePosts(a: Post, b: Post, order: 'asc' | 'desc' = 'desc') {
 
 const sorted = [...all].sort((a, b) => comparePosts(a, b));
 
-/* "latest" strip on the home page — the 3 most recent *published* posts
-   that have a cover image, newest first. Drafts are excluded. */
-const featured = [...all]
-  .filter((p) => !p.data.draft && p.data.posted && p.data.image)
-  .sort((a, b) =>
-    b.data.posted!.getTime() - a.data.posted!.getTime()
-    || a.data.title.localeCompare(b.data.title),
-  )
-  .slice(0, 3);
+/* Featured strip on the home page — a hand-curated, ordered shortlist rather
+   than "newest N". Edit FEATURED_SLUGS to change what leads the page and in
+   what order: the FIRST slug becomes the large feature card, the rest render
+   as smaller "Recent" cards beside it. Slugs are post filenames (without the
+   .mdx extension). A slug that doesn't resolve to a published post with a
+   cover image is skipped, so a typo or an unpublished post degrades
+   gracefully instead of breaking the build. */
+const FEATURED_SLUGS = [
+  'agent-governance-au-insurtech',        // lead: regulated AU-insurance agent governance
+  'most-hitl-is-escalation-done-badly',   // human-in-the-loop as escalation
+  'rpa-already-solved-this',              // agent operating-model credibility
+] as const;
+
+const byId = new Map(all.map((p) => [p.id, p]));
+const featured = FEATURED_SLUGS
+  .map((slug) => byId.get(slug))
+  .filter((p): p is Post => !!p && !p.data.draft && !!p.data.posted && !!p.data.image);
 
 /* The featured posts appear only in the strip, not repeated in the list
    below — so the list is every other post, in the usual order. */
