@@ -1,37 +1,33 @@
 import { test, expect } from '@playwright/test';
 
 /* Every post in home-page render order. comparePosts (index.astro) sorts
-   all live posts ahead of drafts, then by `posted` desc, ties broken by
-   title. Drafts are built + listed on the home page, but excluded from
-   RSS, the sitemap, llms.txt, and the homepage Blog JSON-LD. */
+   by `posted` desc, ties broken by title. Every post is live (none sets
+   draft: true), so all of them appear in RSS, the sitemap, llms.txt, and
+   the homepage Blog JSON-LD. */
 const liveSlugs = [
-  'polymarket-bot-event-driven',
+  'coding-agent-setup-may-2026',
+  'rpa-already-solved-this',
+  'agent-governance-au-insurtech',
+  'from-mvc-to-vertical-slice',
+  'judgement-before-pmf',
   'most-hitl-is-escalation-done-badly',
   'when-to-force-the-llm-and-when-to-use-a-button',
 ];
-const draftSlugs = [
-  'rpa-already-solved-this',
-  'agent-governance-au-insurtech',
-  'boring-infrastructure-stack-for-startups',
-  'from-mvc-to-vertical-slice',
-  'judgement-before-pmf',
-];
+const draftSlugs: string[] = [];
 const allPostSlugs = [...liveSlugs, ...draftSlugs];
 
-/* The posts index shows the newest published posts as a Featured strip and
-   lists everything else below — the two never overlap. Right now all three
-   published posts are featured, so the list is exactly the five drafts. */
+/* The posts index leads with the hand-curated FEATURED_SLUGS strip
+   (index.astro) and lists everything else below — the two never overlap. */
 const featuredSlugs = [
-  'polymarket-bot-event-driven',                    // the large "feature" card
-  'most-hitl-is-escalation-done-badly',             // recent
-  'when-to-force-the-llm-and-when-to-use-a-button', // recent
+  'agent-governance-au-insurtech',      // the large "feature" card
+  'most-hitl-is-escalation-done-badly', // recent
+  'rpa-already-solved-this',            // recent
 ];
 const listedSlugs = [
-  'rpa-already-solved-this',
-  'agent-governance-au-insurtech',
-  'boring-infrastructure-stack-for-startups',
+  'coding-agent-setup-may-2026',
   'from-mvc-to-vertical-slice',
   'judgement-before-pmf',
+  'when-to-force-the-llm-and-when-to-use-a-button',
 ];
 
 /* examplePost is the shared fixture for the rich-content tests (TOC,
@@ -44,11 +40,13 @@ test.describe('home (posts list)', () => {
     await page.goto('/');
 
     await expect(page).toHaveTitle(/^Jonathan Abraham/);
-    await expect(page.locator('.page-head .prompt')).toHaveText('./posts');
+    /* The eng-mode "./" prefix is CSS-generated (ph-prefix::before) so it
+       stays out of the crawlable DOM — the h1 text is just "posts". */
+    await expect(page.locator('.page-head .prompt')).toHaveText('posts');
 
     // The prompt now IS the h1 — exactly one h1 in page-head, with the path text
     await expect(page.locator('.page-head h1')).toHaveCount(1);
-    await expect(page.locator('.page-head h1')).toHaveText('./posts');
+    await expect(page.locator('.page-head h1')).toHaveText('posts');
     await expect(page.locator('.page-head .tagline')).toHaveCount(0);
     await expect(page.locator('.links-row')).toHaveCount(0);
 
@@ -66,7 +64,7 @@ test.describe('home (posts list)', () => {
     expect(hrefs).toEqual(listedSlugs.map((slug) => `/posts/${slug}`));
     for (const slug of featuredSlugs) expect(hrefs).not.toContain(`/posts/${slug}`);
 
-    await expect(page.locator('.post-list .draft')).toHaveCount(listedSlugs.length);
+    await expect(page.locator('.post-list .draft')).toHaveCount(0);
     await expect(page.locator('main')).not.toContainText('Building this site with Astro');
   });
 
@@ -81,24 +79,24 @@ test.describe('home (posts list)', () => {
     /* Content-type options reflect the *listed* (non-featured) posts; types
        with no listed posts (Technical Builds, Case Studies) are dropped. */
     await expect(page.locator('[data-dropdown][data-kind="type"] .dd-option')).toHaveText([
-      'all types (5)',
+      'all types (4)',
       'Learning Guides (1)',
       'Decision/Diagnostic Guides (2)',
-      'Playbooks (2)',
+      'Playbooks (1)',
     ]);
 
-    // Chip filter: Engineering Practice has 2 listed posts.
+    // Chip filter: Engineering Practice has 1 listed post.
     await page.getByRole('button', { name: 'Engineering Practice' }).click();
-    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(2);
+    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(1);
     await expect(page.locator('.topic-chip.is-active')).toHaveText('Engineering Practice');
-    await expect(page.locator('#post-status')).toContainText('2 of 5');
+    await expect(page.locator('#post-status')).toContainText('1 of 4');
     await expect(page.locator('#post-status')).toContainText('Engineering Practice');
 
     // Type and chips are mutually exclusive: picking a type resets the chip.
     await page.locator('[data-dropdown][data-kind="type"] .dd-trigger').click();
     await page.locator('[data-dropdown][data-kind="type"] .dd-option[data-value="Playbooks"]').click();
     await expect(page.locator('.topic-chip.is-active')).toHaveText('All');
-    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(2);
+    await expect(page.locator('.post-list li:not([hidden]) .post-row')).toHaveCount(1);
     await expect(page.locator('#post-status')).toContainText('Playbooks');
 
     // Back to All — every listed post visible. The status text clears but the
@@ -121,8 +119,8 @@ test.describe('home (posts list)', () => {
     await expect(page.locator('[data-dropdown][data-kind="order"] .dd-value')).toHaveText('newest first');
     expect(await rowHrefs()).toEqual(listedSlugs.map((slug) => `/posts/${slug}`));
 
-    // Switch to oldest first via the custom dropdown. Listed posts are all
-    // drafts, so oldest-first is the plain reverse.
+    // Switch to oldest first via the custom dropdown. Date ties invert
+    // their title tie-break too, so oldest-first is the plain reverse.
     await page.locator('[data-dropdown][data-kind="order"] .dd-trigger').click();
     await page.locator('[data-dropdown][data-kind="order"] .dd-option[data-value="asc"]').click();
     const ascSlugs = [...listedSlugs].reverse();
@@ -142,17 +140,17 @@ test.describe('home (posts list)', () => {
     expect(order[2]).toMatch(/^div\.meta/);
 
     const meta = first.locator('.meta');
-    // First listed post (rpa) is a draft in "Agents and Workflows", typed Playbooks.
-    await expect(meta).toContainText('draft');
+    // First listed post (coding-agent-setup) sits in "Agents and Workflows", typed Playbooks.
     await expect(meta).toContainText('Agents and Workflows');
     await expect(meta.locator('.tag-cat')).toHaveText(['Playbooks']);
 
+    /* Reading time ("~ N min") is a deliberate part of the card meta now,
+       so it is no longer on the noisy-text list. */
     const visibleListText = (await page.locator('.post-list').textContent()) || '';
     for (const noisy of [
       'Prioritised',
       'unpublished',
       'words',
-      '~ ',
       'adaptive-ai',
       'personalisation',
     ]) {
@@ -184,7 +182,11 @@ test.describe('home (posts list)', () => {
 
   test('nav has posts, terminal, about (no rss link)', async ({ page }) => {
     await page.goto('/');
-    const linkTexts = await page.locator('nav.top .nav-links a').allTextContents();
+    /* The terminal link keeps its label out of the crawlable DOM — the text
+       is generated from data-label via CSS — so read text OR data-label. */
+    const linkTexts = await page.locator('nav.top .nav-links a').evaluateAll(
+      (els) => els.map((e) => (e.textContent || '').trim() || e.getAttribute('data-label') || ''),
+    );
     expect(linkTexts).toEqual(['posts', 'terminal', 'about']);
   });
 
@@ -458,7 +460,10 @@ test.describe('terminal page', () => {
 
   test('terminal link is marked current on /terminal', async ({ page }) => {
     await page.goto('/terminal');
-    await expect(page.locator('nav.top .nav-links a[aria-current="page"]')).toHaveText('terminal');
+    // The label renders via CSS from data-label, so assert attributes, not text.
+    const current = page.locator('nav.top .nav-links a[aria-current="page"]');
+    await expect(current).toHaveAttribute('href', '/terminal');
+    await expect(current).toHaveAttribute('data-label', 'terminal');
   });
 
   test('typing `help` produces output', async ({ page }) => {
@@ -606,10 +611,15 @@ test.describe('SEO / AEO — head + structured data', () => {
       const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
       expect(canonical).toMatch(/^https:\/\/jabrahamtech\.com/);
 
-      // robots index,follow (not noindex)
+      // robots index,follow — except /terminal, which is deliberately
+      // noindex so the eng-mode chrome stays out of search results.
       const robots = await page.locator('meta[name="robots"]').getAttribute('content');
-      expect(robots).toMatch(/index/);
-      expect(robots).not.toMatch(/noindex/);
+      if (path === '/terminal') {
+        expect(robots).toMatch(/noindex/);
+      } else {
+        expect(robots).toMatch(/index/);
+        expect(robots).not.toMatch(/noindex/);
+      }
 
       // OG essentials
       for (const prop of ['og:title', 'og:description', 'og:url', 'og:image', 'og:site_name', 'og:type', 'og:locale']) {
